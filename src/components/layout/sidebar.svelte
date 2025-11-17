@@ -72,8 +72,10 @@
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
 				<Sidebar.MenuButton size="lg" class="mt-4">
-					<LayoutDashboard class="size-5" />
-					<span class="ml-2">Dashboard</span>
+					<a href="/" class="flex items-center">
+						<LayoutDashboard class="size-5" />
+						<span class="ml-2">Dashboard</span>
+					</a>
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
