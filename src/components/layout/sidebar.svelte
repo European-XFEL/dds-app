@@ -51,6 +51,7 @@
 </script>
 
 <script lang="ts">
+	import NavAppPicker from '$components/ui/app-picker.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import type { ComponentProps } from 'svelte';
 	import { LayoutDashboard } from '@lucide/svelte';
@@ -61,6 +62,13 @@
 
 <Sidebar.Root bind:ref variant="inset" {...restProps}>
 	<Sidebar.Header>
+		<NavAppPicker
+			apps={[
+				{ title: 'Scattering Simulator' },
+				{ title: 'Diffraction Analyzer', disabled: true },
+				{ title: 'Molecular Viewer', disabled: true }
+			]}
+		/>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
 				<Sidebar.MenuButton size="lg" class="mt-4">
