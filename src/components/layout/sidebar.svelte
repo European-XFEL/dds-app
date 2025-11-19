@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import { Beaker, Upload, Microscope, History } from '@lucide/svelte';
+	import { Beaker, Upload, Microscope, History, TestTubes, Projector } from '@lucide/svelte';
 
 	const data = {
 		user: {
@@ -8,6 +8,27 @@
 			avatar: '/avatars/shadcn.jpg'
 		},
 		navMain: [
+			{
+				title: 'Experiment',
+				url: '#',
+				items: [
+					{
+						title: 'Samples',
+						url: '/experiment/samples',
+						icon: TestTubes
+					},
+					{
+						title: 'Pump/Probe',
+						url: '/experiment/pump-probe',
+						icon: Projector
+					},
+					{
+						title: 'Detector',
+						url: '/experiment/detector',
+						icon: Microscope
+					}
+				]
+			},
 			{
 				title: 'Results',
 				url: '#',
