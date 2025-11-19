@@ -77,8 +77,14 @@
 	import type { ComponentProps } from 'svelte';
 	import { LayoutDashboard } from '@lucide/svelte';
 	import { GitCompare } from '@lucide/svelte';
+	import type { SampleDetails } from '$lib/types';
+	// import SamplePopover from '$components/ui/sample-popover.svelte';
 
-	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
+	type SidebarWrapperProps = ComponentProps<typeof Sidebar.Root> & {
+		sample: SampleDetails;
+	};
+
+	let { sample = $bindable(), ref = $bindable(null), ...restProps }: SidebarWrapperProps = $props();
 </script>
 
 <Sidebar.Root bind:ref variant="inset" {...restProps}>
@@ -124,4 +130,10 @@
 			</Sidebar.Group>
 		{/each}
 	</Sidebar.Content>
+	<Sidebar.Footer class="grid gap-1 text-sm text-muted-foreground">
+		<span>Ground: {sample.molecule_ground}</span>
+		<span>Excited: {sample.molecule_excited}</span>
+		<span>Solvent: {sample.solvent}</span>
+		<span>Concentration: {sample.concentration}%</span>
+	</Sidebar.Footer>
 </Sidebar.Root>

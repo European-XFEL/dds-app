@@ -4,7 +4,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import AppSidebar from '$components/layout/sidebar.svelte';
 
-	let { children } = $props();
+	let { sample, children } = $props();
 </script>
 
 <svelte:head>
@@ -12,7 +12,7 @@
 </svelte:head>
 
 <Sidebar.Provider>
-	<AppSidebar />
+	<AppSidebar {sample} />
 	<Sidebar.Inset>
 		<div class="flex flex-1 flex-col gap-4 p-4 pt-0">
 			{@render children()}
