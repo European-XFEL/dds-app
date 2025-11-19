@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { Upload } from '@lucide/svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -29,11 +28,6 @@
 		{ value: 'ethanol', label: 'Ethanol' },
 		{ value: 'acetonitrile', label: 'Acetonitrile' }
 	];
-
-	const dispatch = createEventDispatcher<{
-		change: SampleChangeDetail;
-		upload: SampleUploadDetail;
-	}>();
 
 	function generateSampleId() {
 		if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -80,6 +74,8 @@
 		selectedMolecule?: string;
 		selectedSolvent?: string;
 		concentration?: number;
+		onchange?: (detail: SampleChangeDetail) => void;
+		onupload?: (detail: SampleUploadDetail) => void;
 	};
 
 	let {
@@ -99,7 +95,9 @@
 		),
 		selectedMolecule = $bindable(initialMolecule),
 		selectedSolvent = $bindable(initialSolvent),
-		concentration = $bindable(initialConcentration)
+		concentration = $bindable(initialConcentration),
+		onchange,
+		onupload
 	}: SampleProps = $props();
 
 	const normalizedSampleName = $derived(normalizeName(sampleName));
@@ -141,13 +139,13 @@
 	const nameErrorId = `${componentId}-name-error`;
 
 	function handleUploadRequest() {
-		dispatch('upload', { sampleId });
+		onupload?.({ sampleId });
 	}
 
 	$effect(() => {
 		const normalized = normalizedSampleName;
 
-		dispatch('change', {
+		onchange?.({
 			concentration,
 			isNameValid,
 			molecule: selectedMolecule,
