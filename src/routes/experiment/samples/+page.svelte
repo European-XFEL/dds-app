@@ -43,8 +43,8 @@
 				sampleId={sample.id}
 				sample_name={sample.name}
 				knownSamples={knownSamples}
-				on:change={(event) => handleSampleChange(event.detail)}
-				on:upload={(event) => handleSampleUpload(event.detail)}
+				onchange={handleSampleChange}
+				onupload={handleSampleUpload}
 			/>
 		{/each}
 	</div>
