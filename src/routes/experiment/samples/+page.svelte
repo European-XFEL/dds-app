@@ -1,14 +1,9 @@
 <script lang="ts">
-	import { setContext } from 'svelte';
 	import Sample from '$components/ui/sample.svelte';
-	import { createSampleRegistry, sampleRegistryKey } from '$lib/sample-registry';
 	import type { SampleChangeDetail, SampleUploadDetail } from '$lib/types/sample';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-
-	const registry = createSampleRegistry();
-	setContext(sampleRegistryKey, registry);
 
 	const sampleDefinitions = $state([
 		{ id: 'sample-a', name: 'Sample A' },
@@ -17,6 +12,20 @@
 
 	const samples = $state(new Map<string, SampleChangeDetail>());
 	const pendingUploads = $state(new Set<string>());
+
+	let knownSamples = $state(
+		sampleDefinitions.map((definition) => ({ id: definition.id, name: definition.name }))
+	);
+
+	$effect(() => {
+		knownSamples = sampleDefinitions.map((definition) => {
+			const current = samples.get(definition.id);
+			return {
+				id: definition.id,
+				name: current?.rawSampleName ?? current?.sampleName ?? definition.name
+			};
+		});
+	});
 
 	function handleSampleChange(detail: SampleChangeDetail) {
 		samples.set(detail.sampleId, detail);
@@ -33,6 +42,7 @@
 			<Sample
 				sampleId={sample.id}
 				sample_name={sample.name}
+				knownSamples={knownSamples}
 				on:change={(event) => handleSampleChange(event.detail)}
 				on:upload={(event) => handleSampleUpload(event.detail)}
 			/>
