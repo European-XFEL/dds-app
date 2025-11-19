@@ -1,17 +1,21 @@
 <script lang="ts">
-	import { createEventDispatcher, getContext, onDestroy } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { Upload } from '@lucide/svelte';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { sampleRegistryKey, type SampleRegistry } from '$lib/sample-registry';
 	import type { SampleChangeDetail, SampleUploadDetail } from '$lib/types/sample';
 
 	type Option = {
 		label: string;
 		value: string;
+	};
+
+	type KnownSample = {
+		id: string;
+		name: string;
 	};
 
 	const defaultMolecules: Option[] = [
@@ -63,6 +67,21 @@
 		return true;
 	}
 
+	type SampleProps = {
+		sample_name?: string;
+		sampleId?: string;
+		molecules?: Option[];
+		solvents?: Option[];
+		initialMolecule?: string;
+		initialSolvent?: string;
+		initialConcentration?: number;
+		knownSamples?: KnownSample[];
+		sampleName?: string;
+		selectedMolecule?: string;
+		selectedSolvent?: string;
+		concentration?: number;
+	};
+
 	let {
 		sample_name = 'Sample',
 		sampleId = generateSampleId(),
@@ -70,27 +89,35 @@
 		solvents = defaultSolvents,
 		initialMolecule = molecules[0]?.value ?? '',
 		initialSolvent = solvents[0]?.value ?? '',
-		initialConcentration = 50
-	} = $props();
-
-	const initialNormalizedName = (() => {
-		const normalized = normalizeName(sample_name);
-		return normalized.length ? normalized : 'Sample';
-	})();
-
-	let sampleName = $state(initialNormalizedName);
-	let selectedMolecule = $state(initialMolecule);
-	let selectedSolvent = $state(initialSolvent);
-	let concentration = $state(initialConcentration);
+		initialConcentration = 50,
+		knownSamples = [],
+		sampleName = $bindable(
+			(() => {
+				const normalized = normalizeName(sample_name);
+				return normalized.length ? normalized : 'Sample';
+			})()
+		),
+		selectedMolecule = $bindable(initialMolecule),
+		selectedSolvent = $bindable(initialSolvent),
+		concentration = $bindable(initialConcentration)
+	}: SampleProps = $props();
 
 	const normalizedSampleName = $derived(normalizeName(sampleName));
 	const displayName = $derived(normalizedSampleName.length ? normalizedSampleName : 'Untitled sample');
 
-	const registry = getContext<SampleRegistry | undefined>(sampleRegistryKey);
+	let nameIsUnique = $state(true);
 
-	let namesSnapshot: Map<string, string> = registry?.getSnapshot() ?? new Map();
-	let registryUnsubscribe: (() => void) | undefined;
-	let nameIsUnique = $state(isNameUniqueFor(namesSnapshot, sampleId, initialNormalizedName));
+	$effect(() => {
+		const snapshot = new Map<string, string>();
+		for (const sample of knownSamples) {
+			if (!sample) continue;
+			snapshot.set(sample.id, normalizeName(sample.name));
+		}
+		if (!snapshot.has(sampleId)) {
+			snapshot.set(sampleId, normalizedSampleName);
+		}
+		nameIsUnique = isNameUniqueFor(snapshot, sampleId, normalizedSampleName);
+	});
 
 	const nameIsMeaningful = $derived(normalizedSampleName.length > 0);
 	const isNameValid = $derived(nameIsMeaningful && nameIsUnique);
@@ -98,25 +125,12 @@
 		!nameIsMeaningful ? 'Enter a sample name' : nameIsUnique ? '' : 'Name must be unique'
 	);
 	const hasNameError = $derived(Boolean(nameError));
-
-	if (registry) {
-		registryUnsubscribe = registry.subscribe((snapshot) => {
-			namesSnapshot = snapshot;
-			nameIsUnique = isNameUniqueFor(namesSnapshot, sampleId, normalizedSampleName);
-		});
-	}
-
-	if (!registry) {
-		namesSnapshot = new Map([[sampleId, initialNormalizedName]]);
-		nameIsUnique = isNameUniqueFor(namesSnapshot, sampleId, initialNormalizedName);
-	}
-
 	const moleculeTrigger = $derived(
-		molecules.find((option) => option.value === selectedMolecule)?.label ?? 'Select a molecule'
+		molecules.find((option: Option) => option.value === selectedMolecule)?.label ?? 'Select a molecule'
 	);
 
 	const solventTrigger = $derived(
-		solvents.find((option) => option.value === selectedSolvent)?.label ?? 'Select a solvent'
+		solvents.find((option: Option) => option.value === selectedSolvent)?.label ?? 'Select a solvent'
 	);
 
 	const componentId = `sample-${sampleId}`;
@@ -130,19 +144,8 @@
 		dispatch('upload', { sampleId });
 	}
 
-	function handleNameInput(event: Event & { currentTarget: HTMLInputElement }) {
-		sampleName = event.currentTarget.value;
-	}
-
 	$effect(() => {
 		const normalized = normalizedSampleName;
-		if (registry) {
-			registry.setName(sampleId, normalized);
-		} else {
-			namesSnapshot = new Map(namesSnapshot);
-			namesSnapshot.set(sampleId, normalized);
-			nameIsUnique = isNameUniqueFor(namesSnapshot, sampleId, normalized);
-		}
 
 		dispatch('change', {
 			concentration,
@@ -153,11 +156,6 @@
 			solvent: selectedSolvent,
 			rawSampleName: sampleName
 		});
-	});
-
-	onDestroy(() => {
-		registryUnsubscribe?.();
-		registry?.remove(sampleId);
 	});
 </script>
 
@@ -176,7 +174,6 @@
 				id={nameFieldId}
 				placeholder="Enter a descriptive name"
 				bind:value={sampleName}
-				oninput={handleNameInput}
 				aria-invalid={!isNameValid}
 				aria-describedby={hasNameError ? nameErrorId : undefined}
 			/>
