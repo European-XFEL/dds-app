@@ -81,10 +81,10 @@
 	// import SamplePopover from '$components/ui/sample-popover.svelte';
 
 	type SidebarWrapperProps = ComponentProps<typeof Sidebar.Root> & {
-		sample: SampleDetails;
+		state: SampleDetails;
 	};
 
-	let { sample = $bindable(), ref = $bindable(null), ...restProps }: SidebarWrapperProps = $props();
+	let { state = $bindable(), ref = $bindable(null), ...restProps }: SidebarWrapperProps = $props();
 </script>
 
 <Sidebar.Root bind:ref variant="inset" {...restProps}>
@@ -131,9 +131,9 @@
 		{/each}
 	</Sidebar.Content>
 	<Sidebar.Footer class="grid gap-1 text-sm text-muted-foreground">
-		<span>Ground: {sample.molecule_ground}</span>
-		<span>Excited: {sample.molecule_excited}</span>
-		<span>Solvent: {sample.solvent}</span>
-		<span>Concentration: {sample.concentration}%</span>
+		<span>Ground: {state.molecule_ground}</span>
+		<span>Excited: {state.molecule_excited}</span>
+		<span>Solvent: {state.solvent}</span>
+		<span>Concentration: {state.concentration}%</span>
 	</Sidebar.Footer>
 </Sidebar.Root>
