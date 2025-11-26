@@ -4,17 +4,17 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// Consult https://svelte.dev/docs/kit/integrations
-	// for more information about preprocessors
-	preprocess: [vitePreprocess(), mdsvex()],
-	kit: {
+  // Consult https://svelte.dev/docs/kit/integrations
+  // for more information about preprocessors
+  preprocess: [vitePreprocess(), mdsvex()],
+  kit: {
     adapter: adapter(),
     alias: {
-      "$css": "./src/app.css",
-      "$components": "./src/components",
+      $css: './src/app.css',
+      $components: './src/components',
     },
   },
-	extensions: ['.svelte', '.svx']
+  extensions: ['.svelte', '.svx'],
 };
 
 export default config;

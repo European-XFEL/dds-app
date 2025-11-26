@@ -15,7 +15,9 @@
   });
 </script>
 
-<Story name="Logged In" play={async ({ canvasElement }) => {
+<Story
+  name="Logged In"
+  play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const loginButton = canvas.getByRole('button', { name: /Log in/i });
     await expect(loginButton).toBeInTheDocument();
