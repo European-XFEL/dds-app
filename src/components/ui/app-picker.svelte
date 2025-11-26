@@ -7,24 +7,23 @@
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
   import { useSidebar } from '$shadcn/ui/sidebar/index.js';
 
-  let {
-    apps,
-  }: {
-    apps: {
-      title: string;
-      disabled?: boolean;
-    }[];
-  } = $props();
+  type AppOption = {
+    title: string;
+    disabled?: boolean;
+  };
+
+  let { apps }: { apps: AppOption[] } = $props();
 
   const sidebar = useSidebar();
-  let selectedApp = $state(apps[0]);
-  const fallbackApp = $derived(apps[0]);
+  let selectedApp = $state<AppOption | undefined>(apps[0]);
+  const fallbackApp = $derived(apps[0]) as AppOption | undefined;
   const displayApp = $derived(
     selectedApp && apps.includes(selectedApp) ? selectedApp : fallbackApp,
-  );
+  ) as AppOption | undefined;
+  const displayTitle = $derived(displayApp?.title ?? 'Select App');
 
-  function handleSelect(app: { title: string; disabled?: boolean }) {
-    if (!apps.includes(app)) {
+  function handleSelect(app: AppOption) {
+    if (app.disabled || !apps.includes(app)) {
       return;
     }
 
@@ -48,7 +47,7 @@
               <FlaskRoundIcon class="size-4" />
             </div>
             <div class="flex flex-col gap-0.5 leading-none">
-              <span class="font-semibold">{displayApp.title}</span>
+              <span class="font-semibold">{displayTitle}</span>
             </div>
             <ChevronsUpDownIcon class="ml-auto size-4" />
           </Sidebar.MenuButton>
