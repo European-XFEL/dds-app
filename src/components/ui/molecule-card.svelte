@@ -4,10 +4,8 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	// import MoleculeViewer from '$components/ui/mol-viewer.svelte';
-	import MoleculeViewer from './molecule-viewer.svelte';
 	import type { SampleDetails } from '$lib/types';
-	import { browser } from '$app/environment';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 
 	let {
 		title,
@@ -59,7 +57,11 @@
 				</Button>
 			</div>
 			<div class="h-60 w-full border border-muted/50">
-				<MoleculeViewer {molecule} />
+				{#await import('./molecule-viewer.svelte')}
+					<Skeleton class="h-full w-full" />
+				{:then { default: MoleculeViewer }}
+					<MoleculeViewer {molecule} />
+				{/await}
 			</div>
 		</div>
 	</Card.Content>
