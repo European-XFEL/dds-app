@@ -7,10 +7,12 @@
 
 	let {
 		solvents,
-		sample = $bindable()
+		sample = $bindable(),
+		short = false
 	}: {
 		solvents: { id: string; name: string }[];
 		sample: SampleDetails;
+		short?: boolean;
 	} = $props();
 
 	const triggerSolvent = $derived(
@@ -18,14 +20,16 @@
 	);
 </script>
 
-<Card.Root class="grid w-full gap-6">
+<Card.Root class="w-full @sm:gap-0">
 	<Card.Header>
 		<Card.Title>Sample Parameters</Card.Title>
-		<Card.Description>Parameters shared by both ground and excited states.</Card.Description>
+		<Card.Description hidden={short}
+			>Parameters shared by both ground and excited states.</Card.Description
+		>
 	</Card.Header>
 
-	<Card.Content class="grid gap-6">
-		<div class="grid gap-2">
+	<Card.Content class="grid gap-6 @sm:gap-0">
+		<div class="grid gap-2 @sm:gap-0" hidden={short}>
 			<Label>Solvent</Label>
 			<Select.Root
 				type="single"
@@ -51,10 +55,18 @@
 			</Select.Root>
 		</div>
 
-		<div class="grid gap-2">
+		<div class="grid gap-2 @sm:gap-0">
 			<div class="flex items-center justify-between">
-				<Label>Concentration</Label>
-				<span class="text-sm text-muted-foreground">{sample.concentration}%</span>
+				<Label>Solute Concentration</Label>
+				<Input
+					type="number"
+					min="0"
+					max="100"
+					step="0.1"
+					bind:value={sample.concentration}
+					disabled={false}
+					class="w-30 text-sm text-muted-foreground"
+				/>
 			</div>
 			<Input
 				type="range"
