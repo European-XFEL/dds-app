@@ -47,7 +47,7 @@
           {triggerSolvent}
         </Select.Trigger>
         <Select.Content class="w-(--radix-select-trigger-width)">
-          {#each solvents as { id, name }}
+          {#each solvents as { id, name } (id)}
             <Select.Item value={id} label={name}>
               {name}
             </Select.Item>
@@ -58,7 +58,7 @@
 
     <div class="grid gap-2 @sm:gap-0">
       <div class="flex items-center justify-between">
-        <Label>Solute Concentration</Label>
+        <Label>Solute Concentration (%)</Label>
         <Input
           type="number"
           min="0"
@@ -69,18 +69,7 @@
           class="w-30 text-sm text-muted-foreground"
         />
       </div>
-      <Input
-        type="range"
-        min="0"
-        max="100"
-        step="0.1"
-        value={sample.concentration}
-        oninput={(event) => {
-          const target = event.currentTarget as HTMLInputElement;
-          const nextValue = Number(target.value);
-          sample.concentration = Number.isNaN(nextValue) ? sample.concentration : nextValue;
-        }}
-      />
+      <Input type="range" min="0" max="100" step="0.1" bind:value={sample.concentration} />
     </div>
   </Card.Content>
 </Card.Root>

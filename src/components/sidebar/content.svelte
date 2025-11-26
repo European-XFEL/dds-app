@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import { Beaker, History, Microscope, Projector, TestTubes, Upload } from '@lucide/svelte';
+  import { History, Microscope, Projector, TestTubes } from '@lucide/svelte';
 
   const data = {
     user: {
@@ -72,8 +72,6 @@
 </script>
 
 <script lang="ts">
-  import { GitCompare } from '@lucide/svelte';
-
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 </script>
 
