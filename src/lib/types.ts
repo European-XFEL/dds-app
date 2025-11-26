@@ -1,35 +1,30 @@
+import * as schema from '$lib/server/db/schema';
+
 export type SampleDetails = {
-	/** Molecule identifier. */
-	molecule_ground: string;
-	molecule_excited: string;
-	/** Solvent identifier. */
-	solvent: string;
-	/** Concentration percentage. */
+	groundMolecule: typeof schema.moleculeTable.$inferSelect;
+	excitedMolecule: typeof schema.moleculeTable.$inferSelect;
+	solvent: typeof schema.solventTable.$inferSelect;
 	concentration: number;
 };
 
-export type ProbeDetails = {
-	LaserEnergy: number;
-	ExcitedFrac: number;
-	ExcitedPotential: number;
+export type PPDetails = {
+	laserEnergy?: number;
+	excitedFrac?: number;
+	excitedPotential?: number;
 };
 
 export type QVals = {
-	min: number;
-	max: number;
-	step: number;
+	min?: number;
+	max?: number;
+	step?: number;
 };
 
 export type Detector = {
-	name: string;
+	name?: string;
 };
 
 export type SimulationDetails = {
 	sample: SampleDetails;
-	molecules: string[];
-	solvents: string[];
-	sample_ground: string;
-	sample_excited: string;
-	q_vals: QVals;
+	qVals: QVals;
 	detector: Detector;
 };
