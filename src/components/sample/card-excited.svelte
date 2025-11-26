@@ -1,8 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import { MoleculeCard } from '$components/ui/sample';
   import { appState } from '$lib/state.svelte';
+
+  import { MoleculeCard } from '$components/ui/sample';
 
   let { sample } = $state(appState);
 </script>

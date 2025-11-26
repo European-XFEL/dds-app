@@ -1,6 +1,8 @@
-import type { LayoutServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';
+
+import type { LayoutServerLoad } from './$types';
+
 export const prerender = true;
 
 export const load: LayoutServerLoad = async ({}) => {

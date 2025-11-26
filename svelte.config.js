@@ -1,6 +1,7 @@
-import { mdsvex } from 'mdsvex';
-import adapter from 'svelte-adapter-bun';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { mdsvex } from 'mdsvex';
+
+import adapter from 'svelte-adapter-bun';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -12,6 +13,7 @@ const config = {
     alias: {
       $css: './src/app.css',
       $components: './src/components',
+      $shadcn: './src/lib/shadcn/components',
     },
   },
   extensions: ['.svelte', '.svx'],

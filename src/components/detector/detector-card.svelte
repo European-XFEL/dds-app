@@ -1,6 +1,7 @@
 <script lang="ts">
-  import DetectorCard from '$components/ui/detector/detector-card.svelte';
   import { appState } from '$lib/state.svelte';
+
+  import DetectorCard from '$components/ui/detector/detector-card.svelte';
 
   let { q_vals, detector } = $state(appState);
 

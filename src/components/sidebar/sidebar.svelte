@@ -1,11 +1,14 @@
 <script lang="ts">
-  import Footer from './footer.svelte';
-  import Content from './content.svelte';
+  import { LayoutDashboard } from '@lucide/svelte';
+
+  import type { ComponentProps } from 'svelte';
+
+  import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
   import AppPicker from '$components/ui/app-picker.svelte';
-  import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-  import { LayoutDashboard } from '@lucide/svelte';
-  import type { ComponentProps } from 'svelte';
+
+  import Content from './content.svelte';
+  import Footer from './footer.svelte';
 
   let {
     sample,
