@@ -10,5 +10,5 @@
 <MoleculeCard
 	title="Excited Molecule"
 	molecules={page.data.molecules}
-	bind:molecule={sample.excitedMolecule}
+	bind:molecule={sample.excited}
 />

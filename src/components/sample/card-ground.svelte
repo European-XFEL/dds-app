@@ -10,5 +10,5 @@
 <MoleculeCard
 	title="Ground Molecule"
 	molecules={page.data.molecules}
-	bind:molecule={sample.groundMolecule}
+	bind:molecule={sample.ground}
 />

@@ -2,12 +2,12 @@ import type * as types from '$lib/types';
 
 const initial: types.SimulationDetails = {
 	sample: {
-		groundMolecule: {
+		ground: {
 			id: '',
 			name: '',
 			content: ''
 		},
-		excitedMolecule: {
+		excited: {
 			id: '',
 			name: '',
 			content: ''
@@ -19,13 +19,23 @@ const initial: types.SimulationDetails = {
 		},
 		concentration: 0
 	},
-	qVals: {
-		min: undefined,
-		max: undefined,
-		step: undefined
+	q_vals: {
+		min: 0,
+		max: 0,
+		step: 0
 	},
 	detector: {
-		name: undefined
+		name: 'detector',
+		pixel_size: 0.172,
+		distance: 200,
+		wavelength: 1.54,
+		shape: [512, 512],
+		beam_center: [256, 256]
+	},
+	pump: {
+		energy: 0,
+		excitedFrac: 0,
+		excitedPotential: 0
 	}
 };
 

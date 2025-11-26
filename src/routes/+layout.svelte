@@ -10,8 +10,8 @@
 	let state = $state(appState);
 
 	let sample = $derived({
-		groundName: state.sample.groundMolecule.name,
-		excitedName: state.sample.excitedMolecule.name,
+		groundName: state.sample.ground.name,
+		excitedName: state.sample.excited.name,
 		solventName: state.sample.solvent.name,
 		concentration: state.sample.concentration
 	});
