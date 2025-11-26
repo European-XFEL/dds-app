@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import SharedCard from '$components/sample/shared-card.svelte';
-	import MoleculeCard from '$components/sample/molecule-card.svelte';
+	import { MoleculeSharedCard, MoleculeCard } from '$components/sample';
 	import { appState } from '../../../lib/state.svelte';
 
 	let { sample } = $state(appState);
@@ -11,7 +10,7 @@
 
 <div class="grid gap-4 md:grid-rows-1">
 	<div>
-		<SharedCard solvents={data.solvents} bind:sample />
+		<MoleculeSharedCard solvents={data.solvents} bind:sample />
 	</div>
 	<div class="grid gap-4 md:grid-cols-2">
 		<MoleculeCard
