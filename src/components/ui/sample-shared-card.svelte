@@ -5,14 +5,17 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import type { SampleDetails } from '$lib/types';
 
-	type Props = {
-		solvents: string[];
+	let {
+		solvents,
+		sample = $bindable()
+	}: {
+		solvents: { id: string; name: string }[];
 		sample: SampleDetails;
-	};
+	} = $props();
 
-	let { solvents = $bindable<string[]>(), sample = $bindable<SampleDetails>() }: Props = $props();
-
-	const triggerSolvent = $derived(solvents.find((s) => s === sample.solvent) ?? 'Select a solvent');
+	const triggerSolvent = $derived(
+		solvents.find((s) => s.id === sample.solvent.id)?.name ?? 'Select a solvent'
+	);
 </script>
 
 <Card.Root class="grid w-full gap-6">
@@ -24,14 +27,24 @@
 	<Card.Content class="grid gap-6">
 		<div class="grid gap-2">
 			<Label>Solvent</Label>
-			<Select.Root type="single" bind:value={sample.solvent} name="solvent">
+			<Select.Root
+				type="single"
+				name="solvent"
+				bind:value={
+					() => sample.solvent.id,
+					(v) => (
+						(sample.solvent.id = v),
+						(sample.solvent.name = solvents.find((s) => s.id === v)?.name ?? sample.solvent.name)
+					)
+				}
+			>
 				<Select.Trigger class="w-full justify-between">
 					{triggerSolvent}
 				</Select.Trigger>
 				<Select.Content class="w-(--radix-select-trigger-width)">
-					{#each solvents as label}
-						<Select.Item value={label} {label}>
-							{label}
+					{#each solvents as { id, name }}
+						<Select.Item value={id} label={name}>
+							{name}
 						</Select.Item>
 					{/each}
 				</Select.Content>
