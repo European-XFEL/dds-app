@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import SharedCard from '$components/ui/sample-shared-card.svelte';
-	import MoleculeCard from '$components/ui/molecule-card.svelte';
+	import SharedCard from '$components/sample/shared-card.svelte';
+	import MoleculeCard from '$components/sample/molecule-card.svelte';
 	import { appState } from '../../../lib/state.svelte';
 
 	let { sample } = $state(appState);
