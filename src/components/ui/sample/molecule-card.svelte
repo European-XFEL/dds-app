@@ -14,7 +14,7 @@
 	}: {
 		title: string;
 		molecules: { id: string; name: string; content: string }[];
-		molecule: SampleDetails['groundMolecule'] | SampleDetails['excitedMolecule'];
+		molecule: SampleDetails['ground'] | SampleDetails['excited'];
 	} = $props();
 
 	const triggerMolecule = $derived(
