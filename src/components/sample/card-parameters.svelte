@@ -5,6 +5,8 @@
 	import { appState } from '$lib/state.svelte';
 
 	let { sample } = $state(appState);
+
+	let { short = false } = $props();
 </script>
 
-<MoleculeSharedCard solvents={page.data.solvents} bind:sample />
+<MoleculeSharedCard solvents={page.data.solvents} bind:sample {short} />
