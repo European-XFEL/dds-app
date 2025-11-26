@@ -1,7 +1,5 @@
 <script lang="ts">
-	import SampleCardParameters from '$components/sample-card-parameters.svelte';
-	import SampleCardGround from '$components/sample-card-ground.svelte';
-	import SampleCardExcited from '$components/sample-card-excited.svelte';
+	import { SampleCardParameters, SampleCardGround, SampleCardExcited } from '$components/sample';
 </script>
 
 <div class="grid gap-4 md:grid-rows-1">
