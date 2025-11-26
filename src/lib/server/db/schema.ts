@@ -1,8 +1,17 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const user = sqliteTable('user', {
+export const moleculeTable = sqliteTable('molecules', {
 	id: text('id')
 		.primaryKey()
 		.$defaultFn(() => crypto.randomUUID()),
-	age: integer('age')
+	name: text('name').notNull(),
+	content: text('content').notNull()
+});
+
+export const solventTable = sqliteTable('solvents', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	name: text('name').notNull(),
+	content: text('content').notNull()
 });
