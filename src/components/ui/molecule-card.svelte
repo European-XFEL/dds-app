@@ -4,24 +4,24 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
+	// import MoleculeViewer from '$components/ui/mol-viewer.svelte';
+	import MoleculeViewer from './molecule-viewer.svelte';
 	import type { SampleDetails } from '$lib/types';
-
-	type Props = {
-		sample_type: 'ground' | 'excited';
-		molecules: string[];
-		molecule: string;
-	};
+	import { browser } from '$app/environment';
 
 	let {
-		sample_type = $bindable<'ground' | 'excited'>('ground'),
-		molecules = $bindable<string[]>(),
-		molecule = $bindable<string>()
-	}: Props = $props();
+		title,
+		molecules,
+		molecule = $bindable()
+	}: {
+		title: string;
+		molecules: { id: string; name: string; content: string }[];
+		molecule: SampleDetails['groundMolecule'] | SampleDetails['excitedMolecule'];
+	} = $props();
 
-	const title = $derived(sample_type === 'ground' ? 'Ground State Sample' : 'Excited State Sample');
-
-	const triggerMolecule = $derived(molecules.find((m) => m === molecule) ?? 'Select a molecule');
+	const triggerMolecule = $derived(
+		molecules.find((m) => m.id === molecule.id)?.name ?? 'Select a molecule'
+	);
 </script>
 
 <Card.Root class="grid w-full gap-6">
@@ -33,25 +33,33 @@
 		<div class="flex flex-col gap-2">
 			<Label>Sample molecule</Label>
 			<div class="flex flex-col items-stretch gap-2 sm:flex-row">
-				<Select.Root type="single" bind:value={molecule} name="molecule">
+				<Select.Root
+					name="molecule"
+					type="single"
+					bind:value={
+						() => molecule.id,
+						(v) => {
+							molecule = molecules.find((m) => m.id === v) ?? molecule;
+						}
+					}
+				>
 					<Select.Trigger class="w-full justify-between">
 						{triggerMolecule}
 					</Select.Trigger>
 					<Select.Content class="w-(--radix-select-trigger-width)">
-						{#each molecules as label}
-							<Select.Item value={label} {label}>
-								{label}
+						{#each molecules as { id, name }}
+							<Select.Item value={id} label={name}>
+								{name}
 							</Select.Item>
 						{/each}
 					</Select.Content>
 				</Select.Root>
-				<Button type="button" variant="outline" class="whitespace-nowrap">
+				<Button type="button" variant="outline" class="whitespace-nowrap" disabled>
 					<Upload class="mr-2 h-4 w-4" /> Upload file
 				</Button>
 			</div>
-			<div class="flex items-center space-x-4">
-				<!-- Placeholder for 3Dmol.js viewer -->
-				<Skeleton class="h-[200px] w-full" />
+			<div class="h-60 w-full border border-muted/50">
+				<MoleculeViewer {molecule} />
 			</div>
 		</div>
 	</Card.Content>

@@ -1,17 +1,28 @@
 <script lang="ts">
+	import type { PageProps } from './$types';
 	import SharedCard from '$components/ui/sample-shared-card.svelte';
 	import MoleculeCard from '$components/ui/molecule-card.svelte';
 	import { appState } from '../../../lib/state.svelte';
 
-	let { sample, molecules, solvents } = $state(appState);
+	let { sample } = $state(appState);
+
+	let { data }: PageProps = $props();
 </script>
 
 <div class="grid gap-4 md:grid-rows-1">
 	<div>
-		<SharedCard {solvents} {sample} />
+		<SharedCard solvents={data.solvents} bind:sample />
 	</div>
 	<div class="grid gap-4 md:grid-cols-2">
-		<MoleculeCard sample_type="ground" {molecules} bind:molecule={sample.molecule_ground} />
-		<MoleculeCard sample_type="excited" {molecules} bind:molecule={sample.molecule_excited} />
+		<MoleculeCard
+			title="Ground Molecule"
+			molecules={data.molecules}
+			bind:molecule={sample.groundMolecule}
+		/>
+		<MoleculeCard
+			title="Excited Molecule"
+			molecules={data.molecules}
+			bind:molecule={sample.excitedMolecule}
+		/>
 	</div>
 </div>
