@@ -1,9 +1,11 @@
 <script lang="ts">
   import '$css';
-  import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+
+  import * as Sidebar from '$shadcn/ui/sidebar/index.js';
+
+  import { appState } from '$lib/state.svelte';
 
   import AppSidebar from '$components/sidebar/sidebar.svelte';
-  import { appState } from '$lib/state.svelte';
 
   let { children } = $props();
 

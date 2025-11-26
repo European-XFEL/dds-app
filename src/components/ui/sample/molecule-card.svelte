@@ -1,11 +1,13 @@
 <script lang="ts">
   import { Upload } from '@lucide/svelte';
-  import * as Card from '$lib/components/ui/card/index.js';
-  import { Button } from '$lib/components/ui/button/index.js';
-  import * as Select from '$lib/components/ui/select/index.js';
+
+  import { Button } from '$shadcn/ui/button/index.js';
+  import * as Card from '$shadcn/ui/card/index.js';
+  import * as Field from '$shadcn/ui/field/index.js';
+  import * as Select from '$shadcn/ui/select/index.js';
+  import { Skeleton } from '$shadcn/ui/skeleton';
+
   import type { SampleDetails } from '$lib/types';
-  import { Skeleton } from '$lib/components/ui/skeleton';
-  import * as Field from '$lib/components/ui/field/index.js';
 
   let {
     title,

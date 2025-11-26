@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-
   import * as TDmol from '3dmol';
+
+  import { onMount } from 'svelte';
 
   import type { SampleDetails } from '$lib/types';
 
   let {
     molecule,
   }: {
-    molecule: SampleDetails['groundMolecule'] | SampleDetails['excitedMolecule'];
+    molecule: SampleDetails['ground'] | SampleDetails['excited'];
   } = $props();
 
   let container: HTMLDivElement | null = null;

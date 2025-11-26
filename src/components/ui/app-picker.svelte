@@ -3,9 +3,9 @@
   import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
   import FlaskRoundIcon from '@lucide/svelte/icons/flask-round';
 
-  import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-  import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-  import { useSidebar } from '$lib/components/ui/sidebar/index.js';
+  import * as DropdownMenu from '$shadcn/ui/dropdown-menu/index.js';
+  import * as Sidebar from '$shadcn/ui/sidebar/index.js';
+  import { useSidebar } from '$shadcn/ui/sidebar/index.js';
 
   let {
     apps,

@@ -1,11 +1,11 @@
-import path from 'path';
+import { drizzle } from 'drizzle-orm/libsql/node';
+import type { SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core/table';
 import fs from 'fs/promises';
+import path from 'path';
 
 import { env } from '$env/dynamic/private';
 
-import { drizzle } from 'drizzle-orm/libsql/node';
 import * as schema from './schema';
-import type { SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core/table';
 
 if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
 

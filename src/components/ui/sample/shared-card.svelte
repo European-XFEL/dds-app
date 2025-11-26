@@ -1,8 +1,9 @@
 <script lang="ts">
-  import * as Card from '$lib/components/ui/card/index.js';
-  import * as Select from '$lib/components/ui/select/index.js';
-  import { Input } from '$lib/components/ui/input/index.js';
-  import { Label } from '$lib/components/ui/label/index.js';
+  import * as Card from '$shadcn/ui/card/index.js';
+  import { Input } from '$shadcn/ui/input/index.js';
+  import { Label } from '$shadcn/ui/label/index.js';
+  import * as Select from '$shadcn/ui/select/index.js';
+
   import type { SampleDetails } from '$lib/types';
 
   let {

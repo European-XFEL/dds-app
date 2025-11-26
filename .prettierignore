@@ -10,4 +10,4 @@ bun.lockb
 /drizzle/
 
 # ShadCN Components
-/src/lib/components/
+/src/lib/shadcn/

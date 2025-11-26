@@ -1,9 +1,10 @@
 <script lang="ts">
-  import * as Card from '$lib/components/ui/card/index.js';
-  import { Input } from '$lib/components/ui/input/index.js';
-  import { Label } from '$lib/components/ui/label/index.js';
+  import * as Card from '$shadcn/ui/card/index.js';
+  import { Input } from '$shadcn/ui/input/index.js';
+  import { Label } from '$shadcn/ui/label/index.js';
+  import { Toggle } from '$shadcn/ui/toggle';
+
   import * as qConvert from '$lib/math/q_detector_convert.ts';
-  import { Toggle } from '$lib/components/ui/toggle';
   import type { Detector, QVals } from '$lib/types';
 
   let {
