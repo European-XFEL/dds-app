@@ -8,8 +8,4 @@
   let { sample } = $state(appState);
 </script>
 
-<MoleculeCard
-  title="Ground State"
-  molecules={page.data.molecules}
-  bind:molecule={sample.ground}
-/>
+<MoleculeCard title="Ground State" molecules={page.data.molecules} bind:molecule={sample.ground} />

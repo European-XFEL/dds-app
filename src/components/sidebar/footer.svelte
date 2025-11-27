@@ -13,7 +13,9 @@
   } = $props();
 </script>
 
-<Sidebar.Footer class="group-data-[collapsible=icon]:hidden grid gap-1 text-sm text-muted-foreground">
+<Sidebar.Footer
+  class="grid gap-1 text-sm text-muted-foreground group-data-[collapsible=icon]:hidden"
+>
   <span>Ground: {sample.groundName}</span>
   <span>Excited: {sample.excitedName}</span>
   <span>Solvent: {sample.solventName}</span>
