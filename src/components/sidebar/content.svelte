@@ -1,5 +1,13 @@
 <script lang="ts" module>
-  import { History, LayoutDashboard, Microscope, Projector, TestTubes } from '@lucide/svelte';
+  import {
+    Beaker,
+    History,
+    LayoutDashboard,
+    Microscope,
+    Projector,
+    TestTubes,
+    Upload,
+  } from '@lucide/svelte';
 
   const data = {
     user: {
@@ -24,17 +32,22 @@
         url: '#',
         items: [
           {
-            title: 'Samples',
+            title: 'Sample',
             url: '/experiment/samples',
             icon: TestTubes,
           },
           {
-            title: 'Pump/Probe',
+            title: 'Optical Pump', // Check if this name is appropriate
+            url: '/experiment/ir-pump',
+            icon: Projector,
+          },
+          {
+            title: 'X-Ray Probe', // Detector wavelength goes here
             url: '/experiment/pump-probe',
             icon: Projector,
           },
           {
-            title: 'Detector',
+            title: 'X-Ray Detector',
             url: '/experiment/detector',
             icon: Microscope,
           },
@@ -56,28 +69,28 @@
           },
         ],
       },
-      // {
-      // 	title: 'Define',
-      // 	url: '#',
-      // 	items: [
-      // 		{
-      // 			title: 'Molecular Files',
-      // 			url: '/define/upload',
-      // 			icon: Upload,
-      // 			isActive: true
-      // 		},
-      // 		{
-      // 			title: 'Solvents',
-      // 			url: '/define/solvent',
-      // 			icon: Beaker
-      // 		},
-      // 		{
-      // 			title: 'Detectors',
-      // 			url: '/define/detectors',
-      // 			icon: Microscope
-      // 		}
-      // 	]
-      // }
+      {
+        title: 'Define',
+        url: '#',
+        items: [
+          {
+            title: 'Molecular Files',
+            url: '/define/upload',
+            icon: Upload,
+            isActive: true,
+          },
+          {
+            title: 'Solvents',
+            url: '/define/solvent',
+            icon: Beaker,
+          },
+          {
+            title: 'Detectors',
+            url: '/define/detectors',
+            icon: Microscope,
+          },
+        ],
+      },
     ],
   };
 </script>

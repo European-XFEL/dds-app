@@ -9,7 +9,7 @@
 </script>
 
 <MoleculeCard
-  title="Ground Molecule"
+  title="Ground State"
   molecules={page.data.molecules}
   bind:molecule={sample.ground}
 />

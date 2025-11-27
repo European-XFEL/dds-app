@@ -9,7 +9,7 @@
 </script>
 
 <MoleculeCard
-  title="Excited Molecule"
+  title="Excited State"
   molecules={page.data.molecules}
   bind:molecule={sample.excited}
 />

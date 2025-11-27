@@ -40,11 +40,6 @@
     <Card.Title>
       <div class="flex items-center justify-between">
         Detector Setup
-        <Card.Action>
-          <Toggle variant="outline" bind:pressed={configure_via_q}>
-            <Label class="text-xs">Configure via Q parameters</Label>
-          </Toggle>
-        </Card.Action>
       </div>
     </Card.Title>
   </Card.Header>
@@ -118,7 +113,16 @@
   <hr class="my-4" />
 
   <Card.Header hidden={short}>
-    <Card.Title hidden={short}>Q Parameters</Card.Title>
+    <Card.Title hidden={short}>
+      <div class="flex items-center justify-between">
+        Momentum Transfer Range
+        <Card.Action>
+          <Toggle variant="outline" bind:pressed={configure_via_q}>
+            <Label class="text-xs">Configure via Q parameters</Label>
+          </Toggle>
+        </Card.Action>
+      </div>
+    </Card.Title>
   </Card.Header>
 
   <Card.Content>
