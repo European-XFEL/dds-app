@@ -12,7 +12,6 @@
   import { SampleCardExcited, SampleCardGround, SampleCardParameters } from '$components/sample';
 
   let sample = $state(appState);
-
   let sample_dump = $derived({
     sample: {
       ground: sample.sample.ground.name,
@@ -20,6 +19,7 @@
       solvent: sample.sample.solvent.name,
       concentration: sample.sample.concentration,
     },
+    pump: sample.pump,
     q_vals: sample.q_vals,
     detector: sample.detector,
   });

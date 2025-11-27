@@ -32,7 +32,6 @@
   <Card.Content>
     <form class="flex flex-col gap-6">
       <Field.Field>
-        <Field.Label>Sample molecule</Field.Label>
         <Field.Content class="items-stretch gap-2 sm:flex-row">
           <Select.Root
             name="molecule"

@@ -56,9 +56,12 @@
       </Select.Root>
     </div>
 
+    <hr class="my-4" hidden={short} />
+
     <div class="grid">
-      <div class="flex items-center justify-between">
-        <Label>Solute Concentration (%)</Label>
+      <Label>Solute Concentration (%)</Label>
+      <div class="flex items-center justify-between gap-4">
+        <Input type="range" min="0" max="100" step="0.1" bind:value={sample.concentration} />
         <Input
           type="number"
           min="0"
@@ -69,7 +72,6 @@
           class="w-30 text-sm text-muted-foreground"
         />
       </div>
-      <Input type="range" min="0" max="100" step="0.1" bind:value={sample.concentration} />
     </div>
   </Card.Content>
 </Card.Root>
