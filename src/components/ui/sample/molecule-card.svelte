@@ -24,7 +24,7 @@
   );
 </script>
 
-<Card.Root>
+<Card.Root class="flex-auto @sm:gap-3">
   <Card.Header>
     <Card.Title>{title}</Card.Title>
   </Card.Header>
