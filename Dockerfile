@@ -7,17 +7,26 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-COPY . /app
-
-
 # Production Dependencies
-FROM base AS prod-deps
+FROM base AS build-deps
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+COPY package.json pnpm-lock.yaml ./
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm fetch --frozen-lockfile
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Build
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+FROM build-deps AS build
+
+COPY . ./
+
+ENV DATABASE_URL="file:/app/local.db"
+
+RUN pnpm db:push --force
+
 RUN pnpm run build
 
 # Serve
