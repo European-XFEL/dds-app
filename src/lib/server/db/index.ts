@@ -7,9 +7,12 @@ import { env } from '$env/dynamic/private';
 
 import * as schema from './schema';
 
-if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
+export async function setup_db() {
+  if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
 
-export const db = drizzle(env.DATABASE_URL, { schema });
+  const db = drizzle(env.DATABASE_URL, { schema });
+  return db;
+}
 
 /**
  * Bootstrap function that inserts example data into the table.
@@ -17,10 +20,15 @@ export const db = drizzle(env.DATABASE_URL, { schema });
  * The IDs for example data are hardcoded to `example-{filename}` so that this function can be
  * re-run without creating duplicate entries, instead it will just overwrite existing example entries.
  */
-async function bootstrap_examples(
+export async function bootstrap(
+  db: ReturnType<typeof drizzle> | null = null,
   example_molecules_dir = './src/lib/server/db/examples/molecules',
   example_solvents_dir = './src/lib/server/db/examples/solvents',
 ) {
+  if (!db) {
+    db = await setup_db();
+  }
+
   // Define schema directory pairs
   let schema_file_pairs: [SQLiteTableWithColumns<any>, string, string[]][] = [
     [schema.moleculeTable, example_molecules_dir, await fs.readdir(example_molecules_dir)],
@@ -56,5 +64,3 @@ async function bootstrap_examples(
     }
   }
 }
-
-export { bootstrap_examples as bootstrap };
