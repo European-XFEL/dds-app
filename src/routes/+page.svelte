@@ -1,7 +1,6 @@
 <script lang="ts">
   import JSONTree from 'svelte-json-tree';
 
-  import * as Card from '$shadcn/ui/card';
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
   import Toggle from '$shadcn/ui/toggle/toggle.svelte';

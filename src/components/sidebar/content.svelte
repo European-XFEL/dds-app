@@ -1,11 +1,13 @@
 <script lang="ts" module>
   import {
     Beaker,
+    Fullscreen,
     History,
     LayoutDashboard,
     Microscope,
     Projector,
-    TestTubes,
+    Radiation,
+    TestTube,
     Upload,
   } from '@lucide/svelte';
 
@@ -34,7 +36,7 @@
           {
             title: 'Sample',
             url: '/experiment/samples',
-            icon: TestTubes,
+            icon: TestTube,
           },
           {
             title: 'Optical Pump', // Check if this name is appropriate
@@ -44,12 +46,12 @@
           {
             title: 'X-Ray Probe', // Detector wavelength goes here
             url: '/experiment/pump-probe',
-            icon: Projector,
+            icon: Radiation,
           },
           {
             title: 'X-Ray Detector',
             url: '/experiment/detector',
-            icon: Microscope,
+            icon: Fullscreen,
           },
         ],
       },

@@ -18,7 +18,7 @@
   }: ComponentProps<typeof Sidebar.Root> & ComponentProps<typeof Footer> = $props();
 </script>
 
-<Sidebar.Root bind:ref {collapsible} {...restProps}>
+<Sidebar.Root bind:ref {collapsible} {...restProps} variant="floating">
   <Sidebar.Header>
     <AppPicker
       apps={[
