@@ -38,9 +38,7 @@
 <Card.Root class="w-full @sm:gap-2">
   <Card.Header>
     <Card.Title>
-      <div class="flex items-center justify-between">
-        Detector Setup
-      </div>
+      <div class="flex items-center justify-between">Detector Setup</div>
     </Card.Title>
   </Card.Header>
 

@@ -34,16 +34,16 @@
     <JSONTree value={sample_dump} shouldShowPreview={false} defaultExpandedLevel={4} />
   </Resizable.Pane>
   <Resizable.Handle />
-  <Resizable.Pane defaultSize={30} class="min-w-110 flex flex-col">
+  <Resizable.Pane defaultSize={30} class="flex min-w-110 flex-col">
     <ScrollArea class="@container h-full">
-      <div class="grid gap-4 md:grid-rows-1 flex-1 overflow-y-auto p-4">
+      <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
         <SampleCardParameters {short} />
         <!-- <SampleCardGround /> -->
         <!-- <SampleCardExcited /> -->
         <DetectorCard {short} />
       </div>
     </ScrollArea>
-    <Toggle class="mb-4 shrink-0 border-t p-0 bg-gray-50" bind:pressed={short}>
+    <Toggle class="mb-4 shrink-0 border-t bg-gray-50 p-0" bind:pressed={short}>
       {short ? 'Short Cards' : 'Detailed Cards'}
     </Toggle>
   </Resizable.Pane>
