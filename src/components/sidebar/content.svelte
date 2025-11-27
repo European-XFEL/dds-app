@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import { History, Microscope, Projector, TestTubes } from '@lucide/svelte';
+  import { History, LayoutDashboard, Microscope, Projector, TestTubes } from '@lucide/svelte';
 
   const data = {
     user: {
@@ -8,6 +8,17 @@
       avatar: '/avatars/shadcn.jpg',
     },
     navMain: [
+      {
+        title: '',
+        url: '#',
+        items: [
+          {
+            title: 'Dashboard',
+            url: '/',
+            icon: LayoutDashboard,
+          },
+        ],
+      },
       {
         title: 'Experiment',
         url: '#',
@@ -75,26 +86,29 @@
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 </script>
 
-<Sidebar.Content>
-  {#each data.navMain as group (group.title)}
-    <Sidebar.Group class="group-data-[collapsible=icon]:hidden">
+{#each data.navMain as group (group.title)}
+  <Sidebar.Group>
+    {#if group.title}
       <Sidebar.GroupLabel>{group.title}</Sidebar.GroupLabel>
-      <Sidebar.GroupContent>
-        <Sidebar.Menu>
-          {#each group.items as item (item.title)}
-            <Sidebar.MenuItem>
-              <Sidebar.MenuButton>
-                {#snippet child({ props })}
-                  <a href={item.url} {...props}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </a>
-                {/snippet}
-              </Sidebar.MenuButton>
-            </Sidebar.MenuItem>
-          {/each}
-        </Sidebar.Menu>
-      </Sidebar.GroupContent>
-    </Sidebar.Group>
-  {/each}
-</Sidebar.Content>
+    {/if}
+    <Sidebar.GroupContent>
+      <Sidebar.Menu>
+        {#each group.items as item (item.title)}
+          <Sidebar.MenuItem>
+            <Sidebar.MenuButton>
+              {#snippet tooltipContent()}
+                {item.title}
+              {/snippet}
+              {#snippet child({ props })}
+                <a href={item.url} {...props}>
+                  <item.icon />
+                  <span>{item.title}</span>
+                </a>
+              {/snippet}
+            </Sidebar.MenuButton>
+          </Sidebar.MenuItem>
+        {/each}
+      </Sidebar.Menu>
+    </Sidebar.GroupContent>
+  </Sidebar.Group>
+{/each}
