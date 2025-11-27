@@ -22,3 +22,6 @@ prettier*
 
 # Ignore local dev database
 local.db
+
+# Ignore compose
+docker-compose.*
