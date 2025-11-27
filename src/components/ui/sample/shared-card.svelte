@@ -21,7 +21,7 @@
   );
 </script>
 
-<Card.Root class="w-full @sm:gap-0">
+<Card.Root class="w-full @sm:gap-3">
   <Card.Header>
     <Card.Title>Sample Parameters</Card.Title>
     <Card.Description hidden={short}
@@ -29,8 +29,8 @@
     >
   </Card.Header>
 
-  <Card.Content class="grid gap-6 @sm:gap-0">
-    <div class="grid gap-2 @sm:gap-0" hidden={short}>
+  <Card.Content class="grid gap-4 @sm:gap-2">
+    <div class="grid gap-2" hidden={short}>
       <Label>Solvent</Label>
       <Select.Root
         type="single"
@@ -56,7 +56,7 @@
       </Select.Root>
     </div>
 
-    <div class="grid gap-2 @sm:gap-0">
+    <div class="grid">
       <div class="flex items-center justify-between">
         <Label>Solute Concentration (%)</Label>
         <Input

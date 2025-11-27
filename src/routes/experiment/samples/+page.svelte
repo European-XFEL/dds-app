@@ -6,7 +6,7 @@
   <div>
     <SampleCardParameters />
   </div>
-  <div class="grid gap-4 md:grid-cols-2">
+  <div class="flex flex-wrap gap-4">
     <SampleCardGround />
     <SampleCardExcited />
   </div>

@@ -17,7 +17,7 @@
   }: ComponentProps<typeof Sidebar.Root> & ComponentProps<typeof Footer> = $props();
 </script>
 
-<Sidebar.Root bind:ref variant="inset" {...restProps}>
+<Sidebar.Root bind:ref {...restProps}>
   <Sidebar.Header>
     <AppPicker
       apps={[
@@ -42,4 +42,6 @@
   <Content />
 
   <Footer {sample} />
+
+  <Sidebar.Rail />
 </Sidebar.Root>
