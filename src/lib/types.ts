@@ -1,9 +1,13 @@
 import * as schema from '$lib/server/db/schema';
 
+export type Molecule = Omit<typeof schema.moleculeTable.$inferSelect, 'content'>;
+
+export type Solvent = Omit<typeof schema.solventTable.$inferSelect, 'content'>;
+
 export type SampleDetails = {
-  ground: typeof schema.moleculeTable.$inferSelect;
-  excited: typeof schema.moleculeTable.$inferSelect;
-  solvent: typeof schema.solventTable.$inferSelect;
+  ground: Molecule;
+  excited: Molecule;
+  solvent: Solvent;
   concentration: number;
 };
 
