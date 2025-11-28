@@ -22,8 +22,8 @@ export async function setup_db() {
  */
 export async function bootstrap(
   db: ReturnType<typeof drizzle> | null = null,
-  example_molecules_dir = './src/lib/server/db/examples/molecules',
-  example_solvents_dir = './src/lib/server/db/examples/solvents',
+  example_molecules_dir = './static/data/molecules',
+  example_solvents_dir = './static/data/solvents',
 ) {
   if (!db) {
     db = await setup_db();
@@ -50,7 +50,7 @@ export async function bootstrap(
       await db
         .insert(table)
         .values({
-          id: `example-${file}`,
+          id: `${file}`,
           name: name,
           content: content,
         })
