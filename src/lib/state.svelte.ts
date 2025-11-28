@@ -5,17 +5,14 @@ const initial: types.SimulationDetails = {
     ground: {
       id: '',
       name: '',
-      content: '',
     },
     excited: {
       id: '',
       name: '',
-      content: '',
     },
     solvent: {
       id: '',
       name: '',
-      content: '',
     },
     concentration: 0,
   },
@@ -31,6 +28,7 @@ const initial: types.SimulationDetails = {
     wavelength: 1.54,
     shape: [512, 512],
     beam_center: [256, 256],
+    quadrant_positions: [],
   },
   pump: {
     energy: 0,
