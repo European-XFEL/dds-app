@@ -1,0 +1,18 @@
+[project]
+name = "simex-debye-grpc"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "debyecalculator>=1.0.14",
+    "numpy>=2.3.5",
+    "periodictable>=2.0.2",
+    "scipy>=1.16.3",
+    "simex-debye",
+    "simex-lite",
+]
+
+[tool.uv.sources]
+simex-debye = { git = "ssh://git@git.xfel.eu:10022/simulation/simex-debye.git" }
+simex-lite = { git = "https://github.com/PaNOSC-ViNYL/SimEx-Lite.git" }
