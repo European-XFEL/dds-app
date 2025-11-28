@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Upload } from '@lucide/svelte';
+  import { Structure } from 'matterviz';
 
   import { Button } from '$shadcn/ui/button/index.js';
   import * as Card from '$shadcn/ui/card/index.js';
@@ -22,6 +23,16 @@
   const triggerMolecule = $derived(
     molecules.find((m) => m.id === molecule.id)?.name ?? 'Select a molecule',
   );
+
+  const data_url = $derived(molecule?.id ? '/data/molecules/' + molecule.id : undefined);
+
+  let structure = $state(undefined);
+
+  $effect(() => {
+    if (data_url) {
+      structure = undefined;
+    }
+  });
 </script>
 
 <Card.Root class="flex-auto @sm:gap-3">
@@ -61,12 +72,12 @@
       </Field.Field>
       <Field.Field>
         <Field.Content>
-          <div class="h-60 w-full border border-muted/50">
-            {#await import('./molecule-viewer.svelte')}
+          <div class="h-120 w-full min-w-150 border border-muted/50">
+            {#if !molecule?.id}
               <Skeleton class="h-full w-full" />
-            {:then { default: MoleculeViewer }}
-              <MoleculeViewer {molecule} />
-            {/await}
+            {:else}
+              <Structure {data_url} bind:structure style="height: 100%; width: 100%" />
+            {/if}
           </div>
         </Field.Content>
       </Field.Field>
