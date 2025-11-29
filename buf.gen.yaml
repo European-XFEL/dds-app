@@ -1,0 +1,14 @@
+version: v2
+managed:
+  enabled: true
+plugins:
+  - local: protoc-gen-es
+    opt: target=ts
+    out: ./src/lib/server/grpc/gen
+    include_imports: true
+  - local: backend/.venv/bin/protoc-gen-python_betterproto2
+    opt: server_generation=async
+    out: ./backend/src/simex_debye_grpc/_gen
+    include_imports: true
+inputs:
+  - directory: ./proto/
