@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package files;
+
+service FileService {
+  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+
+  rpc GetFile(GetFileRequest) returns (File);
+
+  rpc CreateFile(CreateFileRequest) returns (File);
+
+  rpc UpdateFile(UpdateFileRequest) returns (File);
+
+  rpc DeleteFile(DeleteFileRequest) returns (Empty);
+}
+
+message Empty {}
+
+enum FileTypes {
+  FILE_TYPE_UNSPECIFIED = 0;
+  STRUCTURE_FILE = 1;
+  SOLVENT_FILE = 2;
+}
+
+message File {
+  FileTypes type = 1;
+
+  string id = 2;
+
+  string filename = 3;
+
+  string name = 4;
+
+  bytes contents = 5;
+}
+
+message FileMeta {
+  string id = 1;
+
+  string filename = 2;
+
+  string name = 3;
+}
+
+message ListFilesRequest { FileTypes type = 1; }
+
+message ListFilesResponse { repeated FileMeta files = 1; }
+
+message GetFileRequest {
+  FileTypes type = 1;
+
+  string id = 2;
+}
+
+message CreateFileRequest {
+  FileTypes type = 1;
+
+  string filename = 3;
+
+  string name = 4;
+
+  bytes contents = 5;
+}
+
+message UpdateFileRequest {
+  // The File resource which replaces the resource on the server.
+  File File = 1;
+}
+
+message DeleteFileRequest {
+  FileTypes type = 1;
+
+  string id = 2;
+}

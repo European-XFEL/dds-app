@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+import "files.proto";
+
+service SimulationService {
+  rpc RunSimulation(SimulationRequest) returns (SimulationResponse);
+}
+
+message SimulationRequest {
+  message QRange {
+    double min = 1;
+    double max = 2;
+    double step = 3;
+  }
+
+  message Pump {
+    double photon_energy_ev = 1;
+    double excited_state_energy_ev = 2;
+    double excited_state_fraction = 3;
+  }
+
+  message Sample {
+    double concentration_solute_molar = 1;
+
+    files.File ground = 2;
+
+    files.File excited = 3;
+
+    files.File solvent = 4;
+  }
+
+  QRange q_range = 1;
+  Pump pump = 2;
+  Sample sample = 3;
+}
+
+message SimulationResponse {
+  repeated double q = 1;
+
+  repeated double delta_s_total = 2;
+  repeated double delta_s_solute = 3;
+  repeated double delta_s_solvent = 4;
+
+  double deposited_energy_joule = 5;
+  double delta_temperature_k = 6;
+  double solvent_to_solute_ratio = 7;
+}
