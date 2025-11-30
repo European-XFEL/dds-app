@@ -61,6 +61,7 @@
     "dotenv": "^17.2.3",
     "drizzle-kit": "^0.31.5",
     "drizzle-orm": "^0.44.6",
+    "echarts": "^6.0.0",
     "embla-carousel-svelte": "^8.6.0",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
