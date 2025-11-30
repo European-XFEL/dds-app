@@ -18,6 +18,30 @@ N_AV = 6.02e23
 ELECTRON_CHARGE_JOULE = 1.602e-19
 
 
+def pre_parse_structure_contents(contents: bytes):
+    """Pre-parse structure contents from bytes to list of strings."""
+    text = np.genfromtxt(StringIO(contents.decode("utf-8")), dtype=str, skip_header=2)
+
+    elements = text[:, 0].tolist()
+    xyz = text[:, 1:].astype(float)
+
+    return elements, xyz
+
+
+def calc_debye(
+    qmin: float,
+    qmax: float,
+    qstep: float,
+    structure_source: tuple[list[str], np.ndarray],
+) -> IqTuple | list[IqTuple]:
+    calculator = DebyeCalculator(
+        qmin=qmin,
+        qmax=qmax,
+        qstep=qstep,
+    )
+    return calculator.iq(structure_source=structure_source)
+
+
 class SimulationCalculator:
     """A class to perform difference scattering calculations based on simulation requests."""
 
@@ -26,17 +50,6 @@ class SimulationCalculator:
         self.sample = request.sample
         self.pump = request.pump
         self.q_range = request.q_range
-
-    def pre_parse_structure_contents(self, contents: bytes):
-        """Pre-parse structure contents from bytes to list of strings."""
-        text = np.genfromtxt(
-            StringIO(contents.decode("utf-8")), dtype=str, skip_header=2
-        )
-
-        elements = text[:, 0].tolist()
-        xyz = text[:, 1:].astype(float)
-
-        return elements, xyz
 
     def run(self) -> models.SimulationResponse:
         solvent_chemical = Chemical(self.sample.solvent.name)
@@ -67,14 +80,45 @@ class SimulationCalculator:
             excited_concentration / solvent_concentration * delta_e / solvent_cpm * N_AV
         )
 
-        calculator = DebyeCalculator(
-            qmin=self.q_range.min,
-            qmax=self.q_range.max,
-            qstep=self.q_range.step,
+        S_0, S_1 = self._calc_debye_g_e()
+
+        delta_s_solute = S_1.i - S_0.i
+
+        ratio_solvent_solute = (
+            solvent_concentration / self.sample.concentration_solute_molar
         )
 
+        Q_read, dS_read = load_dsdt(
+            StringIO(self.request.sample.solvent.contents.decode("utf-8"))  # pyright: ignore[reportArgumentType]
+        )
+
+        dS_solv = interpolate_dsdt(Q_read, dS_read, S_0.q)
+
+        delta_s = (
+            self.pump.excited_state_fraction * delta_s_solute
+            + ratio_solvent_solute * dS_solv * delta_t
+        )
+
+        return models.SimulationResponse(
+            q=S_0.q.tolist(),
+            delta_s=delta_s.tolist(),
+            delta_s_solvent=(dS_solv * ratio_solvent_solute * delta_t).tolist(),
+            delta_s_solute_ex_frac=(
+                delta_s_solute * self.pump.excited_state_fraction
+            ).tolist(),
+            deposited_energy_joule=delta_e,
+            delta_temperature_k=delta_t,
+            solvent_to_solute_ratio=ratio_solvent_solute,
+        )
+
+    def _calc_debye_g_e(self):
         S0, S1 = (
-            calculator.iq(structure_source=self.pre_parse_structure_contents(source))
+            calc_debye(
+                qmin=self.q_range.min,
+                qmax=self.q_range.max,
+                qstep=self.q_range.step,
+                structure_source=pre_parse_structure_contents(source),
+            )
             for source in (
                 self.sample.ground.contents,
                 self.sample.excited.contents,
@@ -89,33 +133,7 @@ class SimulationCalculator:
 
         S_0 = cast(IqTuple, S0)
         S_1 = cast(IqTuple, S1)
-
-        delta_s_solute = S_1.i - S_0.i
-
-        Q_read, dS_read = load_dsdt(
-            StringIO(self.request.sample.solvent.contents.decode("utf-8"))  # pyright: ignore[reportArgumentType]
-        )
-
-        dS_solv = interpolate_dsdt(Q_read, dS_read, S_0.q)
-
-        ratio_solvent_solute = (
-            solvent_concentration / self.sample.concentration_solute_molar
-        )
-
-        delta_s = (
-            self.pump.excited_state_fraction * delta_s_solute
-            + ratio_solvent_solute * dS_solv * delta_t
-        )
-
-        return models.SimulationResponse(
-            q=S_0.q.tolist(),
-            delta_s_total=delta_s.tolist(),
-            delta_s_solute=delta_s_solute.tolist(),
-            delta_s_solvent=dS_solv.tolist(),
-            deposited_energy_joule=delta_e,
-            delta_temperature_k=delta_t,
-            solvent_to_solute_ratio=ratio_solvent_solute,
-        )
+        return S_0, S_1
 
 
 if __name__ == "__main__":
