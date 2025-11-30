@@ -4,19 +4,20 @@
   import { Separator } from '$shadcn/ui/separator';
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
-  import { appState } from '$lib/state.svelte';
+  import { createSimulationSeed, provideSimulationState } from '$lib/state.svelte';
 
   import AppSidebar from '$components/sidebar/sidebar.svelte';
 
   let { children } = $props();
 
-  let state = $state(appState);
+  const simulation = $state(createSimulationSeed());
+  provideSimulationState(simulation);
 
-  let sample = $derived({
-    groundName: state.sample.ground.name,
-    excitedName: state.sample.excited.name,
-    solventName: state.sample.solvent.name,
-    concentrationSoluteMolar: state.sample.concentrationSoluteMolar,
+  const sample = $derived({
+    groundName: simulation.sample.ground.name,
+    excitedName: simulation.sample.excited.name,
+    solventName: simulation.sample.solvent.name,
+    concentrationSoluteMolar: simulation.sample.concentrationSoluteMolar,
   });
 </script>
 

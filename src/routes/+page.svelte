@@ -10,7 +10,7 @@
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
   import Toggle from '$shadcn/ui/toggle/toggle.svelte';
 
-  import { appState } from '$lib/state.svelte';
+  import { useSimulationState } from '$lib/state.svelte';
 
   import DetectorCard from '$components/detector/detector-card.svelte';
   import { SampleCardParameters } from '$components/sample';
@@ -18,11 +18,11 @@
 
   import type { PageProps } from './$types';
 
-  let simulation = $state(appState);
+  const simulation = useSimulationState();
 
   let short = $state(true);
 
-  let simulation_json = $derived(JSON.stringify(simulation));
+  const simulation_json = $derived(JSON.stringify($state.snapshot(simulation)));
 
   let { form }: PageProps = $props();
 

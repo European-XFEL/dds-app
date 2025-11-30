@@ -1,11 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state';
 
-  import { appState } from '$lib/state.svelte';
+  import { useSimulationState } from '$lib/state.svelte';
 
   import { MoleculeCard } from '$components/ui/sample';
 
-  let { sample } = $state(appState);
+  const simulation = useSimulationState();
+  const sample = simulation.sample;
 </script>
 
 <MoleculeCard
