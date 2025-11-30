@@ -16,7 +16,7 @@
     groundName: state.sample.ground.name,
     excitedName: state.sample.excited.name,
     solventName: state.sample.solvent.name,
-    concentration: state.sample.concentration,
+    concentrationSoluteMolar: state.sample.concentrationSoluteMolar,
   });
 </script>
 
