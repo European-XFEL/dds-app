@@ -46,19 +46,21 @@ export async function bootstrap(
       console.log(` - ${file}`);
       // Strip file extension for name
       let name = file.replace(/\.[^/.]+$/, '');
-      const content = await fs.readFile(path.join(root, file), 'utf-8');
+      const contents = await fs.readFile(path.join(root, file), 'utf-8');
       await db
         .insert(table)
         .values({
           id: `${file}`,
+          filename: file,
           name: name,
-          content: content,
+          contents: contents,
         })
         .onConflictDoUpdate({
           target: table.id,
           set: {
             name: name,
-            content: content,
+            filename: file,
+            contents: contents,
           },
         });
     }

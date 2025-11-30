@@ -1,25 +1,33 @@
 import type * as types from '$lib/types';
 
 const initial: types.SimulationDetails = {
+  qRange: {
+    min: 0.01,
+    max: 9.0,
+    step: 0.01,
+  },
+  pump: {
+    photonEnergyEv: 4.0,
+    excitedStateEnergyEv: 2.0,
+    excitedStateFraction: 0.5,
+  },
   sample: {
+    concentrationSoluteMolar: 0.005,
     ground: {
-      id: '',
-      name: '',
+      id: 'Au2L2-S0_GS.xyz',
+      filename: 'Au2L2-S0_GS.xyz',
+      name: 'Au2L2-S0_GS',
     },
     excited: {
-      id: '',
-      name: '',
+      id: 'Au2L2-T0_ES.xyz',
+      filename: 'Au2L2-T0_ES.xyz',
+      name: 'Au2L2-T0_ES',
     },
     solvent: {
-      id: '',
-      name: '',
+      id: 'MeCN.txt',
+      filename: 'MeCN.txt',
+      name: 'acetonitrile',
     },
-    concentration: 0,
-  },
-  q_vals: {
-    min: 0,
-    max: 0,
-    step: 0,
   },
   detector: {
     name: 'detector',
@@ -29,11 +37,6 @@ const initial: types.SimulationDetails = {
     shape: [512, 512],
     beam_center: [256, 256],
     quadrant_positions: [],
-  },
-  pump: {
-    energy: 0,
-    excitedFrac: 0,
-    excitedPotential: 0,
   },
 };
 
