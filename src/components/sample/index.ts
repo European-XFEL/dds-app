@@ -1,5 +1,5 @@
-import SampleCardExcited from './card-excited.svelte';
-import SampleCardGround from './card-ground.svelte';
-import SampleCardParameters from './card-parameters.svelte';
+import SampleExcitedCard from './SampleExcitedCard.svelte';
+import SampleGroundCard from './SampleGroundCard.svelte';
+import SampleParametersCard from './SampleParametersCard.svelte';
 
-export { SampleCardParameters, SampleCardGround, SampleCardExcited };
+export { SampleParametersCard, SampleGroundCard, SampleExcitedCard };

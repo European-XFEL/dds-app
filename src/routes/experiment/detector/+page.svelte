@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DetectorCard from '$components/detector/detector-card.svelte';
+  import DetectorCard from '$components/DetectorSetupCard.svelte';
 </script>
 
 <DetectorCard />

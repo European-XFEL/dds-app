@@ -13,10 +13,10 @@
 
   import { useSimulationState } from '$lib/state.svelte';
 
-  import DetectorCard from '$components/detector/detector-card.svelte';
-  import PumpCard from '$components/pump/pump-card.svelte';
-  import { SampleCardParameters } from '$components/sample';
-  import LineChart from '$components/ui/plots/line.svelte';
+  import DetectorCard from '$components/DetectorSetupCard.svelte';
+  import PumpCard from '$components/PumpSetupCard.svelte';
+  import { SampleParametersCard } from '$components/sample';
+  import LineChart from '$components/ui/plots/line-chart.svelte';
 
   import type { PageProps } from './$types';
 
@@ -32,28 +32,16 @@
   let lastSimulationSnapshot = '';
 
   let previousAutoRun = true;
-  const autoSubmitScheduler = createDebouncedSubmitter(AUTO_RUN_DEBOUNCE_MS);
+  let autoSubmitTimeout: ReturnType<typeof setTimeout> | null = null;
 
   const simulation_json = $derived(JSON.stringify($state.snapshot(simulation)));
 
-  function createDebouncedSubmitter(delay: number) {
-    let timeout: ReturnType<typeof setTimeout> | null = null;
-
+  function attachRunForm(node: HTMLFormElement) {
+    runForm = node;
     return {
-      schedule(callback: () => void) {
-        if (timeout) {
-          clearTimeout(timeout);
-        }
-
-        timeout = setTimeout(() => {
-          timeout = null;
-          callback();
-        }, delay);
-      },
-      cancel() {
-        if (timeout) {
-          clearTimeout(timeout);
-          timeout = null;
+      destroy() {
+        if (runForm === node) {
+          runForm = null;
         }
       },
     };
@@ -74,7 +62,10 @@
 
     if (!autoRun) {
       lastSimulationSnapshot = snapshot;
-      autoSubmitScheduler.cancel();
+      if (autoSubmitTimeout) {
+        clearTimeout(autoSubmitTimeout);
+        autoSubmitTimeout = null;
+      }
       return;
     }
 
@@ -86,23 +77,41 @@
     if (!runForm) {
       return;
     }
-    autoSubmitScheduler.schedule(submitSimulation);
+    if (autoSubmitTimeout) {
+      clearTimeout(autoSubmitTimeout);
+    }
+    autoSubmitTimeout = setTimeout(() => {
+      autoSubmitTimeout = null;
+      submitSimulation();
+    }, AUTO_RUN_DEBOUNCE_MS);
   });
 
   $effect(() => {
     if (autoRun && !previousAutoRun && hasRegisteredSnapshot && runForm) {
-      autoSubmitScheduler.schedule(submitSimulation);
+      if (autoSubmitTimeout) {
+        clearTimeout(autoSubmitTimeout);
+      }
+      autoSubmitTimeout = setTimeout(() => {
+        autoSubmitTimeout = null;
+        submitSimulation();
+      }, AUTO_RUN_DEBOUNCE_MS);
     }
 
     if (!autoRun && previousAutoRun) {
-      autoSubmitScheduler.cancel();
+      if (autoSubmitTimeout) {
+        clearTimeout(autoSubmitTimeout);
+        autoSubmitTimeout = null;
+      }
     }
 
     previousAutoRun = autoRun.valueOf();
   });
 
   onDestroy(() => {
-    autoSubmitScheduler.cancel();
+    if (autoSubmitTimeout) {
+      clearTimeout(autoSubmitTimeout);
+      autoSubmitTimeout = null;
+    }
   });
 
   let { form }: PageProps = $props();
@@ -177,7 +186,7 @@
     <form
       action="?/run_simulation"
       method="post"
-      bind:this={runForm}
+      {@attach attachRunForm}
       use:enhance={({ formData }) => {
         formData.set('state', simulation_json);
 
@@ -196,9 +205,9 @@
     </form>
     <ScrollArea class="@container h-full">
       <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
-        <SampleCardParameters {short} />
-        <!-- <SampleCardGround /> -->
-        <!-- <SampleCardExcited /> -->
+        <SampleParametersCard {short} />
+        <!-- <SampleGroundCard /> -->
+        <!-- <SampleExcitedCard /> -->
         <DetectorCard {short} />
         <PumpCard {short} />
       </div>

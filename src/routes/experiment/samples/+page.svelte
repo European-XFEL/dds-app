@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { SampleCardExcited, SampleCardGround, SampleCardParameters } from '$components/sample';
+  import { SampleExcitedCard, SampleGroundCard, SampleParametersCard } from '$components/sample';
 </script>
 
 <div class="grid gap-4 md:grid-rows-1">
   <div>
-    <SampleCardParameters />
+    <SampleParametersCard />
   </div>
   <div class="flex flex-wrap gap-4">
-    <SampleCardGround />
-    <SampleCardExcited />
+    <SampleGroundCard />
+    <SampleExcitedCard />
   </div>
 </div>
