@@ -8,7 +8,7 @@
       groundName: string;
       excitedName: string;
       solventName: string;
-      concentration: number;
+      concentrationSoluteMolar: number;
     };
   } = $props();
 </script>
@@ -19,5 +19,5 @@
   <span>Ground: {sample.groundName}</span>
   <span>Excited: {sample.excitedName}</span>
   <span>Solvent: {sample.solventName}</span>
-  <span>Concentration: {sample.concentration}%</span>
+  <span>Solute Concentration: {sample.concentrationSoluteMolar}%</span>
 </Sidebar.Footer>
