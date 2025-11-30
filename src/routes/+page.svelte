@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { EChartsOption, SeriesOption } from 'echarts';
 
+  import { onDestroy } from 'svelte';
   import JSONTree from 'svelte-json-tree';
 
   import { enhance } from '$app/forms';
@@ -22,8 +23,87 @@
   const simulation = useSimulationState();
 
   let short = $state(true);
+  let autoRun = $state(true);
+
+  const AUTO_RUN_DEBOUNCE_MS = 600;
+
+  let runForm: HTMLFormElement | null = null;
+  let hasRegisteredSnapshot = false;
+  let lastSimulationSnapshot = '';
+
+  let previousAutoRun = true;
+  const autoSubmitScheduler = createDebouncedSubmitter(AUTO_RUN_DEBOUNCE_MS);
 
   const simulation_json = $derived(JSON.stringify($state.snapshot(simulation)));
+
+  function createDebouncedSubmitter(delay: number) {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+
+    return {
+      schedule(callback: () => void) {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+
+        timeout = setTimeout(() => {
+          timeout = null;
+          callback();
+        }, delay);
+      },
+      cancel() {
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+      },
+    };
+  }
+
+  function submitSimulation() {
+    runForm?.requestSubmit();
+  }
+
+  $effect(() => {
+    const snapshot = simulation_json;
+
+    if (!hasRegisteredSnapshot) {
+      hasRegisteredSnapshot = true;
+      lastSimulationSnapshot = snapshot;
+      return;
+    }
+
+    if (!autoRun) {
+      lastSimulationSnapshot = snapshot;
+      autoSubmitScheduler.cancel();
+      return;
+    }
+
+    if (snapshot === lastSimulationSnapshot) {
+      return;
+    }
+
+    lastSimulationSnapshot = snapshot;
+    if (!runForm) {
+      return;
+    }
+    autoSubmitScheduler.schedule(submitSimulation);
+  });
+
+  $effect(() => {
+    if (autoRun && !previousAutoRun && hasRegisteredSnapshot && runForm) {
+      autoSubmitScheduler.schedule(submitSimulation);
+    }
+
+    if (!autoRun && previousAutoRun) {
+      autoSubmitScheduler.cancel();
+    }
+
+    previousAutoRun = autoRun.valueOf();
+  });
+
+  onDestroy(() => {
+    autoSubmitScheduler.cancel();
+  });
 
   let { form }: PageProps = $props();
 
@@ -97,11 +177,22 @@
     <form
       action="?/run_simulation"
       method="post"
+      bind:this={runForm}
       use:enhance={({ formData }) => {
         formData.set('state', simulation_json);
+
+        return async ({ update }) => {
+          await update({ reset: false });
+        };
       }}
     >
-      <Button type="submit" class="w-full">Run simulation</Button>
+      <div class="flex items-center gap-3">
+        <Button type="submit" class="flex-1">Run Simulation</Button>
+        <label class="flex items-center gap-2 text-sm font-medium">
+          <input type="checkbox" class="h-4 w-4" bind:checked={autoRun} />
+          Auto-Run
+        </label>
+      </div>
     </form>
     <ScrollArea class="@container h-full">
       <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
