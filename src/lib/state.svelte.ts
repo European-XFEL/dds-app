@@ -1,3 +1,5 @@
+import { getContext, hasContext, setContext } from 'svelte';
+
 import type * as types from '$lib/types';
 
 const initial: types.SimulationDetails = {
@@ -40,4 +42,23 @@ const initial: types.SimulationDetails = {
   },
 };
 
-export const appState = $state(initial);
+const APP_STATE_KEY = Symbol('simulation-state');
+
+export type SimulationState = types.SimulationDetails;
+
+export function createSimulationSeed(seed: types.SimulationDetails = initial): types.SimulationDetails {
+  return structuredClone(seed);
+}
+
+export function provideSimulationState(state: SimulationState): SimulationState {
+  setContext(APP_STATE_KEY, state);
+  return state;
+}
+
+export function useSimulationState(): SimulationState {
+  if (!hasContext(APP_STATE_KEY)) {
+    throw new Error('Simulation state has not been provided in this component tree.');
+  }
+
+  return getContext<SimulationState>(APP_STATE_KEY);
+}

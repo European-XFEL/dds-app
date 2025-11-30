@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { appState } from '$lib/state.svelte';
+  import { useSimulationState } from '$lib/state.svelte';
 
   import DetectorCard from '$components/ui/detector/detector-card.svelte';
 
-  let { qRange: q_range, detector } = $state(appState);
+  const simulation = useSimulationState();
 
   let { short = false } = $props();
 </script>
 
-<DetectorCard bind:detector bind:q_range {short} />
+<DetectorCard detector={simulation.detector} q_range={simulation.qRange} {short} />
