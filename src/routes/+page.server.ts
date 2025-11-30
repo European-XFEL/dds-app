@@ -1,0 +1,115 @@
+import { create } from '@bufbuild/protobuf';
+import { ConnectError } from '@connectrpc/connect';
+import { eq } from 'drizzle-orm';
+
+import type { Actions } from '@sveltejs/kit';
+
+import * as schema from '$lib/server/db/schema';
+import { SimulationService, createClient, createGrpcTransport } from '$lib/server/grpc';
+import * as protoFiles from '$lib/server/grpc/gen/files_pb';
+import * as protoSim from '$lib/server/grpc/gen/simulation_pb';
+
+import { _db } from './+layout.server';
+
+export const actions: Actions = {
+  run_simulation: async ({ request, fetch }) => {
+    const transport = createGrpcTransport({
+      baseUrl: 'http://127.0.0.1:50051',
+    });
+
+    const simulation_client = createClient(SimulationService, transport);
+
+    const formData = await request.formData();
+
+    const state_json = formData.get('state');
+
+    if (typeof state_json !== 'string') {
+      console.log('No state provided');
+      return { results: null };
+    }
+
+    const state = JSON.parse(state_json);
+
+    const [ground] = await _db
+      .select()
+      .from(schema.moleculeTable)
+      .where(eq(schema.moleculeTable.id, state.sample.ground.id))
+      .limit(1);
+
+    const [excited] = await _db
+      .select()
+      .from(schema.moleculeTable)
+      .where(eq(schema.moleculeTable.id, state.sample.excited.id))
+      .limit(1);
+
+    const [solvent] = await _db
+      .select()
+      .from(schema.solventTable)
+      .where(eq(schema.solventTable.id, state.sample.solvent.id))
+      .limit(1);
+
+    if (!ground || !excited || !solvent) {
+      console.log('Could not find all sample files in database');
+      return { results: null };
+    }
+
+    // Encode contents as UInt8Array
+    const encoder = new TextEncoder();
+    const ground_contents = encoder.encode(ground.contents);
+    const excited_contents = encoder.encode(excited.contents);
+    const solvent_contents = encoder.encode(solvent.contents);
+
+    const sample = {
+      concentrationSoluteMolar: state.sample.concentrationSoluteMolar,
+      ground: {
+        filetype: protoFiles.FileTypes.STRUCTURE_FILE,
+        ...ground,
+        contents: ground_contents,
+      },
+      excited: {
+        filetype: protoFiles.FileTypes.STRUCTURE_FILE,
+        ...excited,
+        contents: excited_contents,
+      },
+      solvent: {
+        filetype: protoFiles.FileTypes.SOLVENT_FILE,
+        ...solvent,
+        contents: solvent_contents,
+      },
+    };
+
+    const sample_dump = {
+      ...sample,
+      qRange: state.qRange,
+      pump: state.pump,
+      ground: { ...sample.ground, contents: `<${sample.ground.contents.length} bytes>` },
+      excited: { ...sample.excited, contents: `<${sample.excited.contents.length} bytes>` },
+      solvent: { ...sample.solvent, contents: `<${sample.solvent.contents.length} bytes>` },
+    };
+    console.log('Sample dump:', sample_dump);
+
+    try {
+      const results = await simulation_client.runSimulation(
+        create(protoSim.SimulationRequestSchema, {
+          qRange: state.qRange,
+          pump: state.pump,
+          sample: sample,
+        }),
+      );
+
+      return {
+        results,
+      };
+    } catch (err) {
+      if (err instanceof ConnectError) {
+        err.code;
+        err.message;
+      }
+      const connectErr = ConnectError.from(err);
+      connectErr.code;
+      connectErr.message;
+      console.error('Simulation gRPC error:', connectErr);
+      return { results: null };
+    }
+  },
+};
