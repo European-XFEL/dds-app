@@ -13,6 +13,7 @@
   import { useSimulationState } from '$lib/state.svelte';
 
   import DetectorCard from '$components/detector/detector-card.svelte';
+  import PumpCard from '$components/pump/pump-card.svelte';
   import { SampleCardParameters } from '$components/sample';
   import LineChart from '$components/ui/plots/line.svelte';
 
@@ -108,6 +109,7 @@
         <!-- <SampleCardGround /> -->
         <!-- <SampleCardExcited /> -->
         <DetectorCard {short} />
+        <PumpCard {short} />
       </div>
     </ScrollArea>
     <Toggle class="mb-4 shrink-0 border-t bg-gray-50 p-0" bind:pressed={short}>
