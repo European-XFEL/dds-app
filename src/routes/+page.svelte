@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { EChartsOption, SeriesOption } from 'echarts';
 
+  import JSONTree from 'svelte-json-tree';
+
   import { enhance } from '$app/forms';
 
   import { Button } from '$shadcn/ui/button/index.js';
@@ -72,11 +74,22 @@
       ...series_common,
     },
   ]);
+
+  let results_dump = $derived({
+    ...form?.results,
+    q: `<${form?.results?.q?.length} values>`,
+    deltaS: `<${form?.results?.deltaS?.length} values>`,
+    deltaSSoluteExFrac: `<${form?.results?.deltaSSoluteExFrac?.length} values>`,
+    deltaSSolvent: `<${form?.results?.deltaSSolvent?.length} values>`,
+  });
 </script>
 
 <Resizable.PaneGroup direction="horizontal" class="max-w-full gap-4 rounded-lg">
   <Resizable.Pane defaultSize={70}>
     <LineChart {constant_options} {xAxis} {series} />
+    <div class="m-4 max-h-96 overflow-auto rounded-lg border p-4">
+      <JSONTree value={results_dump} shouldShowPreview={false} defaultExpandedLevel={3} />
+    </div>
   </Resizable.Pane>
   <Resizable.Handle />
   <Resizable.Pane defaultSize={30} class="flex min-w-110 flex-col">

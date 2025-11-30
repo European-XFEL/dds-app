@@ -97,6 +97,17 @@ export const actions: Actions = {
         }),
       );
 
+      // Log results summary, replacing large arrays with their lengths
+      const results_dump = {
+        ...results,
+        q: `<${results?.q?.length} values>`,
+        deltaS: `<${results?.deltaS?.length} values>`,
+        deltaSSoluteExFrac: `<${results?.deltaSSoluteExFrac?.length} values>`,
+        deltaSSolvent: `<${results?.deltaSSolvent?.length} values>`,
+      };
+
+      console.log('Simulation results dump:', results_dump);
+
       return {
         results,
       };
