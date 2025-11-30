@@ -4,7 +4,7 @@
   import { Label } from '$shadcn/ui/label/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
 
-  import type { SampleDetails } from '$lib/types';
+  import type { Sample } from '$lib/types';
 
   let {
     solvents,
@@ -12,7 +12,7 @@
     short = false,
   }: {
     solvents: { id: string; name: string }[];
-    sample: SampleDetails;
+    sample: Sample;
     short?: boolean;
   } = $props();
 
@@ -61,13 +61,19 @@
     <div class="grid">
       <Label>Solute Concentration (%)</Label>
       <div class="flex items-center justify-between gap-4">
-        <Input type="range" min="0" max="100" step="0.1" bind:value={sample.concentration} />
+        <Input
+          type="range"
+          min="0.001"
+          max="5"
+          step="0.001"
+          bind:value={sample.concentrationSoluteMolar}
+        />
         <Input
           type="number"
-          min="0"
-          max="100"
-          step="0.1"
-          bind:value={sample.concentration}
+          min="0.001"
+          max="5"
+          step="0.001"
+          bind:value={sample.concentrationSoluteMolar}
           disabled={false}
           class="w-30 text-sm text-muted-foreground"
         />

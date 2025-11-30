@@ -7,7 +7,7 @@
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
 
-  import type { SampleDetails } from '$lib/types';
+  import type { Sample } from '$lib/types';
 
   import LabeledPlaceholder from '$components/ui/placeholder.svelte';
 
@@ -17,8 +17,8 @@
     molecule = $bindable(),
   }: {
     title: string;
-    molecules: { id: string; name: string; content: string }[];
-    molecule: SampleDetails['ground'] | SampleDetails['excited'];
+    molecules: { id: string; filename: string; name: string; content: string }[];
+    molecule: Sample['ground'] | Sample['excited'];
   } = $props();
 
   const triggerMolecule = $derived(
@@ -75,7 +75,7 @@
         <Field.Content>
           <div class="h-120 w-full min-w-150 border border-muted/50">
             {#if !molecule?.id}
-              <LabeledPlaceholder label="No molecule selected" class="opacity-50 h-full w-full"/>
+              <LabeledPlaceholder label="No molecule selected" class="h-full w-full opacity-50" />
             {:else}
               <Structure {data_url} bind:structure style="height: 100%; width: 100%" />
             {/if}

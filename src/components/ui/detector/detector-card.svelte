@@ -5,19 +5,19 @@
   import { Toggle } from '$shadcn/ui/toggle';
 
   import * as qConvert from '$lib/math/q_detector_convert.ts';
-  import type { Detector, QVals } from '$lib/types';
+  import type { Detector, QRange } from '$lib/types';
 
   let {
     detector = $bindable(),
-    q_vals = $bindable(),
+    q_range = $bindable(),
     short = false,
   }: {
     detector: Detector;
-    q_vals: QVals;
+    q_range: QRange;
     short?: boolean;
   } = $props();
 
-  let configure_via_q: boolean = $state(false);
+  let configure_via_q: boolean = $state(true);
 
   $effect(() => {
     if (configure_via_q) return;
@@ -29,9 +29,9 @@
       detector.beam_center,
     );
 
-    q_vals.min = new_q_vals.min;
-    q_vals.max = new_q_vals.max;
-    q_vals.step = new_q_vals.step;
+    q_range.min = new_q_vals.min;
+    q_range.max = new_q_vals.max;
+    q_range.step = new_q_vals.step;
   });
 </script>
 
@@ -130,7 +130,7 @@
         <Input
           type="number"
           placeholder="0.1"
-          bind:value={q_vals.min}
+          bind:value={q_range.min}
           disabled={!configure_via_q}
         />
       </div>
@@ -139,7 +139,7 @@
         <Input
           type="number"
           placeholder="5.0"
-          bind:value={q_vals.max}
+          bind:value={q_range.max}
           disabled={!configure_via_q}
         />
       </div>
@@ -148,7 +148,7 @@
         <Input
           type="number"
           placeholder="0.01"
-          bind:value={q_vals.step}
+          bind:value={q_range.step}
           disabled={!configure_via_q}
         />
       </div>
