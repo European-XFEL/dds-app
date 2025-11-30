@@ -11,3 +11,9 @@ bun.lockb
 
 # ShadCN Components
 /src/lib/shadcn/
+
+# Backend
+/backend
+
+# Generated files
+/src/lib/server/grpc/gen

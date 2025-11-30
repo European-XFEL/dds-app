@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ params }) => {
   }
 
   const res = await _db
-    .select({ content: table.content })
+    .select({ content: table.contents })
     .from(table)
     .where(eq(table.id, params.id));
 
