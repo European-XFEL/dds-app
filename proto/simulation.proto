@@ -37,8 +37,8 @@ message SimulationRequest {
 message SimulationResponse {
   repeated double q = 1;
 
-  repeated double delta_s_total = 2;
-  repeated double delta_s_solute = 3;
+  repeated double delta_s = 2;
+  repeated double delta_s_solute_ex_frac = 3;
   repeated double delta_s_solvent = 4;
 
   double deposited_energy_joule = 5;

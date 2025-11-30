@@ -95,11 +95,11 @@ default_message_pool.register_message(
 class SimulationResponse(betterproto2.Message):
     q: "list[float]" = betterproto2.field(1, betterproto2.TYPE_DOUBLE, repeated=True)
 
-    delta_s_total: "list[float]" = betterproto2.field(
+    delta_s: "list[float]" = betterproto2.field(
         2, betterproto2.TYPE_DOUBLE, repeated=True
     )
 
-    delta_s_solute: "list[float]" = betterproto2.field(
+    delta_s_solute_ex_frac: "list[float]" = betterproto2.field(
         3, betterproto2.TYPE_DOUBLE, repeated=True
     )
 
