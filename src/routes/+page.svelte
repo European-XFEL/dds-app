@@ -1,6 +1,9 @@
 <script lang="ts">
-  import JSONTree from 'svelte-json-tree';
+  import type { EChartsOption, SeriesOption } from 'echarts';
 
+  import { enhance } from '$app/forms';
+
+  import { Button } from '$shadcn/ui/button/index.js';
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
   import Toggle from '$shadcn/ui/toggle/toggle.svelte';
@@ -8,32 +11,84 @@
   import { appState } from '$lib/state.svelte';
 
   import DetectorCard from '$components/detector/detector-card.svelte';
-  import { SampleCardExcited, SampleCardGround, SampleCardParameters } from '$components/sample';
+  import { SampleCardParameters } from '$components/sample';
+  import LineChart from '$components/ui/plots/line.svelte';
 
-  let sample = $state(appState);
-  let sample_dump = $derived({
-    sample: {
-      ground: sample.sample.ground.name,
-      excited: sample.sample.excited.name,
-      solvent: sample.sample.solvent.name,
-      concentration: sample.sample.concentration,
-    },
-    pump: sample.pump,
-    q_vals: sample.q_vals,
-    detector: sample.detector,
-  });
+  import type { PageProps } from './$types';
+
+  let simulation = $state(appState);
 
   let short = $state(true);
+
+  let simulation_json = $derived(JSON.stringify(simulation));
+
+  let { form }: PageProps = $props();
+
+  const constant_options: EChartsOption = {
+    title: { text: 'Difference Scattering Signals ΔS(q)' },
+    legend: { top: 'bottom' },
+    xAxis: {
+      id: 'q',
+      name: 'q (Å⁻¹)',
+      data: [],
+      axisLabel: {
+        formatter: (value: number) => Number(value).toPrecision(3),
+      },
+    },
+    yAxis: { type: 'value' },
+    series: [],
+    animationDuration: 500,
+    tooltip: { trigger: 'axis' },
+  };
+
+  let xAxis = $derived<EChartsOption['xAxis']>({
+    id: 'q',
+    data: form?.results?.q ?? [],
+  });
+
+  const series_common: SeriesOption = {
+    type: 'line',
+    showSymbol: false,
+    symbol: 'none',
+  };
+
+  let series = $derived<EChartsOption['series']>([
+    {
+      id: 'deltaS',
+      name: 'ΔS',
+      data: form?.results?.deltaS ?? [],
+      ...series_common,
+    },
+    {
+      id: 'deltaSSoluteExFrac',
+      name: 'ΔS Solute',
+      data: form?.results?.deltaSSoluteExFrac ?? [],
+      ...series_common,
+    },
+    {
+      id: 'deltaSSolvent',
+      name: 'ΔS Solvent',
+      data: form?.results?.deltaSSolvent ?? [],
+      ...series_common,
+    },
+  ]);
 </script>
 
 <Resizable.PaneGroup direction="horizontal" class="max-w-full gap-4 rounded-lg">
   <Resizable.Pane defaultSize={70}>
-    <h1 class="text-lg font-semibold">Current Sample Configuration</h1>
-    <br />
-    <JSONTree value={sample_dump} shouldShowPreview={false} defaultExpandedLevel={4} />
+    <LineChart {constant_options} {xAxis} {series} />
   </Resizable.Pane>
   <Resizable.Handle />
   <Resizable.Pane defaultSize={30} class="flex min-w-110 flex-col">
+    <form
+      action="?/run_simulation"
+      method="post"
+      use:enhance={({ formData }) => {
+        formData.set('state', simulation_json);
+      }}
+    >
+      <Button type="submit" class="w-full">Run simulation</Button>
+    </form>
     <ScrollArea class="@container h-full">
       <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
         <SampleCardParameters {short} />
