@@ -1,21 +1,19 @@
 <script lang="ts">
-  import { LayoutDashboard } from '@lucide/svelte';
-
   import type { ComponentProps } from 'svelte';
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
   import AppPicker from '$components/ui/app-picker.svelte';
 
-  import Content from './content.svelte';
-  import Footer from './footer.svelte';
+  import SidebarContent from './SidebarContent.svelte';
+  import SidebarFooter from './SidebarFooter.svelte';
 
   let {
     sample,
     ref = $bindable(null),
     collapsible = 'icon',
     ...restProps
-  }: ComponentProps<typeof Sidebar.Root> & ComponentProps<typeof Footer> = $props();
+  }: ComponentProps<typeof Sidebar.Root> & ComponentProps<typeof SidebarFooter> = $props();
 </script>
 
 <Sidebar.Root bind:ref {collapsible} {...restProps} variant="floating">
@@ -30,10 +28,10 @@
   </Sidebar.Header>
 
   <Sidebar.Content>
-    <Content />
+    <SidebarContent />
   </Sidebar.Content>
 
-  <Footer {sample} />
+  <SidebarFooter {sample} />
 
   <Sidebar.Rail />
 </Sidebar.Root>

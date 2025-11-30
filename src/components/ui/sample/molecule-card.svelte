@@ -26,14 +26,6 @@
   );
 
   const data_url = $derived(molecule?.id ? '/data/molecules/' + molecule.id : undefined);
-
-  let structure = $state(undefined);
-
-  $effect(() => {
-    if (data_url) {
-      structure = undefined;
-    }
-  });
 </script>
 
 <Card.Root class="flex-auto @sm:gap-3">
@@ -59,7 +51,7 @@
               {triggerMolecule}
             </Select.Trigger>
             <Select.Content class="w-(--radix-select-trigger-width)">
-              {#each molecules as { id, name }}
+              {#each molecules as { id, name } (id)}
                 <Select.Item value={id} label={name}>
                   {name}
                 </Select.Item>
@@ -77,7 +69,7 @@
             {#if !molecule?.id}
               <LabeledPlaceholder label="No molecule selected" class="h-full w-full opacity-50" />
             {:else}
-              <Structure {data_url} bind:structure style="height: 100%; width: 100%" />
+              <Structure {data_url} style="height: 100%; width: 100%" />
             {/if}
           </div>
         </Field.Content>

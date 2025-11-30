@@ -3,11 +3,11 @@
 
   import { useSimulationState } from '$lib/state.svelte';
 
-  import { MoleculeSharedCard } from '$components/ui/sample';
+  import { SampleSharedCard } from '$components/ui/sample';
 
   const simulation = useSimulationState();
 
   let { short = false } = $props();
 </script>
 
-<MoleculeSharedCard solvents={page.data.solvents} sample={simulation.sample} {short} />
+<SampleSharedCard solvents={page.data.solvents} sample={simulation.sample} {short} />

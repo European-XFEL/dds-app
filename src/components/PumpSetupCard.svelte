@@ -1,11 +1,11 @@
 <script lang="ts">
   import { useSimulationState } from '$lib/state.svelte';
 
-  import DetectorCard from '$components/ui/detector/detector-card.svelte';
+  import PumpSetupCard from '$components/ui/pump/setup-card.svelte';
 
   const simulation = useSimulationState();
 
   let { short = false } = $props();
 </script>
 
-<DetectorCard detector={simulation.detector} q_range={simulation.qRange} {short} />
+<PumpSetupCard pump={simulation.pump} {short} />
