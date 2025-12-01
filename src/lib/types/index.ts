@@ -1,5 +1,6 @@
 export * from './detector';
 export * from './files';
+export * from './probe';
 export * from './pump';
 export * from './q_range';
 export * from './realism_flags';
