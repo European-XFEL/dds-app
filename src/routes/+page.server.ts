@@ -4,6 +4,8 @@ import { eq } from 'drizzle-orm';
 
 import type { Actions } from '@sveltejs/kit';
 
+import { env } from '$env/dynamic/private';
+
 import * as schema from '$lib/server/db/schema';
 import { SimulationService, createClient, createGrpcTransport } from '$lib/server/grpc';
 import * as protoFiles from '$lib/server/grpc/gen/files_pb';
@@ -11,10 +13,12 @@ import * as protoSim from '$lib/server/grpc/gen/simulation_pb';
 
 import { _db } from './+layout.server';
 
+const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:50051';
+
 export const actions: Actions = {
   run_simulation: async ({ request, fetch }) => {
     const transport = createGrpcTransport({
-      baseUrl: 'http://127.0.0.1:50051',
+      baseUrl: `${BACKEND_URL}`,
     });
 
     const simulation_client = createClient(SimulationService, transport);

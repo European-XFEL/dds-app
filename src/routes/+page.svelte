@@ -25,7 +25,7 @@
   let short = $state(true);
   let autoRun = $state(true);
 
-  const AUTO_RUN_DEBOUNCE_MS = 600;
+  const AUTO_RUN_DEBOUNCE_MS = 300;
 
   let runForm: HTMLFormElement | null = null;
   let hasRegisteredSnapshot = false;
@@ -38,12 +38,8 @@
 
   function attachRunForm(node: HTMLFormElement) {
     runForm = node;
-    return {
-      destroy() {
-        if (runForm === node) {
-          runForm = null;
-        }
-      },
+    return () => {
+      if (runForm === node) runForm = null;
     };
   }
 
@@ -174,7 +170,7 @@
   });
 </script>
 
-<Resizable.PaneGroup direction="horizontal" class="max-w-full gap-4 rounded-lg">
+<Resizable.PaneGroup direction="horizontal" class="max-h-svh max-w-full gap-4 rounded-lg">
   <Resizable.Pane defaultSize={70}>
     <LineChart {constant_options} {xAxis} {series} />
     <div class="m-4 max-h-96 overflow-auto rounded-lg border p-4">
