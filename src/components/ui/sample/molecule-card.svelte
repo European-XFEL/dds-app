@@ -7,7 +7,7 @@
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
 
-  import type { Sample } from '$lib/types';
+  import type { Sample } from '$lib/types/';
 
   import LabeledPlaceholder from '$components/ui/placeholder.svelte';
 
