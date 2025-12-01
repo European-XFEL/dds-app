@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
 
-  import type { Point } from '$lib/math/crystallography_transforms';
+  import type { Point } from '$lib/types/';
 
   let {
     x,

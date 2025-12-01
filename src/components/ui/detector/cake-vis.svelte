@@ -5,28 +5,27 @@
   import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
   import {
-    type DetectorModule,
-    type Point,
-    type TransformedModuleTessellated,
     generateCakedGridLines,
-    getDefaultModules,
     radiusToTwoTheta,
     tessellatedModuleToSvgPaths,
     transformModuleTessellated,
   } from '$lib/math/crystallography_transforms';
+  import type { DetectorModule, Point, TransformedModuleTessellated } from '$lib/types/';
 
   import Crosshair from './cake-crosshair.svelte';
   import DraggableModule from './cake-module.svelte';
 
   let {
-    initialModules = getDefaultModules(),
+    detectorModules = $bindable(),
+    beamCenter = $bindable(),
     detectorDistance = 300,
     panelWidth = 450,
     panelHeight = 350,
     radiusRange = [0, 250] as [number, number],
     tessellationGrid = 20,
   }: {
-    initialModules?: DetectorModule[];
+    detectorModules: DetectorModule[];
+    beamCenter: Point;
     detectorDistance?: number;
     panelWidth?: number;
     panelHeight?: number;
@@ -34,12 +33,6 @@
     tessellationGrid?: number;
   } = $props();
 
-  let center = $state<Point>({
-    x: panelWidth / 2,
-    y: panelHeight / 2,
-  });
-
-  let modules = $state<DetectorModule[]>([...initialModules]);
   let detectorSvgElement = $state<SVGSVGElement | null>(null);
 
   const tailwind_gradient_tokens = [
@@ -60,7 +53,7 @@
   }
 
   let modules_with_color = $derived(
-    modules.map((module, index) => ({
+    detectorModules.map((module, index) => ({
       ...module,
       color: resolve_module_color(index, module.color),
     })),
@@ -89,7 +82,7 @@
 
   let transformed_modules = $derived<TransformedModuleTessellated[]>(
     modules_with_color.map((module) =>
-      transformModuleTessellated(module, center, detectorDistance, tessellationGrid),
+      transformModuleTessellated(module, beamCenter, detectorDistance, tessellationGrid),
     ),
   );
 
@@ -127,14 +120,14 @@
   );
 
   function handleCenterDrag(newPos: Point) {
-    center = {
+    beamCenter = {
       x: Math.max(10, Math.min(panelWidth - 10, newPos.x)),
       y: Math.max(10, Math.min(panelHeight - 10, newPos.y)),
     };
   }
 
   function handleModuleDrag(id: string, newPos: Point) {
-    modules = modules.map((module) =>
+    detectorModules = detectorModules.map((module) =>
       module.id === id ? { ...module, x: newPos.x, y: newPos.y } : module,
     );
   }
@@ -203,8 +196,8 @@
 
             {#each radius_rings as radius (radius)}
               <circle
-                cx={center.x}
-                cy={center.y}
+                cx={beamCenter.x}
+                cy={beamCenter.y}
                 r={radius}
                 fill="none"
                 stroke="currentColor"
@@ -219,8 +212,8 @@
             {/each}
 
             <Crosshair
-              x={center.x}
-              y={center.y}
+              x={beamCenter.x}
+              y={beamCenter.y}
               onDrag={handleCenterDrag}
               svgElement={detectorSvgElement}
             />
@@ -239,7 +232,7 @@
           </svg>
         </div>
         <p class="text-center text-xs text-muted-foreground">
-          Center: ({center.x.toFixed(0)}, {center.y.toFixed(0)})
+          Center: ({beamCenter.x.toFixed(0)}, {beamCenter.y.toFixed(0)})
         </p>
       </section>
 
