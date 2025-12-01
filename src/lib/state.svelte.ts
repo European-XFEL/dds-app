@@ -46,7 +46,9 @@ const APP_STATE_KEY = Symbol('simulation-state');
 
 export type SimulationState = types.SimulationDetails;
 
-export function createSimulationSeed(seed: types.SimulationDetails = initial): types.SimulationDetails {
+export function createSimulationSeed(
+  seed: types.SimulationDetails = initial,
+): types.SimulationDetails {
   return structuredClone(seed);
 }
 
