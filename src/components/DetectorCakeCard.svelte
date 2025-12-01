@@ -10,7 +10,6 @@
       y: 80,
       width: 120,
       height: 100,
-      color: '#3b82f6', // blue
     },
     {
       id: 'module-2',
@@ -18,7 +17,6 @@
       y: 80,
       width: 120,
       height: 100,
-      color: '#10b981', // green
     },
     {
       id: 'module-3',
@@ -26,7 +24,6 @@
       y: 200,
       width: 120,
       height: 100,
-      color: '#f59e0b', // amber
     },
     {
       id: 'module-4',
@@ -34,7 +31,6 @@
       y: 200,
       width: 120,
       height: 100,
-      color: '#ef4444', // red
     },
   ];
 </script>
