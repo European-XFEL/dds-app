@@ -39,36 +39,36 @@ const initial: SimulationDetails = {
     pixel_size: 0.172,
     distance: 200,
     wavelength: 1.54,
-    image_shape: [512, 512],
-    beam_center: { x: 256, y: 256 },
+    image_shape: [undefined, undefined],
+    beam_center: { x: undefined, y: undefined },
     modules: [
       {
         id: 'module-1',
-        x: 100,
-        y: 80,
-        width: 120,
-        height: 100,
+        x: 64,
+        y: 0 + 32,
+        width: 128,
+        height: 256,
       },
       {
         id: 'module-2',
-        x: 240,
-        y: 80,
-        width: 120,
-        height: 100,
+        x: 64 + 32,
+        y: 256 + 32 + 32,
+        width: 128,
+        height: 256,
       },
       {
         id: 'module-3',
-        x: 100,
-        y: 200,
-        width: 120,
-        height: 100,
+        x: 64 + 32 + 128,
+        y: 0 + 32,
+        width: 128,
+        height: 256,
       },
       {
         id: 'module-4',
-        x: 240,
-        y: 200,
-        width: 120,
-        height: 100,
+        x: 64 + 32 + 32 + 128,
+        y: 256 + 32 + 32,
+        width: 128,
+        height: 256,
       },
     ],
   },
@@ -83,6 +83,27 @@ export function createSimulationSeed(seed: SimulationDetails = initial): Simulat
 }
 
 export function provideSimulationState(state: SimulationState): SimulationState {
+  // Set default image shape and beam center if undefined based on the module extents
+  let maxX = 0;
+  let maxY = 0;
+  for (const module of state.detector.modules) {
+    const moduleMaxX = module.x + module.width;
+    const moduleMaxY = module.y + module.height;
+    if (moduleMaxX > maxX) {
+      maxX = moduleMaxX;
+    }
+    if (moduleMaxY > maxY) {
+      maxY = moduleMaxY;
+    }
+  }
+  state.detector.image_shape = [maxY, maxX];
+
+  state.detector.beam_center = {
+    x: state.detector.beam_center.x ?? 16 + (maxX / 2),
+    y: state.detector.beam_center.y ?? 16 + (maxY / 2),
+  };
+
+  $inspect(state.detector.image_shape, state.detector.beam_center);
   setContext(APP_STATE_KEY, state);
   return state;
 }

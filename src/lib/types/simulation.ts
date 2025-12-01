@@ -1,6 +1,6 @@
-import * as protoSim from '$lib/server/grpc/gen/simulation_pb';
+import type * as protoSim from '$lib/server/grpc/gen/simulation_pb';
 
-import type { Detector } from './detector';
+import type { Detector } from './detector.svelte';
 import type { XRayProbe } from './probe';
 import type { Pump } from './pump';
 import type { QRange } from './q_range';

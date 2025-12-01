@@ -2,10 +2,10 @@
   import type { EChartsOption, SeriesOption } from 'echarts';
 
   import { onDestroy } from 'svelte';
-  import JSONTree from 'svelte-json-tree';
 
   import { enhance } from '$app/forms';
 
+  import Badge from '$shadcn/ui/badge/badge.svelte';
   import { Button } from '$shadcn/ui/button/index.js';
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
@@ -16,6 +16,7 @@
   import DetectorCard from '$components/DetectorSetupCard.svelte';
   import PumpCard from '$components/PumpSetupCard.svelte';
   import { SampleParametersCard } from '$components/sample';
+  import Placeholder from '$components/ui/placeholder.svelte';
   import LineChart from '$components/ui/plots/line-chart.svelte';
 
   import type { PageProps } from './$types';
@@ -160,21 +161,20 @@
       ...series_common,
     },
   ]);
-
-  let results_dump = $derived({
-    ...form?.results,
-    q: `<${form?.results?.q?.length} values>`,
-    deltaS: `<${form?.results?.deltaS?.length} values>`,
-    deltaSSoluteExFrac: `<${form?.results?.deltaSSoluteExFrac?.length} values>`,
-    deltaSSolvent: `<${form?.results?.deltaSSolvent?.length} values>`,
-  });
 </script>
 
 <Resizable.PaneGroup direction="horizontal" class="max-h-svh max-w-full gap-4 rounded-lg">
   <Resizable.Pane defaultSize={70}>
-    <LineChart {constant_options} {xAxis} {series} />
-    <div class="m-4 max-h-96 overflow-auto rounded-lg border p-4">
-      <JSONTree value={results_dump} shouldShowPreview={false} defaultExpandedLevel={3} />
+    <div class="flow-row w-max items-center gap-3">
+      <Badge variant="outline"
+        >Delta T (K): {form?.results?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
+      >
+      <Badge variant="outline"
+        >Deposited Energy (J): {form?.results?.depositedEnergyJoule ?? 'N/A'}</Badge
+      >
+    </div>
+    <div class="flex flex-col gap-6 pt-4">
+      <LineChart {constant_options} {xAxis} {series} />
     </div>
   </Resizable.Pane>
   <Resizable.Handle />
