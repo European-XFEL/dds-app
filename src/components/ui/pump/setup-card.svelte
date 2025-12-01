@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ComponentProps } from 'svelte';
+
   import * as Card from '$shadcn/ui/card';
   import * as Field from '$shadcn/ui/field';
   import { Input } from '$shadcn/ui/input';
@@ -9,10 +11,22 @@
   let { pump = $bindable(), short }: { pump: Pump; short: boolean } = $props();
 
   const fields = [
-    { label: 'Excited State Energy (eV)', key: 'excitedStateEnergyEv' },
-    { label: 'Excited State Fraction', key: 'excitedStateFraction' },
-    { label: 'Photon Energy (eV)', key: 'photonEnergyEv' },
-  ] satisfies Array<{ label: string; key: keyof Pump }>;
+    {
+      label: 'Excited State Energy (eV)',
+      key: 'excitedStateEnergyEv',
+      input: { min: 0.1, max: 2, step: 0.1 },
+    },
+    {
+      label: 'Excited State Fraction',
+      key: 'excitedStateFraction',
+      input: { min: 0.0, max: 1.0, step: 0.01 },
+    },
+    {
+      label: 'Photon Energy (eV)',
+      key: 'photonEnergyEv',
+      input: { min: 1.0, max: 5.0, step: 0.1 },
+    },
+  ] satisfies Array<{ label: string; key: keyof Pump; input: ComponentProps<typeof Input> }>;
 </script>
 
 <Card.Root class="max-h-fit @sm:gap-3">
@@ -22,18 +36,17 @@
 
   <Card.Content>
     <form>
-      {#each fields as { label, key } (key)}
+      {#each fields as { label, key, input } (key)}
         <Field.Field>
           <Field.Label>
             <Label>{label}</Label>
           </Field.Label>
           <Field.Content>
             <div class="flex items-center justify-between gap-2">
-              <Input type="range" min="0.01" step="0.01" bind:value={pump[key]} />
+              <Input type="range" {...input} bind:value={pump[key]} />
               <Input
                 type="number"
-                min="0.01"
-                step="0.01"
+                {...input}
                 bind:value={pump[key]}
                 class="w-30 text-sm text-muted-foreground"
               />
