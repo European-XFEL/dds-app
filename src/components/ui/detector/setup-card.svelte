@@ -21,12 +21,13 @@
 
   $effect(() => {
     if (configure_via_q) return;
+
     let new_q_vals = qConvert.detectorQParams(
       detector.image_shape,
       detector.pixel_size,
       detector.distance,
       detector.wavelength,
-      [detector.beam_center.x, detector.beam_center.y],
+      [detector?.beam_center?.x, detector?.beam_center?.y],
     );
 
     q_range.min = new_q_vals.min;
@@ -74,8 +75,8 @@
       <div class="flex flex-col gap-2" hidden={short}>
         <Label>Image Shape (px)</Label>
         <div class="flex flex-row gap-2">
-          <Input type="number" placeholder="512" bind:value={detector.image_shape[0]} />
-          <Input type="number" placeholder="512" bind:value={detector.image_shape[1]} />
+          <Input type="number" placeholder="512" value={detector?.image_shape?.[0]} readonly disabled/>
+          <Input type="number" placeholder="512" value={detector?.image_shape?.[1]} readonly disabled/>
         </div>
       </div>
       <div class="flex flex-col gap-2" hidden={short}>
@@ -84,13 +85,13 @@
           <Input
             type="number"
             placeholder="256"
-            bind:value={detector.beam_center.x}
+            value={detector?.beam_center?.x}
             disabled={configure_via_q}
           />
           <Input
             type="number"
             placeholder="256"
-            bind:value={detector.beam_center.y}
+            value={detector.beam_center?.y}
             disabled={configure_via_q}
           />
         </div>

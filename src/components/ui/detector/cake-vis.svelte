@@ -20,7 +20,7 @@
     beamCenter = $bindable(),
     detectorDistance = 300,
     panelWidth = 450,
-    panelHeight = 350,
+    panelHeight = 600,
     radiusRange = [0, 250] as [number, number],
     tessellationGrid = 20,
   }: {

@@ -5,7 +5,21 @@
 
   const simulation = useSimulationState();
 
-  $inspect(simulation.detector.beam_center);
+  $effect(() => {
+    let maxX = 0;
+    let maxY = 0;
+    for (const module of simulation.detector.modules) {
+      const moduleMaxX = module.x + module.width;
+      const moduleMaxY = module.y + module.height;
+      if (moduleMaxX > maxX) {
+        maxX = moduleMaxX;
+      }
+      if (moduleMaxY > maxY) {
+        maxY = moduleMaxY;
+      }
+    }
+    simulation.detector.image_shape = [maxY, maxX];
+  });
 </script>
 
 <DetectorCakeVisualization
