@@ -5,7 +5,7 @@
   import { Toggle } from '$shadcn/ui/toggle';
 
   import * as qConvert from '$lib/math/q_detector_convert.ts';
-  import type { Detector, QRange } from '$lib/types';
+  import type { Detector, QRange } from '$lib/types/';
 
   let {
     detector = $bindable(),

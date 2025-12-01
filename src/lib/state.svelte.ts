@@ -1,8 +1,8 @@
 import { getContext, hasContext, setContext } from 'svelte';
 
-import type * as types from '$lib/types';
+import type { SimulationDetails } from '$lib/types/';
 
-const initial: types.SimulationDetails = {
+const initial: SimulationDetails = {
   qRange: {
     min: 0.01,
     max: 9.0,
@@ -44,11 +44,9 @@ const initial: types.SimulationDetails = {
 
 const APP_STATE_KEY = Symbol('simulation-state');
 
-export type SimulationState = types.SimulationDetails;
+export type SimulationState = SimulationDetails;
 
-export function createSimulationSeed(
-  seed: types.SimulationDetails = initial,
-): types.SimulationDetails {
+export function createSimulationSeed(seed: SimulationDetails = initial): SimulationDetails {
   return structuredClone(seed);
 }
 

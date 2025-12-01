@@ -6,7 +6,7 @@
   import { Input } from '$shadcn/ui/input';
   import { Label } from '$shadcn/ui/label';
 
-  import type { Pump } from '$lib/types';
+  import type { Pump } from '$lib/types/';
 
   let { pump = $bindable(), short }: { pump: Pump; short: boolean } = $props();
 
