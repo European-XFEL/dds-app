@@ -34,7 +34,7 @@ export interface DetectorModule {
   y: number; // Top-left corner y
   width: number;
   height: number;
-  color: string; // For visual distinction
+  color?: string; // Optional; UI can auto-assign colors when omitted
 }
 
 export interface TessellatedQuad {
@@ -118,7 +118,7 @@ export function transformModuleTessellated(
   return {
     id: module.id,
     quads: tessellateModule(module, center, detectorDistance, gridSize),
-    color: module.color,
+    color: module.color ?? 'var(--color-slate-500)',
   };
 }
 
@@ -253,7 +253,6 @@ export function getDefaultModules(): DetectorModule[] {
       y: offsetY,
       width: moduleWidth,
       height: moduleHeight,
-      color: '#3b82f6',
     },
     {
       id: 'module-2',
@@ -261,7 +260,6 @@ export function getDefaultModules(): DetectorModule[] {
       y: offsetY,
       width: moduleWidth,
       height: moduleHeight,
-      color: '#10b981',
     },
     {
       id: 'module-3',
@@ -269,7 +267,6 @@ export function getDefaultModules(): DetectorModule[] {
       y: offsetY + moduleHeight + gap,
       width: moduleWidth,
       height: moduleHeight,
-      color: '#f59e0b',
     },
     {
       id: 'module-4',
@@ -277,7 +274,6 @@ export function getDefaultModules(): DetectorModule[] {
       y: offsetY + moduleHeight + gap,
       width: moduleWidth,
       height: moduleHeight,
-      color: '#ef4444',
     },
   ];
 }

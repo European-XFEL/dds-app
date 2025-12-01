@@ -42,6 +42,30 @@
   let modules = $state<DetectorModule[]>([...initialModules]);
   let detectorSvgElement = $state<SVGSVGElement | null>(null);
 
+  const tailwind_gradient_tokens = [
+    '--color-red-500',
+    '--color-amber-500',
+    '--color-lime-500',
+    '--color-emerald-500',
+    '--color-sky-500',
+    '--color-indigo-500',
+    '--color-fuchsia-500',
+    '--color-rose-600',
+  ] as const;
+
+  function resolve_module_color(index: number, explicit?: string): string {
+    if (explicit) return explicit;
+    const token = tailwind_gradient_tokens[index % tailwind_gradient_tokens.length];
+    return `var(${token})`;
+  }
+
+  let modules_with_color = $derived(
+    modules.map((module, index) => ({
+      ...module,
+      color: resolve_module_color(index, module.color),
+    })),
+  );
+
   function attachDetectorSvg(node: SVGSVGElement) {
     detectorSvgElement = node;
     return {
@@ -64,7 +88,7 @@
   let two_theta_span = $derived(Math.max(two_theta_range[1] - two_theta_range[0], Number.EPSILON));
 
   let transformed_modules = $derived<TransformedModuleTessellated[]>(
-    modules.map((module) =>
+    modules_with_color.map((module) =>
       transformModuleTessellated(module, center, detectorDistance, tessellationGrid),
     ),
   );
@@ -190,7 +214,7 @@
               />
             {/each}
 
-            {#each modules as module (module.id)}
+            {#each modules_with_color as module (module.id)}
               <DraggableModule {module} onDrag={handleModuleDrag} svgElement={detectorSvgElement} />
             {/each}
 
@@ -318,7 +342,7 @@
 
     <!-- Module legend -->
     <div class="flex flex-wrap justify-center gap-3 text-xs text-muted-foreground">
-      {#each modules as module (module.id)}
+      {#each modules_with_color as module (module.id)}
         <div
           class="flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 shadow-sm"
         >

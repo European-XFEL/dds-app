@@ -17,6 +17,7 @@
   let drag_offset: Point = { x: 0, y: 0 };
 
   const module_label = $derived(module.id.replace('module-', 'Module '));
+  const module_color = $derived(module.color ?? 'var(--color-slate-500)');
 
   function handle_mouse_down(event: MouseEvent) {
     event.preventDefault();
@@ -78,9 +79,9 @@
     y={module.y}
     width={module.width}
     height={module.height}
-    fill={module.color}
+    fill={module_color}
     fill-opacity="0.25"
-    stroke={module.color}
+    stroke={module_color}
     stroke-width="2"
     class="hover:fill-opacity-40 pointer-events-auto transition-[fill-opacity]"
   />
@@ -89,7 +90,7 @@
     y={module.y + module.height / 2}
     text-anchor="middle"
     dominant-baseline="middle"
-    fill={module.color}
+    fill={module_color}
     font-size="11"
     font-weight="600"
     class="pointer-events-none tracking-tight select-none"
