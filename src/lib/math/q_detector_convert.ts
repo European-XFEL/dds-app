@@ -1,12 +1,4 @@
-export type Shape = [ny: number, nx: number];
-export type PixelSize = number;
-export type BeamCenter = [cy: number, cx: number];
-
-export interface QParams {
-  min: number;
-  max: number;
-  step: number;
-}
+import type { BeamCenter, PixelSize, QParams, Shape } from '$lib/types/';
 
 /**
  * Compute approximate q_min, q_max, q_step from detector geometry.

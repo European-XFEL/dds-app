@@ -13,6 +13,9 @@ const initial: SimulationDetails = {
     excitedStateEnergyEv: 2.0,
     excitedStateFraction: 0.5,
   },
+  probe: {
+    wavelength: 1.54,
+  },
   sample: {
     concentrationSoluteMolar: 0.005,
     ground: {
@@ -36,9 +39,38 @@ const initial: SimulationDetails = {
     pixel_size: 0.172,
     distance: 200,
     wavelength: 1.54,
-    shape: [512, 512],
-    beam_center: [256, 256],
-    quadrant_positions: [],
+    image_shape: [512, 512],
+    beam_center: { x: 256, y: 256 },
+    modules: [
+      {
+        id: 'module-1',
+        x: 100,
+        y: 80,
+        width: 120,
+        height: 100,
+      },
+      {
+        id: 'module-2',
+        x: 240,
+        y: 80,
+        width: 120,
+        height: 100,
+      },
+      {
+        id: 'module-3',
+        x: 100,
+        y: 200,
+        width: 120,
+        height: 100,
+      },
+      {
+        id: 'module-4',
+        x: 240,
+        y: 200,
+        width: 120,
+        height: 100,
+      },
+    ],
   },
 };
 

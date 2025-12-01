@@ -7,7 +7,15 @@
  * - "Caked" (r, χ) coordinates for the transformed view
  */
 
-type RangeTuple = readonly [number, number];
+
+import type {
+  DetectorModule,
+  Point,
+  PolarPoint,
+  RangeTuple,
+  TessellatedQuad,
+  TransformedModuleTessellated,
+} from '$lib/types/';
 
 const DEG_PER_RAD = 180 / Math.PI;
 const TAU = Math.PI * 2;
@@ -15,36 +23,6 @@ const EPSILON = Number.EPSILON;
 
 function rangeSpan([min, max]: RangeTuple): number {
   return Math.max(max - min, EPSILON);
-}
-
-export interface Point {
-  x: number;
-  y: number;
-}
-
-export interface PolarPoint {
-  r: number; // Radial distance from center
-  phi: number; // Azimuthal angle in radians (-π to π), also called Chi (χ)
-  twoTheta: number; // Scattering angle 2θ in degrees
-}
-
-export interface DetectorModule {
-  id: string;
-  x: number; // Top-left corner x
-  y: number; // Top-left corner y
-  width: number;
-  height: number;
-  color?: string; // Optional; UI can auto-assign colors when omitted
-}
-
-export interface TessellatedQuad {
-  corners: PolarPoint[]; // 4 corners in order: TL, TR, BR, BL
-}
-
-export interface TransformedModuleTessellated {
-  id: string;
-  quads: TessellatedQuad[];
-  color: string;
 }
 
 /**
@@ -234,46 +212,4 @@ export function generateCakedGridLines(
   }
 
   return { twoThetaLines, chiLines };
-}
-
-/**
- * Default detector modules arranged in a 2x2 grid with gaps.
- */
-export function getDefaultModules(): DetectorModule[] {
-  const moduleWidth = 120;
-  const moduleHeight = 100;
-  const gap = 20;
-  const offsetX = 100;
-  const offsetY = 80;
-
-  return [
-    {
-      id: 'module-1',
-      x: offsetX,
-      y: offsetY,
-      width: moduleWidth,
-      height: moduleHeight,
-    },
-    {
-      id: 'module-2',
-      x: offsetX + moduleWidth + gap,
-      y: offsetY,
-      width: moduleWidth,
-      height: moduleHeight,
-    },
-    {
-      id: 'module-3',
-      x: offsetX,
-      y: offsetY + moduleHeight + gap,
-      width: moduleWidth,
-      height: moduleHeight,
-    },
-    {
-      id: 'module-4',
-      x: offsetX + moduleWidth + gap,
-      y: offsetY + moduleHeight + gap,
-      width: moduleWidth,
-      height: moduleHeight,
-    },
-  ];
 }
