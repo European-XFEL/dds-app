@@ -11,13 +11,12 @@
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
   import Toggle from '$shadcn/ui/toggle/toggle.svelte';
 
+  import { DetectorCard } from '$lib/detector';
+  import LineChart from '$lib/plots/line-chart.svelte';
+  import { PumpSetupCard } from '$lib/pump';
+  import { SampleParametersCard } from '$lib/sample';
   import { useSimulationState } from '$lib/state.svelte';
-
-  import DetectorCard from '$components/DetectorSetupCard.svelte';
-  import PumpCard from '$components/PumpSetupCard.svelte';
-  import { SampleParametersCard } from '$components/sample';
-  import Placeholder from '$components/ui/placeholder.svelte';
-  import LineChart from '$components/ui/plots/line-chart.svelte';
+  import Placeholder from '$lib/ui/components/placeholder.svelte';
 
   import type { PageProps } from './$types';
 
@@ -205,7 +204,7 @@
         <!-- <SampleGroundCard /> -->
         <!-- <SampleExcitedCard /> -->
         <DetectorCard {short} />
-        <PumpCard {short} />
+        <PumpSetupCard {short} />
       </div>
     </ScrollArea>
     <Toggle class="mb-4 shrink-0 border-t bg-gray-50 p-0" bind:pressed={short}>

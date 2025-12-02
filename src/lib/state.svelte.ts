@@ -1,6 +1,6 @@
 import { getContext, hasContext, setContext } from 'svelte';
 
-import type { SimulationDetails } from '$lib/types/';
+import type { SimulationDetails } from '$lib/types';
 
 const initial: SimulationDetails = {
   qRange: {
@@ -39,8 +39,8 @@ const initial: SimulationDetails = {
     pixel_size: 0.172,
     distance: 200,
     wavelength: 1.54,
-    image_shape: [undefined, undefined],
-    beam_center: { x: undefined, y: undefined },
+    image_shape: [256, 256],
+    beam_center: { x: 128, y: 128 },
     modules: [
       {
         id: 'module-1',

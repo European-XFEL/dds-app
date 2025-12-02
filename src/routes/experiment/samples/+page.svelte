@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SampleExcitedCard, SampleGroundCard, SampleParametersCard } from '$components/sample';
+  import { SampleExcitedCard, SampleGroundCard, SampleParametersCard } from '$lib/sample';
 </script>
 
 <div class="grid gap-4 md:grid-rows-1">

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import DetectorCakeCard from '$components/DetectorCakeCard.svelte';
-  import DetectorCard from '$components/DetectorSetupCard.svelte';
+  import { DetectorCakeCard, DetectorCard } from '$lib/detector/';
 </script>
 
 <DetectorCard />
