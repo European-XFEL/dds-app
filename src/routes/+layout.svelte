@@ -6,7 +6,7 @@
 
   import { createSimulationSeed, provideSimulationState } from '$lib/state.svelte';
 
-  import AppSidebar from '$components/sidebar/Sidebar.svelte';
+  import AppSidebar from '$lib/sidebar/Sidebar.svelte';
 
   let { children } = $props();
 

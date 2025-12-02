@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PumpCard from '$components/PumpSetupCard.svelte';
+  import { PumpSetupCard } from '$lib/pump';
 </script>
 
-<PumpCard />
+<PumpSetupCard />
