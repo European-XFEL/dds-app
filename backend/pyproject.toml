@@ -13,6 +13,7 @@ dependencies = [
     "numpy>=2.3.5",
     "periodictable>=2.0.2",
     "pydantic>=2.12.5",
+    "pyfai>=2025.3.0",
     "scipy>=1.16.3",
     "simex-debye",
     "simex-lite",
