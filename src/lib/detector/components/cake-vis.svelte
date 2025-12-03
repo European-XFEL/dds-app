@@ -1,6 +1,8 @@
 <script lang="ts">
   import { BadgeInfo } from '@lucide/svelte';
 
+  import { draw } from 'svelte/transition';
+
   import * as Card from '$shadcn/ui/card/index.js';
   import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
@@ -10,7 +12,7 @@
     tessellatedModuleToSvgPaths,
     transformModuleTessellated,
   } from '$lib/detector/components/cake';
-  import type { DetectorModule, CartesianPoint, TransformedModuleTessellated } from '$lib/types';
+  import type { CartesianPoint, DetectorModule, TransformedModuleTessellated } from '$lib/types';
 
   import Crosshair from './cake-crosshair.svelte';
   import DraggableModule from './cake-module.svelte';
@@ -153,19 +155,19 @@
 
 <Card.Root class="@container w-full min-w-fit">
   <Card.Header class="gap-3">
-    <div class="items-center gap-3">
-      <Card.Title>Detector Caking Visualization</Card.Title>
+    <Card.Title
+      >Detector Caking Visualization
       <Tooltip.Provider>
         <Tooltip.Root>
           <Tooltip.Trigger><BadgeInfo size={14} /></Tooltip.Trigger>
           <Tooltip.Content class="max-w-xs">
             Drag the <span class="font-medium text-destructive">red crosshair</span> to move the
-            beam center or drag the <span class="font-medium text-foreground">colored modules</span>
+            beam center or drag the <span class="font-medium text-blue-600">colored modules</span>
             to reposition them. The caked projection updates in real time.
           </Tooltip.Content>
         </Tooltip.Root>
       </Tooltip.Provider>
-    </div>
+    </Card.Title>
   </Card.Header>
 
   <Card.Content class="space-y-6">
@@ -196,14 +198,15 @@
 
             {#each radius_rings as radius (radius)}
               <circle
+                in:draw|global={{ duration: 3000, delay: 500 }}
                 cx={beamCenter.x}
                 cy={beamCenter.y}
                 r={radius}
                 fill="none"
                 stroke="currentColor"
-                stroke-opacity="0.15"
+                stroke-opacity="0.35"
                 stroke-width="1"
-                stroke-dasharray="4 4"
+                stroke-dasharray="4 1"
               />
             {/each}
 
@@ -268,6 +271,7 @@
 
             {#each transformed_paths as tp (tp.id)}
               <path
+                in:draw|global={{ duration: 1200, delay: 200 }}
                 d={tp.path}
                 fill={tp.color}
                 fill-opacity="0.35"

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { draw } from 'svelte/transition';
 
-  import type { DetectorModule, CartesianPoint } from '$lib/types';
+  import type { CartesianPoint, DetectorModule } from '$lib/types';
 
   let {
     module,
@@ -75,6 +76,7 @@
   onmousedown={handle_mouse_down}
 >
   <rect
+    in:draw|global={{ duration: 1200, delay: 200 }}
     x={module.x}
     y={module.y}
     width={module.width}
