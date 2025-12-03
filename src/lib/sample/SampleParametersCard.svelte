@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/state';
+  import { listSolvents } from '../../routes/data.remote';
 
   import { useSimulationState } from '$lib/state.svelte';
 
@@ -10,4 +10,4 @@
   let { short = false } = $props();
 </script>
 
-<SampleSharedCard solvents={page.data.solvents} sample={simulation.sample} {short} />
+<SampleSharedCard solvents={listSolvents()} bind:sample={simulation.sample} {short} />
