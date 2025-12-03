@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/state';
+  import { listMolecules } from '../../routes/data.remote';
 
   import { useSimulationState } from '$lib/state.svelte';
 
@@ -9,8 +9,4 @@
   const sample = simulation.sample;
 </script>
 
-<MoleculeCard
-  title="Excited State"
-  molecules={page.data.molecules}
-  bind:molecule={sample.excited}
-/>
+<MoleculeCard title="Excited State" molecules={listMolecules()} bind:molecule={sample.excited} />
