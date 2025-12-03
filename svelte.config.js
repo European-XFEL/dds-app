@@ -15,6 +15,14 @@ const config = {
       $components: './src/components',
       $shadcn: './src/lib/shadcn/components',
     },
+    experimental: {
+      remoteFunctions: true,
+    },
+  },
+  compilerOptions: {
+    experimental: {
+      async: false,
+    },
   },
   extensions: ['.svelte', '.svx'],
 };
