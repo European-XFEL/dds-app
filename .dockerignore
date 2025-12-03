@@ -25,3 +25,4 @@ local.db
 
 # Ignore compose
 docker-compose.*
+Dockerfile.*

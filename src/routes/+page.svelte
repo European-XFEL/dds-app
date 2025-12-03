@@ -16,7 +16,6 @@
   import { PumpSetupCard } from '$lib/pump';
   import { SampleParametersCard } from '$lib/sample';
   import { useSimulationState } from '$lib/state.svelte';
-  import Placeholder from '$lib/ui/components/placeholder.svelte';
 
   import type { PageProps } from './$types';
 
