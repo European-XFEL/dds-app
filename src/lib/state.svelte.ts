@@ -19,19 +19,19 @@ const initial: SimulationDetails = {
   sample: {
     concentrationSoluteMolar: 0.005,
     ground: {
-      id: 'Au2L2-S0_GS.xyz',
-      filename: 'Au2L2-S0_GS.xyz',
-      name: 'Au2L2-S0_GS',
+      id: '',
+      filename: '',
+      name: '',
     },
     excited: {
-      id: 'Au2L2-T0_ES.xyz',
-      filename: 'Au2L2-T0_ES.xyz',
-      name: 'Au2L2-T0_ES',
+      id: '',
+      filename: '',
+      name: '',
     },
     solvent: {
-      id: 'MeCN.txt',
-      filename: 'MeCN.txt',
-      name: 'acetonitrile',
+      id: '',
+      filename: '',
+      name: '',
     },
   },
   detector: {
@@ -99,11 +99,10 @@ export function provideSimulationState(state: SimulationState): SimulationState 
   state.detector.image_shape = [maxY, maxX];
 
   state.detector.beam_center = {
-    x: state.detector.beam_center.x ?? 16 + (maxX / 2),
-    y: state.detector.beam_center.y ?? 16 + (maxY / 2),
+    x: state.detector.beam_center.x ?? 16 + maxX / 2,
+    y: state.detector.beam_center.y ?? 16 + maxY / 2,
   };
 
-  $inspect(state.detector.image_shape, state.detector.beam_center);
   setContext(APP_STATE_KEY, state);
   return state;
 }

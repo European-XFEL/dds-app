@@ -1,17 +1,14 @@
 import { create } from '@bufbuild/protobuf';
 import { ConnectError } from '@connectrpc/connect';
-import { eq } from 'drizzle-orm';
 
 import type { Actions } from '@sveltejs/kit';
 
 import { env } from '$env/dynamic/private';
 
-import * as schema from '$lib/server/db/schema';
+import { db } from '$lib/server/db';
 import { SimulationService, createClient, createGrpcTransport } from '$lib/server/grpc';
 import * as protoFiles from '$lib/server/grpc/gen/files_pb';
 import * as protoSim from '$lib/server/grpc/gen/simulation_pb';
-
-import { _db } from './+layout.server';
 
 const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:50051';
 
@@ -34,23 +31,20 @@ export const actions: Actions = {
 
     const state = JSON.parse(state_json);
 
-    const [ground] = await _db
-      .select()
-      .from(schema.moleculeTable)
-      .where(eq(schema.moleculeTable.id, state.sample.ground.id))
-      .limit(1);
+    const ground = await db.query.moleculeTable.findFirst({
+      with: { fileTable: true },
+      where: (table, { eq }) => eq(table.id, state.sample.ground.id),
+    });
 
-    const [excited] = await _db
-      .select()
-      .from(schema.moleculeTable)
-      .where(eq(schema.moleculeTable.id, state.sample.excited.id))
-      .limit(1);
+    const excited = await db.query.moleculeTable.findFirst({
+      with: { fileTable: true },
+      where: (table, { eq }) => eq(table.id, state.sample.excited.id),
+    });
 
-    const [solvent] = await _db
-      .select()
-      .from(schema.solventTable)
-      .where(eq(schema.solventTable.id, state.sample.solvent.id))
-      .limit(1);
+    const solvent = await db.query.solventTable.findFirst({
+      with: { fileTable: true },
+      where: (table, { eq }) => eq(table.id, state.sample.solvent.id),
+    });
 
     if (!ground || !excited || !solvent) {
       console.log('Could not find all sample files in database');
@@ -59,9 +53,9 @@ export const actions: Actions = {
 
     // Encode contents as UInt8Array
     const encoder = new TextEncoder();
-    const ground_contents = encoder.encode(ground.contents);
-    const excited_contents = encoder.encode(excited.contents);
-    const solvent_contents = encoder.encode(solvent.contents);
+    const ground_contents = encoder.encode(ground.fileTable.contents);
+    const excited_contents = encoder.encode(excited.fileTable.contents);
+    const solvent_contents = encoder.encode(solvent.fileTable.contents);
 
     const sample = {
       concentrationSoluteMolar: state.sample.concentrationSoluteMolar,
