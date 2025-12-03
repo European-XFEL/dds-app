@@ -75,8 +75,20 @@
       <div class="flex flex-col gap-2" hidden={short}>
         <Label>Image Shape (px)</Label>
         <div class="flex flex-row gap-2">
-          <Input type="number" placeholder="512" value={detector?.image_shape?.[0]} readonly disabled/>
-          <Input type="number" placeholder="512" value={detector?.image_shape?.[1]} readonly disabled/>
+          <Input
+            type="number"
+            placeholder="512"
+            value={detector?.image_shape?.[0]}
+            readonly
+            disabled
+          />
+          <Input
+            type="number"
+            placeholder="512"
+            value={detector?.image_shape?.[1]}
+            readonly
+            disabled
+          />
         </div>
       </div>
       <div class="flex flex-col gap-2" hidden={short}>

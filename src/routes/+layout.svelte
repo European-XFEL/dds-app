@@ -4,9 +4,8 @@
   import { Separator } from '$shadcn/ui/separator';
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
-  import { createSimulationSeed, provideSimulationState } from '$lib/state.svelte';
-
   import AppSidebar from '$lib/sidebar/Sidebar.svelte';
+  import { createSimulationSeed, provideSimulationState } from '$lib/state.svelte';
 
   let { children } = $props();
 

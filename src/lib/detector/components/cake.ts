@@ -6,11 +6,9 @@
  * - Polar (r, φ) coordinates where r is distance from beam center and φ is azimuthal angle
  * - "Caked" (r, χ) coordinates for the transformed view
  */
-
-
 import type {
-  DetectorModule,
   CartesianPoint,
+  DetectorModule,
   PolarPoint,
   RangeTuple,
   TessellatedQuad,
@@ -39,7 +37,11 @@ export function radiusToTwoTheta(radius: number, detectorDistance: number): numb
 /**
  * Convert detector (x, y) coordinates to polar coordinates relative to beam center.
  */
-export function detectorToPolar(point: CartesianPoint, center: CartesianPoint, detectorDistance: number): PolarPoint {
+export function detectorToPolar(
+  point: CartesianPoint,
+  center: CartesianPoint,
+  detectorDistance: number,
+): PolarPoint {
   const dx = point.x - center.x;
   const dy = point.y - center.y;
 
