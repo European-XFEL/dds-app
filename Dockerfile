@@ -23,11 +23,22 @@ FROM build-deps AS build
 
 COPY . ./
 
-ENV DATABASE_URL="file:/app/local.db"
+ENV DATABASE_URL="/app/local.db"
 
 RUN pnpm db:push --force
 
+RUN pnpm db:seed
+
 RUN pnpm run build
+
+# Serve dev
+FROM build AS dev
+
+WORKDIR /app
+
+EXPOSE 4173
+
+CMD [ "pnpm", "run", "preview", "--host", "0.0.0.0" ]
 
 # Serve
 FROM oven/bun:latest
