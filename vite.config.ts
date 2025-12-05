@@ -1,11 +1,20 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { playwright } from '@vitest/browser-playwright';
+import { visualizer } from 'rollup-plugin-visualizer';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+  plugins: [
+    tailwindcss(),
+    sveltekit(),
+    devtoolsJson(),
+    visualizer({
+      emitFile: true,
+      filename: 'stats.html',
+    }),
+  ],
   test: {
     expect: { requireAssertions: true },
     projects: [
