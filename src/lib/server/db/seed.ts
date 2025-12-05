@@ -26,8 +26,8 @@ export async function bootstrap(
   const client = new PGlite(env.DATABASE_URL);
   const db = drizzle({ client, schema });
 
-  await seedMolecules(db, molecules_dir);
-  await seedSolvents(db, solvents_dir);
+  // Run molecule and solvent seeding in parallel
+  await Promise.all([seedMolecules(db, molecules_dir), seedSolvents(db, solvents_dir)]);
 }
 
 /**
@@ -38,25 +38,26 @@ async function seedMolecules(db: Database, directory: string) {
   const files = await fs.readdir(directory);
   const xyzFiles = files.filter((file) => file.endsWith('.xyz'));
 
-  for (const filename of xyzFiles) {
+  // Read all files in parallel
+  const moleculeData = await Promise.all(
+    xyzFiles.map(async (filename) => {
     const filePath = path.join(directory, filename);
     const contents = await fs.readFile(filePath, 'utf-8');
     const name = path.basename(filename, '.xyz');
+      return { name, filename, contents };
+    }),
+  );
 
-    // Insert file and get the id
-    const [fileRecord] = await db
-      .insert(fileTable)
-      .values({ filename, contents })
-      .onConflictDoNothing()
-      .returning({ id: fileTable.id });
-
-    // If file was inserted (not a duplicate), create the molecule entry
-    if (fileRecord?.id) {
+  // Insert all molecules in parallel
+  await Promise.all(
+    moleculeData.map(async ({ name, filename, contents }) => {
+      console.log(`Seeding molecule: ${name} from file: ${filename}`);
       await db
-        .insert(moleculeTable)
-        .values({ name, fileId: fileRecord.id })
-        .onConflictDoNothing({ target: moleculeTable.name });
-    }
+        .insert(molecules)
+        .values({ name, filename, contents })
+        .onConflictDoNothing({ target: molecules.name });
+    }),
+  );
   }
 }
 
@@ -80,7 +81,8 @@ async function seedSolvents(db: Database, directory: string) {
     (file) => file.endsWith('.txt') && !file.endsWith('-error.txt'),
   );
 
-  for (const filename of solventFiles) {
+  // Read all files and start chemical queries in parallel
+  const solventDataPromises = solventFiles.map(async (filename) => {
     const filePath = path.join(directory, filename);
     const contents = await fs.readFile(filePath, 'utf-8');
     const fileName = path.parse(filename).name;
@@ -93,14 +95,22 @@ async function seedSolvents(db: Database, directory: string) {
       .onConflictDoNothing()
       .returning({ id: fileTable.id });
 
-    // If file was inserted (not a duplicate), create the solvent entry
-    if (fileRecord?.id) {
+  // Wait for all file processing to complete
+  const solventData = await Promise.all(solventDataPromises);
+
+  // Insert all solvents in parallel
+  await Promise.all(
+    solventData.map(async (values) => {
+      console.log(
+        `Seeding solvent: ${values.name} with rhom: ${values.rhom}, cpm: ${values.cpm}, q: [${values.qMin}, ${values.qMax}] step: ${values.qStep}`,
+      );
+
       await db
-        .insert(solventTable)
-        .values({ name, fileId: fileRecord.id })
-        .onConflictDoNothing({ target: solventTable.name });
-    }
-  }
+        .insert(solvents)
+        .values(values)
+        .onConflictDoUpdate({ target: solvents.name, set: values });
+    }),
+  );
 }
 
 // Run bootstrap when executed directly
