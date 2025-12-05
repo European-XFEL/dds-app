@@ -6,19 +6,15 @@
   const simulation = useSimulationState();
 
   $effect(() => {
-    let maxX = 0;
-    let maxY = 0;
-    for (const module of simulation.detector.modules) {
-      const moduleMaxX = module.x + module.width;
-      const moduleMaxY = module.y + module.height;
-      if (moduleMaxX > maxX) {
-        maxX = moduleMaxX;
-      }
-      if (moduleMaxY > maxY) {
-        maxY = moduleMaxY;
-      }
-    }
-    simulation.detector.image_shape = [maxY, maxX];
+    const modules = simulation.detector.modules;
+
+    const moduleXs = modules.map((m) => m.x);
+    const moduleYs = modules.map((m) => m.y);
+
+    const X = Math.max(...moduleXs) - Math.min(...moduleXs);
+    const Y = Math.min(...moduleYs) - Math.max(...moduleYs);
+
+    simulation.detector.image_shape = [X + modules[0].width, Y + modules[0].height];
   });
 </script>
 
