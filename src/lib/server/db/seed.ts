@@ -1,13 +1,15 @@
+import { queryChemicalPyodide } from '../thermo';
 import { PGlite } from '@electric-sql/pglite';
 import dotenv from 'dotenv';
 import { PgliteDatabase } from 'drizzle-orm/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import fs from 'fs/promises';
+import Papa from 'papaparse';
 import path from 'path';
 import { env } from 'process';
 
 import * as schema from './schema';
-import { fileTable, moleculeTable, solventTable } from './schema';
+import { molecules, solvents } from './schema';
 
 dotenv.config();
 
@@ -41,9 +43,9 @@ async function seedMolecules(db: Database, directory: string) {
   // Read all files in parallel
   const moleculeData = await Promise.all(
     xyzFiles.map(async (filename) => {
-    const filePath = path.join(directory, filename);
-    const contents = await fs.readFile(filePath, 'utf-8');
-    const name = path.basename(filename, '.xyz');
+      const filePath = path.join(directory, filename);
+      const contents = await fs.readFile(filePath, 'utf-8');
+      const name = path.basename(filename, '.xyz');
       return { name, filename, contents };
     }),
   );
@@ -58,24 +60,30 @@ async function seedMolecules(db: Database, directory: string) {
         .onConflictDoNothing({ target: molecules.name });
     }),
   );
-  }
 }
+
+type SolventDifferentials = {
+  Q: number;
+  dSdT: number;
+  dSdRho: number;
+};
+
+const solvent_name_map: { [key: string]: string } = {
+  CCl4: 'carbon tetrachloride',
+  CH2Cl2: 'dichloromethane',
+  CHCl3: 'chloroform',
+  Cyclohexane: 'cyclohexane',
+  EtOH: 'ethanol',
+  'KMnO4-H2O': 'potassium permanganate',
+  MeOH: 'methanol',
+  MeCN: 'acetonitrile',
+};
 
 /**
  * Seed solvents from .txt files in the specified directory.
  * Only non-error files are processed (files ending in -error.txt are skipped).
  */
 async function seedSolvents(db: Database, directory: string) {
-  const solvent_name_map: { [key: string]: string } = {
-    CCl4: 'carbon tetrachloride',
-    CH2Cl2: 'dichloromethane',
-    CHCl3: 'chloroform',
-    Cyclohexane: 'cyclohexane',
-    EtOH: 'ethanol',
-    'KMnO4-H2O': 'aqueous potassium permanganate',
-    MeOH: 'methanol',
-    MeCN: 'acetonitrile',
-  };
   const files = await fs.readdir(directory);
   const solventFiles = files.filter(
     (file) => file.endsWith('.txt') && !file.endsWith('-error.txt'),
@@ -88,12 +96,40 @@ async function seedSolvents(db: Database, directory: string) {
     const fileName = path.parse(filename).name;
     const name = solvent_name_map[fileName] || fileName;
 
-    // Insert file and get the id
-    const [fileRecord] = await db
-      .insert(fileTable)
-      .values({ filename, contents })
-      .onConflictDoNothing()
-      .returning({ id: fileTable.id });
+    // Start the chemical query (returns a promise)
+    const chemPromise = queryChemicalPyodide(name);
+
+    const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents.replaceAll(/#.*\n/g, '');
+    const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
+      delimiter: '\t',
+      dynamicTyping: false,
+      header: true,
+      skipEmptyLines: true,
+    });
+
+    const { data } = parsed;
+
+    const q = new Float64Array(data.map((row) => row.Q));
+
+    const qMin = Math.min(...q);
+    const qMax = Math.max(...q);
+    const qSteps = q.map((val, idx, arr) => (idx === 0 ? 0 : val - arr[idx - 1])).slice(1);
+    const qStep = Math.min(...qSteps);
+
+    // Await the chemical query
+    const [rhom, cpm] = await chemPromise;
+
+    return {
+      name,
+      filename,
+      contents,
+      rhom: rhom,
+      cpm: cpm,
+      qMin: qMin,
+      qMax: qMax,
+      qStep: qStep,
+    };
+  });
 
   // Wait for all file processing to complete
   const solventData = await Promise.all(solventDataPromises);
