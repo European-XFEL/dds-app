@@ -45,7 +45,7 @@
           },
           {
             title: 'X-Ray Probe', // Detector wavelength goes here
-            url: '/experiment/pump-probe',
+            url: '/experiment/x-probe',
             icon: Radiation,
           },
           {
