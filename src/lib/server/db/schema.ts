@@ -1,80 +1,85 @@
 import { createId } from '@paralleldrive/cuid2';
-import { relations } from 'drizzle-orm';
-import { char, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { getTableColumns, relations } from 'drizzle-orm';
+import { char, numeric, pgTable, text, timestamp, unique } from 'drizzle-orm/pg-core';
 
-export const fileTable = pgTable('files', {
-  id: char({ length: 32 })
-    .primaryKey()
-    .$defaultFn(() => createId()),
-  filename: text().unique().notNull(),
-  contents: text().notNull(),
+const timestamps = {
   createdAt: timestamp({ mode: 'date', precision: 3 })
     .notNull()
     .$defaultFn(() => new Date()),
   updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
-});
+};
 
-export const moleculeTable = pgTable('molecules', {
-  id: char({ length: 32 })
-    .primaryKey()
-    .$defaultFn(() => createId()),
-  name: text().unique().notNull(),
-  fileId: char('fileId', { length: 32 })
-    .references(() => fileTable.id)
-    .notNull(),
-});
+const fileData = {
+  filename: text('filename').notNull(),
+  contents: text('contents').notNull(),
+};
 
-export const solventTable = pgTable('solvents', {
-  id: char({ length: 32 })
-    .primaryKey()
-    .$defaultFn(() => createId()),
-  name: text().unique().notNull(),
-  fileId: char('fileId', { length: 32 })
-    .references(() => fileTable.id)
-    .notNull(),
-});
+const qRange = {
+  qMin: numeric({ mode: 'number' }).notNull(),
+  qMax: numeric({ mode: 'number' }).notNull(),
+  qStep: numeric({ mode: 'number' }).notNull(),
+};
 
-export const moleculeFileRelations = relations(moleculeTable, ({ one }) => ({
-  fileTable: one(fileTable, {
-    fields: [moleculeTable.fileId],
-    references: [fileTable.id],
+export const molecules = pgTable(
+  'molecules',
+  {
+    id: char({ length: 32 })
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    name: text().unique().notNull(),
+    ...fileData,
+    ...timestamps,
+  },
+  (table) => ({
+    filenameUnique: unique().on(table.filename),
+  }),
+);
+
+const { contents: _, ...moleculesInfo } = getTableColumns(molecules);
+
+export { moleculesInfo };
+
+export const intensities = pgTable(
+  'intensities',
+  {
+    moleculeId: char({ length: 32 })
+      .references(() => molecules.id)
+      .notNull(),
+    ...qRange,
+    q: numeric().array(),
+    intensity: numeric().array(),
+    ...timestamps,
+  },
+  (table) => ({
+    pk: [table.moleculeId, table.qMin, table.qMax, table.qStep],
+  }),
+);
+
+export const moleculeIntensityRelations = relations(intensities, ({ one }) => ({
+  moleculeTable: one(molecules, {
+    fields: [intensities.moleculeId],
+    references: [molecules.id],
   }),
 }));
 
-export const solventFileRelations = relations(solventTable, ({ one }) => ({
-  fileTable: one(fileTable, {
-    fields: [solventTable.fileId],
-    references: [fileTable.id],
+export const solvents = pgTable(
+  'solvents',
+  {
+    id: char({ length: 32 })
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    name: text().unique().notNull(),
+    rhom: numeric({ mode: 'number' }).notNull(),
+    cpm: numeric({ mode: 'number' }).notNull(),
+    ...fileData,
+    ...timestamps,
+    ...qRange,
+  },
+  (table) => ({
+    filenameUnique: unique().on(table.filename),
   }),
-}));
+);
 
-export const sampleTable = pgTable('samples', {
-  id: char({ length: 32 })
-    .primaryKey()
-    .$defaultFn(() => createId()),
-  name: text().notNull(),
-  groundId: char('groundId', { length: 32 })
-    .references(() => moleculeTable.id)
-    .notNull(),
-  excitedId: char('excitedId', { length: 32 })
-    .references(() => moleculeTable.id)
-    .notNull(),
-  solventId: char('solventId', { length: 32 })
-    .references(() => solventTable.id)
-    .notNull(),
-});
+const { contents: __, ...solventsInfo } = getTableColumns(solvents);
 
-export const sampleRelations = relations(sampleTable, ({ one }) => ({
-  ground: one(moleculeTable, {
-    fields: [sampleTable.groundId],
-    references: [moleculeTable.id],
-  }),
-  excited: one(moleculeTable, {
-    fields: [sampleTable.excitedId],
-    references: [moleculeTable.id],
-  }),
-  solvent: one(solventTable, {
-    fields: [sampleTable.solventId],
-    references: [solventTable.id],
-  }),
-}));
+export { solventsInfo };
