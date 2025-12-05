@@ -5,10 +5,10 @@
     sample,
   }: {
     sample: {
-      groundName: string;
-      excitedName: string;
-      solventName: string;
-      concentrationSoluteMolar: number;
+      groundName: string | undefined;
+      excitedName: string | undefined;
+      solventName: string | undefined;
+      concentrationSoluteMolar: number | undefined;
     };
   } = $props();
 </script>
@@ -16,8 +16,8 @@
 <Sidebar.Footer
   class="grid gap-1 text-sm text-muted-foreground group-data-[collapsible=icon]:hidden"
 >
-  <span>Ground: {sample.groundName}</span>
-  <span>Excited: {sample.excitedName}</span>
-  <span>Solvent: {sample.solventName}</span>
-  <span>Solute Concentration: {sample.concentrationSoluteMolar}%</span>
+  <span>Ground: {sample.groundName ?? ''}</span>
+  <span>Excited: {sample.excitedName ?? ''}</span>
+  <span>Solvent: {sample.solventName ?? ''}</span>
+  <span>Solute Concentration: {sample.concentrationSoluteMolar ?? ''}%</span>
 </Sidebar.Footer>

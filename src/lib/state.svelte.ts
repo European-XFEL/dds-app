@@ -2,7 +2,7 @@ import { getContext, hasContext, setContext } from 'svelte';
 
 import type { SimulationDetails } from '$lib/types';
 
-const initial: SimulationDetails = {
+const initialSeed = {
   qRange: {
     min: 0.01,
     max: 9.0,
@@ -16,31 +16,11 @@ const initial: SimulationDetails = {
   probe: {
     wavelength: 1.54,
   },
-  sample: {
-    concentrationSoluteMolar: 0.005,
-    ground: {
-      id: '',
-      filename: '',
-      name: '',
-    },
-    excited: {
-      id: '',
-      filename: '',
-      name: '',
-    },
-    solvent: {
-      id: '',
-      filename: '',
-      name: '',
-    },
-  },
   detector: {
     name: 'detector',
     pixel_size: 0.172,
     distance: 200,
     wavelength: 1.54,
-    image_shape: [256, 256],
-    beam_center: { x: 128, y: 128 },
     modules: [
       {
         id: 'module-1',
@@ -78,15 +58,13 @@ const APP_STATE_KEY = Symbol('simulation-state');
 
 export type SimulationState = SimulationDetails;
 
-export function createSimulationSeed(seed: SimulationDetails = initial): SimulationDetails {
-  return structuredClone(seed);
-}
+export function createSimulationSeed(_seed = initialSeed): SimulationState {
+  const seed = structuredClone(_seed);
 
-export function provideSimulationState(state: SimulationState): SimulationState {
   // Set default image shape and beam center if undefined based on the module extents
   let maxX = 0;
   let maxY = 0;
-  for (const module of state.detector.modules) {
+  for (const module of seed.detector.modules) {
     const moduleMaxX = module.x + module.width;
     const moduleMaxY = module.y + module.height;
     if (moduleMaxX > maxX) {
@@ -96,14 +74,31 @@ export function provideSimulationState(state: SimulationState): SimulationState 
       maxY = moduleMaxY;
     }
   }
-  state.detector.image_shape = [maxY, maxX];
+  const image_shape: [number, number] = [maxY, maxX];
 
-  state.detector.beam_center = {
-    x: state.detector.beam_center.x ?? 16 + maxX / 2,
-    y: state.detector.beam_center.y ?? 16 + maxY / 2,
+  const beam_center = {
+    x: 16 + maxX / 2,
+    y: 16 + maxY / 2,
   };
 
+  // Wrap with $state() to make it deeply reactive for bindings
+  const state: SimulationState = $state({
+    ...seed,
+    detector: {
+      ...seed.detector,
+      image_shape,
+      beam_center,
+    },
+    sample: {
+      concentrationSoluteMolar: undefined,
+      solvent: undefined,
+      excited: undefined,
+      ground: undefined,
+    },
+  });
+
   setContext(APP_STATE_KEY, state);
+
   return state;
 }
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Info } from '@lucide/svelte';
+
   import { onMount } from 'svelte';
 
   import * as Card from '$shadcn/ui/card/index.js';
@@ -6,18 +8,22 @@
   import { Label } from '$shadcn/ui/label/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
   import { Spinner } from '$shadcn/ui/spinner/index.js';
+  import * as Tooltip from '$shadcn/ui/tooltip';
 
+  import type { listSolvents } from '$lib/data.remote';
   import type { Sample } from '$lib/types';
 
-  type Solvents = { id: string; name: string }[];
+  type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 
   let {
     solvents: _solvents,
-    sample = $bindable(),
+    solvent = $bindable(),
+    concentrationSoluteMolar = $bindable(),
     short = false,
   }: {
     solvents: Solvents | Promise<Solvents>;
-    sample: Sample;
+    solvent: Sample['solvent'];
+    concentrationSoluteMolar: Sample['concentrationSoluteMolar'];
     short?: boolean;
   } = $props();
 
@@ -54,14 +60,15 @@
         name="solvent"
         disabled={loading}
         bind:value={
-          () => sample.solvent.id,
-          (v) => (
-            (sample.solvent.id = v),
-            (sample.solvent.name = solvents.find((s) => s.id === v)?.name ?? sample.solvent.name)
-          )
+            () => solvent?.id,
+            (v) => {
+              if (v !== undefined) {
+                solvent = solvents.find((s) => s.id === v);
+              }
+            }
         }
       >
-        <Select.Trigger class="w-full items-center">
+          <Select.Trigger class="w-full">
           {triggerSolvent}
         </Select.Trigger>
         <Select.Content class="w-(--radix-select-trigger-width)">
@@ -74,9 +81,7 @@
       </Select.Root>
     </div>
 
-    <hr class="my-4" hidden={short} />
-
-    <div class="grid min-w-100 grow">
+      <div class="grid min-w-100 gap-2 grow @sm:min-w-40">
       <Label>Solute Concentration (%)</Label>
       <div class="flex items-center justify-between gap-4">
         <Input
@@ -84,7 +89,7 @@
           min="0.001"
           max="5"
           step="0.001"
-          bind:value={sample.concentrationSoluteMolar}
+            bind:value={concentrationSoluteMolar}
           disabled={false}
           class="w-30 text-sm text-muted-foreground"
         />
@@ -93,8 +98,9 @@
           min="0.001"
           max="5"
           step="0.001"
-          bind:value={sample.concentrationSoluteMolar}
+            bind:value={concentrationSoluteMolar}
         />
+        </div>
       </div>
     </div>
   </Card.Content>

@@ -1,12 +1,16 @@
-import type { SolventFile, StructureFile } from '../files/types';
+import { listMolecules, listSolvents } from '$lib/data.remote';
 
-import type * as protoSim from '$lib/server/grpc/gen/simulation_pb';
+export type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 
-export type Sample = Omit<
-  protoSim.SimulationRequest_Sample,
-  '$typeName' | 'ground' | 'excited' | 'solvent'
-> & {
-  ground: StructureFile;
-  excited: StructureFile;
-  solvent: SolventFile;
+export type Solvent = Solvents[number];
+
+export type Molecules = Awaited<ReturnType<typeof listMolecules>>;
+
+export type Molecule = Molecules[number];
+
+export type Sample = {
+  concentrationSoluteMolar: number | undefined;
+  solvent: Solvent | undefined;
+  ground: Molecule | undefined;
+  excited: Molecule | undefined;
 };

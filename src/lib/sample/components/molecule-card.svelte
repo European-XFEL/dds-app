@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getMoleculeFileContent } from '../../../routes/data.remote';
+  import { getMoleculeFileContent, listMolecules } from '../../data.remote';
   import { Upload } from '@lucide/svelte';
   import { Structure } from 'matterviz';
 
@@ -15,9 +15,9 @@
   import type { Sample } from '$lib/types';
   import LabeledPlaceholder from '$lib/ui/components/placeholder.svelte';
 
-  type Molecules = { id: string; name: string }[];
+  type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
-  const {
+  let {
     title,
     molecules: _molecules,
     molecule = $bindable(),
@@ -63,10 +63,12 @@
             type="single"
             disabled={loading}
             bind:value={
-              () => molecule.id,
+              () => molecule?.id,
               (v) => {
-                molecule.id = v;
-                molecule.name = triggerMolecule;
+                let res = molecules.find((m) => m.id === v);
+                if (res) {
+                  molecule = res;
+                }
               }
             }
           >
