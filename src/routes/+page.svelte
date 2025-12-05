@@ -1,5 +1,12 @@
 <script lang="ts">
-  import type { EChartsOption, SeriesOption } from 'echarts';
+  import type { LineSeriesOption } from 'echarts/charts';
+  import type {
+    GridComponentOption,
+    LegendComponentOption,
+    TitleComponentOption,
+    TooltipComponentOption,
+  } from 'echarts/components';
+  import type { ComposeOption } from 'echarts/core';
 
   import { onDestroy } from 'svelte';
 
@@ -18,6 +25,15 @@
   import { useSimulationState } from '$lib/state.svelte';
 
   import type { PageProps } from './$types';
+
+  // Compose type for type-safe options
+  type ECOption = ComposeOption<
+    | LineSeriesOption
+    | TitleComponentOption
+    | TooltipComponentOption
+    | GridComponentOption
+    | LegendComponentOption
+  >;
 
   const simulation = useSimulationState();
 
@@ -111,7 +127,7 @@
 
   let { form }: PageProps = $props();
 
-  const constant_options: EChartsOption = {
+  const constant_options: ECOption = {
     title: { text: 'Difference Scattering Signals ΔS(q)' },
     legend: { top: 'bottom' },
     xAxis: {
@@ -128,18 +144,18 @@
     tooltip: { trigger: 'axis' },
   };
 
-  let xAxis = $derived<EChartsOption['xAxis']>({
+  let xAxis = $derived<ECOption['xAxis']>({
     id: 'q',
     data: form?.results?.q ?? [],
   });
 
-  const series_common: SeriesOption = {
+  const series_common: LineSeriesOption = {
     type: 'line',
     showSymbol: false,
     symbol: 'none',
   };
 
-  let series = $derived<EChartsOption['series']>([
+  let series = $derived<ECOption['series']>([
     {
       id: 'deltaS',
       name: 'ΔS',
