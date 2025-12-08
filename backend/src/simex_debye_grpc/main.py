@@ -1,38 +1,54 @@
-from grpclib.server import Server
-from grpclib.utils import graceful_exit
+from typing import Annotated
 
-from . import models
-from .calculator import SimulationCalculator
+from connectrpc.request import RequestContext
+from pydantic import BaseModel, Field
+
+from .gen import simulation_connect
+from .gen.simulation_pb2 import SimulationRequest, SimulationResponse
 
 
-class SimulationService(models.SimulationServiceBase):
-    async def run_simulation(
-        self, message: models.SimulationRequest
-    ) -> models.SimulationResponse:
-        calculator = SimulationCalculator(message)
-        response = calculator.run()
-        print(
-            f"SimulationResponse: q={len(response.q)}, "
-            f"delta_s={len(response.delta_s)}, "
-            f"delta_s_solute_ex_frac={len(response.delta_s_solute_ex_frac)}, "
-            f"delta_s_solvent={len(response.delta_s_solvent)}, "
-            f"deposited_energy_joule={response.deposited_energy_joule}, "
-            f"delta_temperature_k={response.delta_temperature_k}, "
-            f"solvent_to_solute_ratio={response.solvent_to_solute_ratio}"
+class QRange(BaseModel):
+    min: Annotated[float, Field(ge=0.001)]
+    max: Annotated[float, Field(le=10)]
+    step: Annotated[float, Field(ge=0.001)]
+
+
+class File(BaseModel):
+    filename: Annotated[str, Field(min_length=4, pattern=r"^\w*\.xyz$")]
+    contents: Annotated[bytes, Field(min_length=8)]
+
+
+class SimulationService(simulation_connect.SimulationService):
+    async def calc_debye(
+        self, request: SimulationRequest, ctx: RequestContext
+    ) -> SimulationResponse:
+        from .calculator import calc_debye
+
+        q_range = request.q_range
+        QRange(min=q_range.min, max=q_range.max, step=q_range.step)
+
+        structure = request.structure
+        File(filename=structure.filename, contents=structure.contents)
+
+        result = calc_debye(
+            q_range=request.q_range,
+            structure=request.structure,
         )
-        return response
+
+        return SimulationResponse(q=result[0], i=result[1])
 
 
-async def main(*, host="127.0.0.1", port=50051):
-    server = Server([SimulationService()])
-
-    with graceful_exit([server]):
-        await server.start(host, port)
-        print(f"Serving on {host}:{port}")
-        await server.wait_closed()
+app = simulation_connect.SimulationServiceASGIApplication(service=SimulationService())
 
 
 if __name__ == "__main__":
     import asyncio
+    import uvicorn
 
-    asyncio.run(main())
+    app = simulation_connect.SimulationServiceASGIApplication(
+        service=SimulationService()
+    )
+
+    asyncio.run(
+        uvicorn.run(app, host="127.0.0.1", port=50051)
+    )
