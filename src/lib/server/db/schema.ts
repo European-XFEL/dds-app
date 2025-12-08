@@ -35,7 +35,7 @@ export const molecules = pgTable(
   }),
 );
 
-const { contents: _, ...moleculesInfo } = getTableColumns(molecules);
+const { contents: _m_contents, ...moleculesInfo } = getTableColumns(molecules);
 
 export { moleculesInfo };
 
@@ -80,6 +80,6 @@ export const solvents = pgTable(
   }),
 );
 
-const { contents: __, ...solventsInfo } = getTableColumns(solvents);
+const { contents: _s_contents, ...solventsInfo } = getTableColumns(solvents);
 
 export { solventsInfo };
