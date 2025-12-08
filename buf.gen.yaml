@@ -6,9 +6,11 @@ plugins:
     opt: target=ts
     out: ./src/lib/server/grpc/gen
     include_imports: true
-  - local: backend/.venv/bin/protoc-gen-python_betterproto2
-    opt: server_generation=async
-    out: ./backend/src/simex_debye_grpc/_gen
-    include_imports: true
+  - remote: buf.build/protocolbuffers/python
+    out: ./backend/src/simex_debye_grpc/gen
+  - remote: buf.build/protocolbuffers/pyi
+    out: ./backend/src/simex_debye_grpc/gen
+  - remote: buf.build/connectrpc/python
+    out: ./backend/src/simex_debye_grpc/gen
 inputs:
   - directory: ./proto/
