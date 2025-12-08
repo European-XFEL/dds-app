@@ -1,4 +1,4 @@
-import { queryChemicalPyodide } from '../thermo';
+import solvents_data from '../../../data/solvents.json';
 import { PGlite } from '@electric-sql/pglite';
 import dotenv from 'dotenv';
 import { PgliteDatabase } from 'drizzle-orm/pglite';
@@ -94,6 +94,31 @@ async function seedSolvents(db: Database, directory: string) {
     const filePath = path.join(directory, filename);
     const contents = await fs.readFile(filePath, 'utf-8');
     const fileName = path.parse(filename).name;
+
+    // Check if the solvent is in the predefined solvents_data, if so, use that data directly
+    const saved_solvent_data = solvents_data.find((solvent) => solvent.filename === filename);
+    if (saved_solvent_data) {
+      const name = saved_solvent_data.name;
+      const rhom = parseFloat(saved_solvent_data.rhom);
+      const cpm = parseFloat(saved_solvent_data.cpm);
+      const qMin = parseFloat(saved_solvent_data.qMin);
+      const qMax = parseFloat(saved_solvent_data.qMax);
+      const qStep = parseFloat(saved_solvent_data.qStep);
+
+      return {
+        name,
+        filename,
+        contents,
+        rhom,
+        cpm,
+        qMin,
+        qMax,
+        qStep,
+      };
+    }
+
+    const queryChemicalPyodide = await import('../thermo').then((mod) => mod.queryChemicalPyodide);
+
     const name = solvent_name_map[fileName] || fileName;
 
     // Start the chemical query (returns a promise)

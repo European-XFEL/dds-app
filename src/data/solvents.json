@@ -1,0 +1,74 @@
+[
+  {
+    "name": "chloroform",
+    "rhom": "12422.780289302276",
+    "cpm": "68.33791089475231",
+    "filename": "CHCl3.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  },
+  {
+    "name": "methanol",
+    "rhom": "24541.13877407094",
+    "cpm": "81.21197130103523",
+    "filename": "MeOH.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  },
+  {
+    "name": "ethanol",
+    "rhom": "17043.39113911614",
+    "cpm": "112.15275615538572",
+    "filename": "EtOH.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  },
+  {
+    "name": "acetonitrile",
+    "rhom": "18920.48958430112",
+    "cpm": "91.50759764023071",
+    "filename": "MeCN.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  },
+  {
+    "name": "dichloromethane",
+    "rhom": "15521.96102773219",
+    "cpm": "66.40281669189002",
+    "filename": "CH2Cl2.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  },
+  {
+    "name": "cyclohexane",
+    "rhom": "9197.688669612044",
+    "cpm": "156.44577384299802",
+    "filename": "Cyclohexane.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  },
+  {
+    "name": "potassium permanganate",
+    "rhom": "17084.931090781178",
+    "cpm": "117.152",
+    "filename": "KMnO4-H2O.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  },
+  {
+    "name": "carbon tetrachloride",
+    "rhom": "10295.730390580384",
+    "cpm": "69.40636531137702",
+    "filename": "CCl4.txt",
+    "qMin": "0.005253",
+    "qMax": "8.498164",
+    "qStep": "0.006044"
+  }
+]
