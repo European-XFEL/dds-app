@@ -12,39 +12,12 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file simulation.proto.
  */
 export const file_simulation: GenFile = /*@__PURE__*/
-  fileDesc("ChBzaW11bGF0aW9uLnByb3RvIq4DChFTaW11bGF0aW9uUmVxdWVzdBIqCgdxX3JhbmdlGAEgASgLMhkuU2ltdWxhdGlvblJlcXVlc3QuUVJhbmdlEiUKBHB1bXAYAiABKAsyFy5TaW11bGF0aW9uUmVxdWVzdC5QdW1wEikKBnNhbXBsZRgDIAEoCzIZLlNpbXVsYXRpb25SZXF1ZXN0LlNhbXBsZRowCgZRUmFuZ2USCwoDbWluGAEgASgBEgsKA21heBgCIAEoARIMCgRzdGVwGAMgASgBGmEKBFB1bXASGAoQcGhvdG9uX2VuZXJneV9ldhgBIAEoARIfChdleGNpdGVkX3N0YXRlX2VuZXJneV9ldhgCIAEoARIeChZleGNpdGVkX3N0YXRlX2ZyYWN0aW9uGAMgASgBGoUBCgZTYW1wbGUSIgoaY29uY2VudHJhdGlvbl9zb2x1dGVfbW9sYXIYASABKAESGwoGZ3JvdW5kGAIgASgLMgsuZmlsZXMuRmlsZRIcCgdleGNpdGVkGAMgASgLMgsuZmlsZXMuRmlsZRIcCgdzb2x2ZW50GAQgASgLMgsuZmlsZXMuRmlsZSLHAQoSU2ltdWxhdGlvblJlc3BvbnNlEgkKAXEYASADKAESDwoHZGVsdGFfcxgCIAMoARIeChZkZWx0YV9zX3NvbHV0ZV9leF9mcmFjGAMgAygBEhcKD2RlbHRhX3Nfc29sdmVudBgEIAMoARIeChZkZXBvc2l0ZWRfZW5lcmd5X2pvdWxlGAUgASgBEhsKE2RlbHRhX3RlbXBlcmF0dXJlX2sYBiABKAESHwoXc29sdmVudF90b19zb2x1dGVfcmF0aW8YByABKAEyTQoRU2ltdWxhdGlvblNlcnZpY2USOAoNUnVuU2ltdWxhdGlvbhISLlNpbXVsYXRpb25SZXF1ZXN0GhMuU2ltdWxhdGlvblJlc3BvbnNlQhNCD1NpbXVsYXRpb25Qcm90b1ABYgZwcm90bzM", [file_files]);
+  fileDesc("ChBzaW11bGF0aW9uLnByb3RvIjAKBlFSYW5nZRILCgNtaW4YASABKAESCwoDbWF4GAIgASgBEgwKBHN0ZXAYAyABKAEiYQoEUHVtcBIYChBwaG90b25fZW5lcmd5X2V2GAEgASgBEh8KF2V4Y2l0ZWRfc3RhdGVfZW5lcmd5X2V2GAIgASgBEh4KFmV4Y2l0ZWRfc3RhdGVfZnJhY3Rpb24YAyABKAEiTQoRU2ltdWxhdGlvblJlcXVlc3QSGAoHcV9yYW5nZRgBIAEoCzIHLlFSYW5nZRIeCglzdHJ1Y3R1cmUYAiABKAsyCy5maWxlcy5GaWxlIioKElNpbXVsYXRpb25SZXNwb25zZRIJCgFxGAEgAygBEgkKAWkYAiADKAEiMgoSU29sdmVudEluZm9SZXF1ZXN0EhwKB3NvbHZlbnQYASABKAsyCy5maWxlcy5GaWxlIkcKE1NvbHZlbnRJbmZvUmVzcG9uc2USDAoEcm9obRgBIAEoARILCgNjcG0YAiABKAESCQoBcRgDIAMoARIKCgJkcxgEIAMoATJJChFTaW11bGF0aW9uU2VydmljZRI0CglDYWxjRGVieWUSEi5TaW11bGF0aW9uUmVxdWVzdBoTLlNpbXVsYXRpb25SZXNwb25zZUITQg9TaW11bGF0aW9uUHJvdG9QAWIGcHJvdG8z", [file_files]);
 
 /**
- * @generated from message SimulationRequest
+ * @generated from message QRange
  */
-export type SimulationRequest = Message<"SimulationRequest"> & {
-  /**
-   * @generated from field: SimulationRequest.QRange q_range = 1;
-   */
-  qRange?: SimulationRequest_QRange;
-
-  /**
-   * @generated from field: SimulationRequest.Pump pump = 2;
-   */
-  pump?: SimulationRequest_Pump;
-
-  /**
-   * @generated from field: SimulationRequest.Sample sample = 3;
-   */
-  sample?: SimulationRequest_Sample;
-};
-
-/**
- * Describes the message SimulationRequest.
- * Use `create(SimulationRequestSchema)` to create a new message.
- */
-export const SimulationRequestSchema: GenMessage<SimulationRequest> = /*@__PURE__*/
-  messageDesc(file_simulation, 0);
-
-/**
- * @generated from message SimulationRequest.QRange
- */
-export type SimulationRequest_QRange = Message<"SimulationRequest.QRange"> & {
+export type QRange = Message<"QRange"> & {
   /**
    * @generated from field: double min = 1;
    */
@@ -62,16 +35,16 @@ export type SimulationRequest_QRange = Message<"SimulationRequest.QRange"> & {
 };
 
 /**
- * Describes the message SimulationRequest.QRange.
- * Use `create(SimulationRequest_QRangeSchema)` to create a new message.
+ * Describes the message QRange.
+ * Use `create(QRangeSchema)` to create a new message.
  */
-export const SimulationRequest_QRangeSchema: GenMessage<SimulationRequest_QRange> = /*@__PURE__*/
-  messageDesc(file_simulation, 0, 0);
+export const QRangeSchema: GenMessage<QRange> = /*@__PURE__*/
+  messageDesc(file_simulation, 0);
 
 /**
- * @generated from message SimulationRequest.Pump
+ * @generated from message Pump
  */
-export type SimulationRequest_Pump = Message<"SimulationRequest.Pump"> & {
+export type Pump = Message<"Pump"> & {
   /**
    * @generated from field: double photon_energy_ev = 1;
    */
@@ -89,43 +62,33 @@ export type SimulationRequest_Pump = Message<"SimulationRequest.Pump"> & {
 };
 
 /**
- * Describes the message SimulationRequest.Pump.
- * Use `create(SimulationRequest_PumpSchema)` to create a new message.
+ * Describes the message Pump.
+ * Use `create(PumpSchema)` to create a new message.
  */
-export const SimulationRequest_PumpSchema: GenMessage<SimulationRequest_Pump> = /*@__PURE__*/
-  messageDesc(file_simulation, 0, 1);
+export const PumpSchema: GenMessage<Pump> = /*@__PURE__*/
+  messageDesc(file_simulation, 1);
 
 /**
- * @generated from message SimulationRequest.Sample
+ * @generated from message SimulationRequest
  */
-export type SimulationRequest_Sample = Message<"SimulationRequest.Sample"> & {
+export type SimulationRequest = Message<"SimulationRequest"> & {
   /**
-   * @generated from field: double concentration_solute_molar = 1;
+   * @generated from field: QRange q_range = 1;
    */
-  concentrationSoluteMolar: number;
+  qRange?: QRange;
 
   /**
-   * @generated from field: files.File ground = 2;
+   * @generated from field: files.File structure = 2;
    */
-  ground?: File;
-
-  /**
-   * @generated from field: files.File excited = 3;
-   */
-  excited?: File;
-
-  /**
-   * @generated from field: files.File solvent = 4;
-   */
-  solvent?: File;
+  structure?: File;
 };
 
 /**
- * Describes the message SimulationRequest.Sample.
- * Use `create(SimulationRequest_SampleSchema)` to create a new message.
+ * Describes the message SimulationRequest.
+ * Use `create(SimulationRequestSchema)` to create a new message.
  */
-export const SimulationRequest_SampleSchema: GenMessage<SimulationRequest_Sample> = /*@__PURE__*/
-  messageDesc(file_simulation, 0, 2);
+export const SimulationRequestSchema: GenMessage<SimulationRequest> = /*@__PURE__*/
+  messageDesc(file_simulation, 2);
 
 /**
  * @generated from message SimulationResponse
@@ -137,34 +100,9 @@ export type SimulationResponse = Message<"SimulationResponse"> & {
   q: number[];
 
   /**
-   * @generated from field: repeated double delta_s = 2;
+   * @generated from field: repeated double i = 2;
    */
-  deltaS: number[];
-
-  /**
-   * @generated from field: repeated double delta_s_solute_ex_frac = 3;
-   */
-  deltaSSoluteExFrac: number[];
-
-  /**
-   * @generated from field: repeated double delta_s_solvent = 4;
-   */
-  deltaSSolvent: number[];
-
-  /**
-   * @generated from field: double deposited_energy_joule = 5;
-   */
-  depositedEnergyJoule: number;
-
-  /**
-   * @generated from field: double delta_temperature_k = 6;
-   */
-  deltaTemperatureK: number;
-
-  /**
-   * @generated from field: double solvent_to_solute_ratio = 7;
-   */
-  solventToSoluteRatio: number;
+  i: number[];
 };
 
 /**
@@ -172,16 +110,65 @@ export type SimulationResponse = Message<"SimulationResponse"> & {
  * Use `create(SimulationResponseSchema)` to create a new message.
  */
 export const SimulationResponseSchema: GenMessage<SimulationResponse> = /*@__PURE__*/
-  messageDesc(file_simulation, 1);
+  messageDesc(file_simulation, 3);
+
+/**
+ * @generated from message SolventInfoRequest
+ */
+export type SolventInfoRequest = Message<"SolventInfoRequest"> & {
+  /**
+   * @generated from field: files.File solvent = 1;
+   */
+  solvent?: File;
+};
+
+/**
+ * Describes the message SolventInfoRequest.
+ * Use `create(SolventInfoRequestSchema)` to create a new message.
+ */
+export const SolventInfoRequestSchema: GenMessage<SolventInfoRequest> = /*@__PURE__*/
+  messageDesc(file_simulation, 4);
+
+/**
+ * @generated from message SolventInfoResponse
+ */
+export type SolventInfoResponse = Message<"SolventInfoResponse"> & {
+  /**
+   * @generated from field: double rohm = 1;
+   */
+  rohm: number;
+
+  /**
+   * @generated from field: double cpm = 2;
+   */
+  cpm: number;
+
+  /**
+   * @generated from field: repeated double q = 3;
+   */
+  q: number[];
+
+  /**
+   * @generated from field: repeated double ds = 4;
+   */
+  ds: number[];
+};
+
+/**
+ * Describes the message SolventInfoResponse.
+ * Use `create(SolventInfoResponseSchema)` to create a new message.
+ */
+export const SolventInfoResponseSchema: GenMessage<SolventInfoResponse> = /*@__PURE__*/
+  messageDesc(file_simulation, 5);
 
 /**
  * @generated from service SimulationService
  */
 export const SimulationService: GenService<{
   /**
-   * @generated from rpc SimulationService.RunSimulation
+   * @generated from rpc SimulationService.CalcDebye
    */
-  runSimulation: {
+  calcDebye: {
     methodKind: "unary";
     input: typeof SimulationRequestSchema;
     output: typeof SimulationResponseSchema;
