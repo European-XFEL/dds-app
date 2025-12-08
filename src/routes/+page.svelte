@@ -8,23 +8,23 @@
   } from 'echarts/components';
   import type { ComposeOption } from 'echarts/core';
 
-  import { onDestroy } from 'svelte';
-
-  import { enhance } from '$app/forms';
-
-  import Badge from '$shadcn/ui/badge/badge.svelte';
-  import { Button } from '$shadcn/ui/button/index.js';
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
   import Toggle from '$shadcn/ui/toggle/toggle.svelte';
 
+  import { getSimulationResult } from '$lib/data.remote';
   import { DetectorCard } from '$lib/detector';
   import LineChart from '$lib/plots/line-chart.svelte';
   import { PumpSetupCard } from '$lib/pump';
   import { SampleParametersCard } from '$lib/sample';
   import { useSimulationState } from '$lib/state.svelte';
 
-  import type { PageProps } from './$types';
+  type SimulationResult = {
+    q: number[];
+    iGround: number[];
+    iExcited: number[];
+    iDiff: number[];
+  };
 
   // Compose type for type-safe options
   type ECOption = ComposeOption<
@@ -38,94 +38,38 @@
   const simulation = useSimulationState();
 
   let short = $state(true);
-  let autoRun = $state(true);
-
-  const AUTO_RUN_DEBOUNCE_MS = 300;
-
-  let runForm: HTMLFormElement | null = null;
-  let hasRegisteredSnapshot = false;
-  let lastSimulationSnapshot = '';
-
-  let previousAutoRun = true;
-  let autoSubmitTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  const simulation_json = $derived(JSON.stringify($state.snapshot(simulation)));
-
-  function attachRunForm(node: HTMLFormElement) {
-    runForm = node;
-    return () => {
-      if (runForm === node) runForm = null;
-    };
-  }
-
-  function submitSimulation() {
-    runForm?.requestSubmit();
-  }
+  let result = $state<SimulationResult | null>(null);
 
   $effect(() => {
-    const snapshot = simulation_json;
-
-    if (!hasRegisteredSnapshot) {
-      hasRegisteredSnapshot = true;
-      lastSimulationSnapshot = snapshot;
+    let { ground, excited } = simulation.sample;
+    let { min, max, step } = simulation.qRange;
+    if (!ground || !excited || !min || !max || !step) {
+      result = null;
       return;
     }
 
-    if (!autoRun) {
-      lastSimulationSnapshot = snapshot;
-      if (autoSubmitTimeout) {
-        clearTimeout(autoSubmitTimeout);
-        autoSubmitTimeout = null;
+    const resultPromises = [ground.id, excited.id].map((id) => {
+      if (!id) return null;
+      return getSimulationResult({
+        fileId: id,
+        qRange: { min, max, step },
+      });
+    });
+
+    Promise.all(resultPromises).then(([groundResult, excitedResult]) => {
+      if (!groundResult || !excitedResult) {
+        result = null;
+        return;
       }
-      return;
-    }
 
-    if (snapshot === lastSimulationSnapshot) {
-      return;
-    }
-
-    lastSimulationSnapshot = snapshot;
-    if (!runForm) {
-      return;
-    }
-    if (autoSubmitTimeout) {
-      clearTimeout(autoSubmitTimeout);
-    }
-    autoSubmitTimeout = setTimeout(() => {
-      autoSubmitTimeout = null;
-      submitSimulation();
-    }, AUTO_RUN_DEBOUNCE_MS);
+      result = {
+        q: groundResult.q,
+        iGround: groundResult.i,
+        iExcited: excitedResult.i,
+        iDiff: excitedResult.i.map((val, idx) => val - groundResult.i[idx]),
+      };
+    });
   });
-
-  $effect(() => {
-    if (autoRun && !previousAutoRun && hasRegisteredSnapshot && runForm) {
-      if (autoSubmitTimeout) {
-        clearTimeout(autoSubmitTimeout);
-      }
-      autoSubmitTimeout = setTimeout(() => {
-        autoSubmitTimeout = null;
-        submitSimulation();
-      }, AUTO_RUN_DEBOUNCE_MS);
-    }
-
-    if (!autoRun && previousAutoRun) {
-      if (autoSubmitTimeout) {
-        clearTimeout(autoSubmitTimeout);
-        autoSubmitTimeout = null;
-      }
-    }
-
-    previousAutoRun = autoRun.valueOf();
-  });
-
-  onDestroy(() => {
-    if (autoSubmitTimeout) {
-      clearTimeout(autoSubmitTimeout);
-      autoSubmitTimeout = null;
-    }
-  });
-
-  let { form }: PageProps = $props();
 
   const constant_options: ECOption = {
     title: { text: 'Difference Scattering Signals ΔS(q)' },
@@ -146,7 +90,7 @@
 
   let xAxis = $derived<ECOption['xAxis']>({
     id: 'q',
-    data: form?.results?.q ?? [],
+    data: result?.q ?? [],
   });
 
   const series_common: LineSeriesOption = {
@@ -159,19 +103,19 @@
     {
       id: 'deltaS',
       name: 'ΔS',
-      data: form?.results?.deltaS ?? [],
+      data: result?.iDiff ?? [],
       ...series_common,
     },
     {
       id: 'deltaSSoluteExFrac',
       name: 'ΔS Solute',
-      data: form?.results?.deltaSSoluteExFrac ?? [],
+      data: result?.iExcited ?? [],
       ...series_common,
     },
     {
       id: 'deltaSSolvent',
       name: 'ΔS Solvent',
-      data: form?.results?.deltaSSolvent ?? [],
+      data: result?.iGround ?? [],
       ...series_common,
     },
   ]);
@@ -179,31 +123,23 @@
 
 <Resizable.PaneGroup direction="horizontal" class="max-h-svh max-w-full gap-4 rounded-lg">
   <Resizable.Pane defaultSize={70}>
-    <div class="flow-row w-max items-center gap-3">
+    <!-- <div class="flow-row w-max items-center gap-3">
       <Badge variant="outline"
-        >Delta T (K): {form?.results?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
+        >Delta T (K): {result?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
       >
       <Badge variant="outline"
-        >Deposited Energy (J): {form?.results?.depositedEnergyJoule ?? 'N/A'}</Badge
+        >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
       >
-    </div>
+    </div> -->
     <div class="flex flex-col gap-6 pt-4">
       <LineChart {constant_options} {xAxis} {series} />
     </div>
   </Resizable.Pane>
   <Resizable.Handle />
   <Resizable.Pane defaultSize={30} class="flex min-w-110 flex-col">
-    <form
+    <!-- <form
       action="?/run_simulation"
       method="post"
-      {@attach attachRunForm}
-      use:enhance={({ formData }) => {
-        formData.set('state', simulation_json);
-
-        return async ({ update }) => {
-          await update({ reset: false });
-        };
-      }}
     >
       <div class="flex items-center gap-3">
         <Button type="submit" class="flex-1">Run Simulation</Button>
@@ -212,7 +148,7 @@
           Auto-Run
         </label>
       </div>
-    </form>
+    </form> -->
     <ScrollArea class="@container h-full">
       <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
         <SampleParametersCard {short} />
