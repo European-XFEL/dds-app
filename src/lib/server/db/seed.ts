@@ -94,35 +94,10 @@ async function seedSolvents(db: Database, directory: string) {
     const filePath = path.join(directory, filename);
     const contents = await fs.readFile(filePath, 'utf-8');
     const fileName = path.parse(filename).name;
-
-    // Check if the solvent is in the predefined solvents_data, if so, use that data directly
-    const saved_solvent_data = solvents_data.find((solvent) => solvent.filename === filename);
-    if (saved_solvent_data) {
-      const name = saved_solvent_data.name;
-      const rhom = parseFloat(saved_solvent_data.rhom);
-      const cpm = parseFloat(saved_solvent_data.cpm);
-      const qMin = parseFloat(saved_solvent_data.qMin);
-      const qMax = parseFloat(saved_solvent_data.qMax);
-      const qStep = parseFloat(saved_solvent_data.qStep);
-
-      return {
-        name,
-        filename,
-        contents,
-        rhom,
-        cpm,
-        qMin,
-        qMax,
-        qStep,
-      };
-    }
-
-    const queryChemicalPyodide = await import('../thermo').then((mod) => mod.queryChemicalPyodide);
-
     const name = solvent_name_map[fileName] || fileName;
 
-    // Start the chemical query (returns a promise)
-    const chemPromise = queryChemicalPyodide(name);
+    let rhom = undefined;
+    let cpm = undefined;
 
     const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents.replaceAll(/#.*\n/g, '');
     const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
@@ -139,10 +114,19 @@ async function seedSolvents(db: Database, directory: string) {
     const qMin = Math.min(...q);
     const qMax = Math.max(...q);
     const qSteps = q.map((val, idx, arr) => (idx === 0 ? 0 : val - arr[idx - 1])).slice(1);
-    const qStep = Math.min(...qSteps);
+    const qStep = Math.min(...qSteps); // Check if the solvent is in the predefined solvents_data, if so, use that data directly
 
-    // Await the chemical query
-    const [rhom, cpm] = await chemPromise;
+    const saved_solvent_data = solvents_data.find((solvent) => solvent.filename === filename);
+    if (saved_solvent_data) {
+      rhom = parseFloat(saved_solvent_data.rhom);
+      cpm = parseFloat(saved_solvent_data.cpm);
+    } else {
+      const queryChemicalPyodide = await import('../thermo').then(
+        (mod) => mod.queryChemicalPyodide,
+      );
+      const chemPromise = queryChemicalPyodide(name);
+      [rhom, cpm] = await chemPromise;
+    }
 
     return {
       name,
