@@ -1,3 +1,3 @@
 import type * as protoSim from '$lib/server/grpc/gen/simulation_pb';
 
-export type QRange = Omit<protoSim.SimulationRequest_QRange, '$typeName'>;
+export type QRange = Omit<protoSim.QRange, '$typeName'>;

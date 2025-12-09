@@ -8,4 +8,4 @@
   let { short = false } = $props();
 </script>
 
-<DetectorSetupCard detector={simulation.detector} q_range={simulation.qRange} {short} />
+<DetectorSetupCard detector={simulation.detector} bind:q_range={simulation.qRange} {short} />
