@@ -8,4 +8,4 @@
   let { short = false } = $props();
 </script>
 
-<PumpSetupCard pump={simulation.pump} {short} />
+<PumpSetupCard bind:pump={simulation.pump} {short} />
