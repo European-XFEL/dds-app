@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LineSeriesOption } from 'echarts/charts';
   import type {
+    DataZoomComponentOption,
     GridComponentOption,
     LegendComponentOption,
     TitleComponentOption,
@@ -27,6 +28,7 @@
     | TooltipComponentOption
     | GridComponentOption
     | LegendComponentOption
+    | DataZoomComponentOption
   >;
 
   const simulation = useSimulationState();
@@ -120,8 +122,8 @@
     let solventId = simulation.sample.solvent?.id;
     if (!solventId || !ratioSolventSolute || !deltaT) {
       deltaSSolvent = null;
-        return;
-      }
+      return;
+    }
     getDeltaSSolvent(solventId, ratioSolventSolute, deltaT).then((data) => {
       deltaSSolvent = data ? data : null;
     });
@@ -158,6 +160,11 @@
   const constant_options: ECOption = {
     title: { text: 'Difference Scattering Signals ΔS(q)' },
     legend: { top: 'bottom' },
+    grid: {
+      left: '10%',
+      right: '10%',
+      bottom: '15%',
+    },
     xAxis: {
       id: 'q',
       name: 'q (Å⁻¹)',
@@ -167,6 +174,32 @@
       },
     },
     yAxis: { type: 'value' },
+    dataZoom: [
+      {
+        type: 'inside',
+        xAxisIndex: 0,
+        filterMode: 'none',
+      },
+      {
+        type: 'inside',
+        yAxisIndex: 0,
+        filterMode: 'none',
+      },
+      {
+        type: 'slider',
+        xAxisIndex: 0,
+        filterMode: 'none',
+        height: 20,
+        bottom: 10,
+      },
+      {
+        type: 'slider',
+        yAxisIndex: 0,
+        filterMode: 'none',
+        width: 20,
+        right: 10,
+      },
+    ],
     series: [],
     animationDuration: 500,
     tooltip: { trigger: 'axis' },
