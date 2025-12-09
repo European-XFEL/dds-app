@@ -13,7 +13,7 @@ const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:50051';
 
 const transport = createConnectTransport({
   baseUrl: `${BACKEND_URL}`,
-  httpVersion: '2',
+  httpVersion: '1.1',
 });
 
 const simulation_client = createClient(SimulationService, transport);
