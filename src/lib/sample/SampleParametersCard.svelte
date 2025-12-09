@@ -13,5 +13,6 @@
   solvents={listSolvents()}
   bind:concentrationSoluteMolar={simulation.sample.concentrationSoluteMolar}
   bind:solvent={simulation.sample.solvent}
+  bind:qRange={simulation.qRange}
   {short}
 />
