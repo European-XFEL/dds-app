@@ -12,19 +12,13 @@
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
   import Toggle from '$shadcn/ui/toggle/toggle.svelte';
 
-  import { getSimulationResult } from '$lib/data.remote';
+  import { getDebyeResult, getSolventIQ } from '$lib/data.remote';
   import { DetectorCard } from '$lib/detector';
   import LineChart from '$lib/plots/line-chart.svelte';
   import { PumpSetupCard } from '$lib/pump';
   import { SampleParametersCard } from '$lib/sample';
   import { useSimulationState } from '$lib/state.svelte';
-
-  type SimulationResult = {
-    q: number[];
-    iGround: number[];
-    iExcited: number[];
-    iDiff: number[];
-  };
+  import type { QRange } from '$lib/types';
 
   // Compose type for type-safe options
   type ECOption = ComposeOption<
@@ -38,37 +32,127 @@
   const simulation = useSimulationState();
 
   let short = $state(true);
-  let result = $state<SimulationResult | null>(null);
+
+  const N_AVOGADRO = 6.02214076e23;
+  const N_E = 1.602e-19;
+
+  // Scalars
+
+  let concentrationSolvent = $derived.by(() => {
+    const rhom = simulation.sample.solvent?.rhom;
+    if (!rhom) return;
+    return rhom / 1000;
+  });
+
+  let concentrationExcited = $derived.by(() => {
+    const concentrationSolute = simulation.sample.concentrationSoluteMolar;
+    const excitedFraction = simulation.pump.excitedStateFraction;
+    if (!concentrationSolute || !excitedFraction) return;
+    return concentrationSolute * excitedFraction;
+  });
+
+  let ratioSolventSolute = $derived.by(() => {
+    const concentrationSolute = simulation.sample.concentrationSoluteMolar;
+    if (!concentrationSolute || !concentrationSolvent) return;
+    return concentrationSolvent / concentrationSolute;
+  });
+
+  let deltaEeV = $derived(simulation.pump.photonEnergyEv - simulation.pump.excitedStateEnergyEv);
+  let deltaEJ = $derived(deltaEeV * N_E);
+
+  let deltaT = $derived.by(() => {
+    const cpm = simulation.sample?.solvent?.cpm;
+    if (!concentrationExcited || !concentrationSolvent || !deltaEJ || !cpm) return;
+    return (((concentrationExcited / concentrationSolvent) * deltaEJ) / cpm) * N_AVOGADRO;
+  });
+
+  // Difference Scattering Signals
+
+  // Solute
+  async function getDeltaSSolute(qRange: QRange, groundId: string, excitedId: string) {
+    const [ground, excited] = await Promise.all([
+      getDebyeResult({ fileId: groundId, qRange }),
+      getDebyeResult({ fileId: excitedId, qRange }),
+    ]);
+
+    if (!ground || !excited) return;
+
+    if (
+      ground.q.map((v) => v.toFixed(6)).toString() !== excited.q.map((v) => v.toFixed(6)).toString()
+    ) {
+      throw new Error('Q ranges of ground and excited states do not match.');
+    }
+    const deltaS = excited.i.map((val, index) => val - ground.i[index]);
+
+    return { q: ground.q, i: deltaS };
+  }
+
+  let deltaSSolute = $state<{
+    q: number[];
+    i: number[];
+  } | null>(null);
 
   $effect(() => {
-    let { ground, excited } = simulation.sample;
-    let { min, max, step } = simulation.qRange;
-    if (!ground || !excited || !min || !max || !step) {
-      result = null;
+    let groundId = simulation.sample.ground?.id;
+    let excitedId = simulation.sample.excited?.id;
+    let qRange = simulation.qRange;
+    if (!groundId || !excitedId || !qRange) {
+      deltaSSolute = null;
       return;
     }
-
-    const resultPromises = [ground.id, excited.id].map((id) => {
-      if (!id) return null;
-      return getSimulationResult({
-        fileId: id,
-        qRange: { min, max, step },
-      });
+    getDeltaSSolute(qRange, groundId, excitedId).then((data) => {
+      deltaSSolute = data ? data : null;
     });
+  });
 
-    Promise.all(resultPromises).then(([groundResult, excitedResult]) => {
-      if (!groundResult || !excitedResult) {
-        result = null;
+  // Solvent
+  async function getDeltaSSolvent(solventId: string, ratioSolventSolute: number, deltaT: number) {
+    const iqSolvent = await getSolventIQ(solventId);
+    const deltaS = iqSolvent.dSdT.map((val) => val * ratioSolventSolute * deltaT);
+    return { q: iqSolvent.q, i: deltaS };
+  }
+
+  let deltaSSolvent = $state<{
+    q: number[];
+    i: number[];
+  } | null>(null);
+  $effect(() => {
+    let solventId = simulation.sample.solvent?.id;
+    if (!solventId || !ratioSolventSolute || !deltaT) {
+      deltaSSolvent = null;
         return;
       }
-
-      result = {
-        q: groundResult.q,
-        iGround: groundResult.i,
-        iExcited: excitedResult.i,
-        iDiff: excitedResult.i.map((val, idx) => val - groundResult.i[idx]),
-      };
+    getDeltaSSolvent(solventId, ratioSolventSolute, deltaT).then((data) => {
+      deltaSSolvent = data ? data : null;
     });
+  });
+
+  let deltaS = $derived.by<{ q: number[]; i: number[] } | null>(() => {
+    if (!deltaSSolute || !deltaSSolvent) return null;
+
+    // Check that Q ranges match (they should be the same)
+    if (deltaSSolute.q.length !== deltaSSolvent.q.length) {
+      console.warn('Q ranges of solute and solvent do not match');
+      return null;
+    }
+
+    const excitedFraction = simulation.pump.excitedStateFraction;
+
+    // Combine: ExFrac * ΔS_solute + ΔS_solvent (already scaled by ratio and deltaT)
+    const combinedI = deltaSSolute.i.map((soluteVal, index) => {
+      const soluteContribution = excitedFraction * soluteVal;
+      const solventContribution = deltaSSolvent!.i[index];
+      return soluteContribution + solventContribution;
+    });
+
+    return { q: deltaSSolute.q, i: combinedI };
+  });
+
+  // Solute contribution scaled by excited fraction for display
+  let deltaSSoluteScaled = $derived.by<number[] | null>(() => {
+    if (!deltaSSolute) return null;
+    const excitedFraction = simulation.pump.excitedStateFraction;
+    return deltaSSolute.i.map((val) => val * excitedFraction);
   });
 
   const constant_options: ECOption = {
@@ -90,7 +174,7 @@
 
   let xAxis = $derived<ECOption['xAxis']>({
     id: 'q',
-    data: result?.q ?? [],
+    data: deltaS?.q ?? deltaSSolvent?.q ?? deltaSSolute?.q ?? [],
   });
 
   const series_common: LineSeriesOption = {
@@ -99,23 +183,23 @@
     symbol: 'none',
   };
 
-  let series = $derived<ECOption['series']>([
+  let series = $derived.by<ECOption['series']>(() => [
     {
       id: 'deltaS',
-      name: 'ΔS',
-      data: result?.iDiff ?? [],
+      name: 'ΔS (Total)',
+      data: deltaS?.i ?? [],
       ...series_common,
     },
     {
       id: 'deltaSSoluteExFrac',
-      name: 'ΔS Solute',
-      data: result?.iExcited ?? [],
+      name: 'ΔS Solute (α·ΔS)',
+      data: deltaSSoluteScaled ?? [],
       ...series_common,
     },
     {
       id: 'deltaSSolvent',
       name: 'ΔS Solvent',
-      data: result?.iGround ?? [],
+      data: deltaSSolvent?.i ?? [],
       ...series_common,
     },
   ]);
@@ -137,18 +221,6 @@
   </Resizable.Pane>
   <Resizable.Handle />
   <Resizable.Pane defaultSize={30} class="flex min-w-110 flex-col">
-    <!-- <form
-      action="?/run_simulation"
-      method="post"
-    >
-      <div class="flex items-center gap-3">
-        <Button type="submit" class="flex-1">Run Simulation</Button>
-        <label class="flex items-center gap-2 text-sm font-medium">
-          <input type="checkbox" class="h-4 w-4" bind:checked={autoRun} />
-          Auto-Run
-        </label>
-      </div>
-    </form> -->
     <ScrollArea class="@container h-full">
       <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
         <SampleParametersCard {short} />
