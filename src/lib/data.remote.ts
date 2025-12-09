@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm';
+import Papa from 'papaparse';
 import z from 'zod';
 
 import { prerender } from '$app/server';
@@ -49,6 +50,52 @@ export const getMoleculeFileContent = prerender(
   {
     inputs: () => {
       return db.query.molecules.findMany().then((molecules) => molecules.map((m) => m.id));
+    },
+  },
+);
+
+type SolventDifferentials = {
+  Q: number;
+  dSdT: number;
+  dSdRho: number;
+};
+
+export const getSolventIQ = prerender(
+  z.string(),
+  async (id: string) => {
+    const contents = await db.query.solvents
+      .findFirst({
+        where: eq(schema.solvents.id, id),
+        columns: {
+          contents: true,
+        },
+      })
+      .then(
+        (s) =>
+          s?.contents ??
+          (() => {
+            throw new Error('Solvent not found');
+          })(),
+      );
+
+    const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents.replaceAll(/#.*\n/g, '');
+    const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
+      delimiter: '\t',
+      dynamicTyping: false,
+      header: true,
+      skipEmptyLines: true,
+    });
+
+    const { data } = parsed;
+
+    const q = data.map((row) => row.Q);
+    const dSdT = data.map((row) => row.dSdT);
+
+    return { q, dSdT };
+  },
+  {
+    inputs: () => {
+      return db.query.solvents.findMany().then((solvents) => solvents.map((s) => s.id));
     },
   },
 );
