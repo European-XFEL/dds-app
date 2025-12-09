@@ -64,7 +64,7 @@ const simulation_request = z.object({
 
 const encoder = new TextEncoder();
 
-export const getSimulationResult = prerender(
+export const getDebyeResult = prerender(
   simulation_request,
   async (request: z.infer<typeof simulation_request>) => {
     const file = await db.query.molecules.findFirst({
@@ -79,7 +79,7 @@ export const getSimulationResult = prerender(
 
     const request_body = {
       structure: {
-        filename: file.name,
+        filename: file.filename,
         contents: contents,
       },
       qRange: {
@@ -92,12 +92,26 @@ export const getSimulationResult = prerender(
     console.log('Sending simulation request:', request_body);
 
     try {
-      const response = await simulation_client.calcDebye(request_body);
-
-      return response;
+      return await simulation_client.calcDebye(request_body);
     } catch (error) {
       console.error('Simulation error:', error);
       throw error;
     }
+  },
+  {
+    inputs: () => {
+      const qRange = {
+        min: 0.005253,
+        max: 8.498164,
+        step: 0.006044,
+      };
+
+      return db.query.molecules.findMany().then((molecules) => {
+        return molecules.map((m) => ({
+          fileId: m.id,
+          qRange: qRange,
+        }));
+      });
+    },
   },
 );
