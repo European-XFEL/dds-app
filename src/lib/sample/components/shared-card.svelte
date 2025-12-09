@@ -11,7 +11,7 @@
   import * as Tooltip from '$shadcn/ui/tooltip';
 
   import type { listSolvents } from '$lib/data.remote';
-  import type { Sample } from '$lib/types';
+  import type { QRange, Sample } from '$lib/types';
 
   type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 
@@ -19,11 +19,13 @@
     solvents: _solvents,
     solvent = $bindable(),
     concentrationSoluteMolar = $bindable(),
+    qRange = $bindable(),
     short = false,
   }: {
     solvents: Solvents | Promise<Solvents>;
     solvent: Sample['solvent'];
     concentrationSoluteMolar: Sample['concentrationSoluteMolar'];
+    qRange: QRange;
     short?: boolean;
   } = $props();
 
@@ -38,6 +40,14 @@
   });
 
   const triggerSolvent = $derived(solvent?.name ?? 'Select a solvent');
+
+  // TODO: make this consistent - sample sets the maximum q values, user can set values
+  // lower than those, which then bins the data via frontend js
+  $effect(() => {
+    qRange.min = solvent?.qMin ?? 0;
+    qRange.max = solvent?.qMax ?? 0;
+    qRange.step = solvent?.qStep ?? 0;
+  });
 
   const tooltip = $derived.by(() => {
     if (!solvent) return;
@@ -110,7 +120,7 @@
         </Select.Root>
       </div>
 
-      <div class="grid min-w-100 gap-2 grow @sm:min-w-40">
+      <div class="grid min-w-100 grow gap-2 @sm:min-w-40">
         <Label>Solute Concentration (%)</Label>
         <div class="flex items-center justify-between gap-4">
           <Input
