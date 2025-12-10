@@ -1,5 +1,5 @@
 import { createId } from '@paralleldrive/cuid2';
-import { getTableColumns, relations } from 'drizzle-orm';
+import { getTableColumns } from 'drizzle-orm';
 import { char, numeric, pgTable, text, timestamp, unique } from 'drizzle-orm/pg-core';
 
 const timestamps = {
@@ -54,13 +54,6 @@ export const intensities = pgTable(
     pk: [table.moleculeId, table.qMin, table.qMax, table.qStep],
   }),
 );
-
-export const moleculeIntensityRelations = relations(intensities, ({ one }) => ({
-  moleculeTable: one(molecules, {
-    fields: [intensities.moleculeId],
-    references: [molecules.id],
-  }),
-}));
 
 export const solvents = pgTable(
   'solvents',
