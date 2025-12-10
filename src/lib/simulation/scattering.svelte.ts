@@ -1,5 +1,5 @@
 import type { SimulationState } from '$lib/state.svelte';
-import { throttled } from '$lib/utils/debounce.svelte';
+import { throttled } from '$lib/utils/throttled.svelte';
 import { EV_TO_JOULES, N_AVOGADRO } from './constants';
 
 export type ScatteringData = {
