@@ -94,7 +94,7 @@
         formatter: (value: number) => Number(value).toPrecision(3),
       },
     },
-    yAxis: { type: 'value' },
+    yAxis: { type: 'value', animationDuration: 150 },
     dataZoom: [
       {
         type: 'inside',
@@ -122,7 +122,7 @@
       },
     ],
     series: [],
-    animationDuration: 500,
+    animationDuration: 150,
     tooltip: { trigger: 'axis' },
   };
 
@@ -135,6 +135,9 @@
     type: 'line',
     showSymbol: false,
     symbol: 'none',
+    smooth: true,
+    animationDuration: 150,
+    animationEasing: 'cubicOut',
   };
 
   let series = $derived.by<ECOption['series']>(() => [
@@ -178,8 +181,6 @@
     <ScrollArea class="@container h-full">
       <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
         <SampleParametersCard {short} />
-        <!-- <SampleGroundCard /> -->
-        <!-- <SampleExcitedCard /> -->
         <DetectorCard {short} />
         <PumpSetupCard {short} />
       </div>
