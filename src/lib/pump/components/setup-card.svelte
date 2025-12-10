@@ -10,23 +10,25 @@
 
   let { pump = $bindable(), short }: { pump: Pump; short: boolean } = $props();
 
-  const fields = [
+  let photonEnergyInvalid = $derived(pump.photonEnergyEv < pump.excitedStateEnergyEv);
+
+  const fields = $derived([
     {
       label: 'Excited State Energy (eV)',
       key: 'excitedStateEnergyEv',
       input: { min: 0.1, max: 2, step: 0.1 },
     },
     {
+      label: 'Photon Energy (eV)',
+      key: 'photonEnergyEv',
+      input: { min: 1.0, max: 5.0, step: 0.1, 'aria-invalid': photonEnergyInvalid },
+    },
+    {
       label: 'Excited State Fraction',
       key: 'excitedStateFraction',
       input: { min: 0.0, max: 1.0, step: 0.01 },
     },
-    {
-      label: 'Photon Energy (eV)',
-      key: 'photonEnergyEv',
-      input: { min: 1.0, max: 5.0, step: 0.1 },
-    },
-  ] satisfies Array<{ label: string; key: keyof Pump; input: ComponentProps<typeof Input> }>;
+  ]) satisfies Array<{ label: string; key: keyof Pump; input: ComponentProps<typeof Input> }>;
 </script>
 
 <Card.Root class="max-h-fit @sm:gap-3">
