@@ -113,6 +113,22 @@ const encoder = new TextEncoder();
 export const getDebyeResult = prerender(
   simulation_request,
   async (request: z.infer<typeof simulation_request>) => {
+    const fetched = await db.query.intensities.findFirst({
+      where: {
+        moleculeId: request.fileId,
+        qMin: request.qRange.min,
+        qMax: request.qRange.max,
+        qStep: request.qRange.step,
+      },
+    });
+
+    if (fetched?.q && fetched?.intensity) {
+      return {
+        q: fetched.q.map((v) => Number(v)),
+        i: fetched.intensity.map((v) => Number(v)),
+      };
+    }
+
     const file = await db.query.molecules.findFirst({
       where: { id: request.fileId },
     });
@@ -135,10 +151,21 @@ export const getDebyeResult = prerender(
       },
     };
 
-    console.log('Sending simulation request:', request_body);
-
     try {
-      return await simulation_client.calcDebye(request_body);
+      const result = await simulation_client.calcDebye(request_body);
+
+      db.insert(schema.intensities)
+        .values({
+          moleculeId: request.fileId,
+          qMin: request.qRange.min,
+          qMax: request.qRange.max,
+          qStep: request.qRange.step,
+          intensity: result.i.map(String),
+          q: result.q.map(String),
+        })
+        .catch((error) => console.error('Failed to insert intensity result:', error));
+
+      return result;
     } catch (error) {
       console.error('Simulation error:', error);
       throw error;
