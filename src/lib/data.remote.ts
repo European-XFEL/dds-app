@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm';
 import Papa from 'papaparse';
 import z from 'zod';
 
@@ -41,7 +40,7 @@ export const getMoleculeFileContent = prerender(
   z.string(),
   async (id: string) => {
     return await db.query.molecules.findFirst({
-      where: eq(schema.molecules.id, id),
+      where: { id },
       columns: {
         contents: true,
       },
@@ -65,7 +64,7 @@ export const getSolventIQ = prerender(
   async (id: string) => {
     const contents = await db.query.solvents
       .findFirst({
-        where: eq(schema.solvents.id, id),
+        where: { id },
         columns: {
           contents: true,
         },
@@ -115,7 +114,7 @@ export const getDebyeResult = prerender(
   simulation_request,
   async (request: z.infer<typeof simulation_request>) => {
     const file = await db.query.molecules.findFirst({
-      where: eq(schema.molecules.id, request.fileId),
+      where: { id: request.fileId },
     });
 
     if (!file) {
