@@ -13,13 +13,21 @@
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
   import Toggle from '$shadcn/ui/toggle/toggle.svelte';
 
-  import { getDebyeResult, getSolventIQ } from '$lib/data.remote';
   import { DetectorCard } from '$lib/detector';
   import LineChart from '$lib/plots/line-chart.svelte';
   import { PumpSetupCard } from '$lib/pump';
   import { SampleParametersCard } from '$lib/sample';
+  import {
+    createScatteringResource,
+    fetchDeltaSSolute,
+    fetchDeltaSSolvent,
+  } from '$lib/simulation/scattering-fetcher.svelte';
+  import {
+    computeDeltaS,
+    createScatteringCalculations,
+    scaleSoluteByExcitedFraction,
+  } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
-  import type { QRange } from '$lib/types';
 
   // Compose type for type-safe options
   type ECOption = ComposeOption<
@@ -35,127 +43,40 @@
 
   let short = $state(true);
 
-  const N_AVOGADRO = 6.02214076e23;
-  const N_E = 1.602e-19;
+  // Use extracted calculations module
+  const calculations = createScatteringCalculations(simulation);
 
-  // Scalars
+  // Reactive scattering data fetching using resource pattern
+  const soluteResource = createScatteringResource(
+    () =>
+      fetchDeltaSSolute(
+        simulation.qRange,
+        simulation.sample.ground!.id,
+        simulation.sample.excited!.id,
+      ),
+    () => !!(simulation.sample.ground?.id && simulation.sample.excited?.id && simulation.qRange),
+  );
 
-  let concentrationSolvent = $derived.by(() => {
-    const rhom = simulation.sample.solvent?.rhom;
-    if (!rhom) return;
-    return rhom / 1000;
-  });
+  const solventResource = createScatteringResource(
+    () =>
+      fetchDeltaSSolvent(
+        simulation.sample.solvent!.id,
+        calculations.ratioSolventSolute!,
+        calculations.deltaT!,
+      ),
+    () =>
+      !!(simulation.sample.solvent?.id && calculations.ratioSolventSolute && calculations.deltaT),
+  );
 
-  let concentrationExcited = $derived.by(() => {
-    const concentrationSolute = simulation.sample.concentrationSoluteMolar;
-    const excitedFraction = simulation.pump.excitedStateFraction;
-    if (!concentrationSolute || !excitedFraction) return;
-    return concentrationSolute * excitedFraction;
-  });
-
-  let ratioSolventSolute = $derived.by(() => {
-    const concentrationSolute = simulation.sample.concentrationSoluteMolar;
-    if (!concentrationSolute || !concentrationSolvent) return;
-    return concentrationSolvent / concentrationSolute;
-  });
-
-  let deltaEeV = $derived(simulation.pump.photonEnergyEv - simulation.pump.excitedStateEnergyEv);
-  let deltaEJ = $derived(deltaEeV * N_E);
-
-  let deltaT = $derived.by(() => {
-    const cpm = simulation.sample?.solvent?.cpm;
-    if (!concentrationExcited || !concentrationSolvent || !deltaEJ || !cpm) return;
-    return (((concentrationExcited / concentrationSolvent) * deltaEJ) / cpm) * N_AVOGADRO;
-  });
-
-  // Difference Scattering Signals
-
-  // Solute
-  async function getDeltaSSolute(qRange: QRange, groundId: string, excitedId: string) {
-    const [ground, excited] = await Promise.all([
-      getDebyeResult({ fileId: groundId, qRange }),
-      getDebyeResult({ fileId: excitedId, qRange }),
-    ]);
-
-    if (!ground || !excited) return;
-
-    if (
-      ground.q.map((v) => v.toFixed(6)).toString() !== excited.q.map((v) => v.toFixed(6)).toString()
-    ) {
-      throw new Error('Q ranges of ground and excited states do not match.');
-    }
-    const deltaS = excited.i.map((val, index) => val - ground.i[index]);
-
-    return { q: ground.q, i: deltaS };
-  }
-
-  let deltaSSolute = $state<{
-    q: number[];
-    i: number[];
-  } | null>(null);
-
-  $effect(() => {
-    let groundId = simulation.sample.ground?.id;
-    let excitedId = simulation.sample.excited?.id;
-    let qRange = simulation.qRange;
-    if (!groundId || !excitedId || !qRange) {
-      deltaSSolute = null;
-      return;
-    }
-    getDeltaSSolute(qRange, groundId, excitedId).then((data) => {
-      deltaSSolute = data ? data : null;
-    });
-  });
-
-  // Solvent
-  async function getDeltaSSolvent(solventId: string, ratioSolventSolute: number, deltaT: number) {
-    const iqSolvent = await getSolventIQ(solventId);
-    const deltaS = iqSolvent.dSdT.map((val) => val * ratioSolventSolute * deltaT);
-    return { q: iqSolvent.q, i: deltaS };
-  }
-
-  let deltaSSolvent = $state<{
-    q: number[];
-    i: number[];
-  } | null>(null);
-  $effect(() => {
-    let solventId = simulation.sample.solvent?.id;
-    if (!solventId || !ratioSolventSolute || !deltaT) {
-      deltaSSolvent = null;
-      return;
-    }
-    getDeltaSSolvent(solventId, ratioSolventSolute, deltaT).then((data) => {
-      deltaSSolvent = data ? data : null;
-    });
-  });
-
-  let deltaS = $derived.by<{ q: number[]; i: number[] } | null>(() => {
-    if (!deltaSSolute || !deltaSSolvent) return null;
-
-    // Check that Q ranges match (they should be the same)
-    if (deltaSSolute.q.length !== deltaSSolvent.q.length) {
-      console.warn('Q ranges of solute and solvent do not match');
-      return null;
-    }
-
-    const excitedFraction = simulation.pump.excitedStateFraction;
-
-    // Combine: ExFrac * ΔS_solute + ΔS_solvent (already scaled by ratio and deltaT)
-    const combinedI = deltaSSolute.i.map((soluteVal, index) => {
-      const soluteContribution = excitedFraction * soluteVal;
-      const solventContribution = deltaSSolvent!.i[index];
-      return soluteContribution + solventContribution;
-    });
-
-    return { q: deltaSSolute.q, i: combinedI };
-  });
+  // Combined difference scattering signal
+  const deltaS = $derived(
+    computeDeltaS(soluteResource.value, solventResource.value, calculations.excitedStateFraction),
+  );
 
   // Solute contribution scaled by excited fraction for display
-  let deltaSSoluteScaled = $derived.by<number[] | null>(() => {
-    if (!deltaSSolute) return null;
-    const excitedFraction = simulation.pump.excitedStateFraction;
-    return deltaSSolute.i.map((val) => val * excitedFraction);
-  });
+  const deltaSSoluteScaled = $derived(
+    scaleSoluteByExcitedFraction(soluteResource.value, calculations.excitedStateFraction),
+  );
 
   const constant_options: ECOption = {
     title: { text: 'Difference Scattering Signals ΔS(q)' },
@@ -207,7 +128,7 @@
 
   let xAxis = $derived<ECOption['xAxis']>({
     id: 'q',
-    data: deltaS?.q ?? deltaSSolvent?.q ?? deltaSSolute?.q ?? [],
+    data: deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
   });
 
   const series_common: LineSeriesOption = {
@@ -232,7 +153,7 @@
     {
       id: 'deltaSSolvent',
       name: 'ΔS Solvent',
-      data: deltaSSolvent?.i ?? [],
+      data: solventResource.value?.i ?? [],
       ...series_common,
     },
   ]);
