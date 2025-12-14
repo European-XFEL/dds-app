@@ -1,6 +1,7 @@
 <script lang="ts" module>
   import {
     Beaker,
+    Flower,
     Fullscreen,
     History,
     LayoutDashboard,
@@ -27,6 +28,11 @@
             url: '/',
             icon: LayoutDashboard,
           },
+          {
+            title: 'Flow',
+            url: '/flow',
+            icon: Flower,
+          },
         ],
       },
       {
@@ -39,14 +45,9 @@
             icon: TestTube,
           },
           {
-            title: 'Optical Pump', // Check if this name is appropriate
-            url: '/experiment/ir-pump',
+            title: 'Pump/Probe',
+            url: '/experiment/pump-probe',
             icon: Projector,
-          },
-          {
-            title: 'X-Ray Probe', // Detector wavelength goes here
-            url: '/experiment/x-probe',
-            icon: Radiation,
           },
           {
             title: 'X-Ray Detector',
