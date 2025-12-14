@@ -8,9 +8,9 @@
 
   import type { Pump } from '$lib/types';
 
-  let { pump = $bindable(), short }: { pump: Pump; short: boolean } = $props();
+  let { pump = $bindable() }: { pump: Pump } = $props();
 
-  let photonEnergyInvalid = $derived(pump.photonEnergyEv < pump.excitedStateEnergyEv);
+  let photonEnergyInvalid = $derived(pump?.photonEnergyEv < pump?.excitedStateEnergyEv);
 
   const fields = $derived([
     {
@@ -31,31 +31,32 @@
   ]) satisfies Array<{ label: string; key: keyof Pump; input: ComponentProps<typeof Input> }>;
 </script>
 
-<Card.Root class="max-h-fit @sm:gap-3">
-  <Card.Header>
-    <Card.Title>Optical Pump Setup</Card.Title>
+<Card.Root class="max-h-fit min-w-fit flex-auto whitespace-nowrap @sm:gap-3">
+  <Card.Header class="min-w-fit">
+    <Card.Title>IR Optical Pump Setup</Card.Title>
   </Card.Header>
 
-  <Card.Content>
-    <form>
-      {#each fields as { label, key, input } (key)}
-        <Field.Field>
-          <Field.Label>
-            <Label>{label}</Label>
-          </Field.Label>
-          <Field.Content>
-            <div class="flex items-center justify-between gap-2">
-              <Input type="range" {...input} bind:value={pump[key]} />
+  <Card.Content class="flex flex-col gap-4">
+    <!-- TODO: Consider allowing setting delta E/delta T directly instead of via energies -->
+    {#each fields as { label, key, input } (key)}
+      <Field.Field class="flex min-w-fit">
+        <Field.Label>
+          <Label class="min-w-fit">{label}</Label>
+        </Field.Label>
+        <Field.Content>
+          <div class="flex min-w-fit items-center justify-between gap-x-2">
+            {#if pump}
               <Input
                 type="number"
                 {...input}
                 bind:value={pump[key]}
-                class="w-30 text-sm text-muted-foreground"
+                class="nodrag w-30 text-sm text-muted-foreground"
               />
-            </div>
-          </Field.Content>
-        </Field.Field>
-      {/each}
-    </form>
+              <Input type="range" {...input} bind:value={pump[key]} class="nodrag" />
+            {/if}
+          </div>
+        </Field.Content>
+      </Field.Field>
+    {/each}
   </Card.Content>
 </Card.Root>

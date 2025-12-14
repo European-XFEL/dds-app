@@ -4,8 +4,6 @@
   import PumpSetupCard from './components/setup-card.svelte';
 
   const simulation = useSimulationState();
-
-  let { short = false } = $props();
 </script>
 
-<PumpSetupCard bind:pump={simulation.pump} {short} />
+<PumpSetupCard bind:pump={simulation.pump} />
