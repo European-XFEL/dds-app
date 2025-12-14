@@ -1,16 +1,18 @@
 <script lang="ts">
-  import { listSolvents } from '$lib/data.remote';
   import { useSimulationState } from '$lib/state.svelte';
 
-  import SampleSharedCard from './components/shared-card.svelte';
+  import SolventCard from './components/solvent-card.svelte';
 
   const simulation = useSimulationState();
 
-  let { short = false } = $props();
+  type Props = {
+    short?: boolean;
+  };
+
+  let { short = false }: Props = $props();
 </script>
 
-<SampleSharedCard
-  solvents={listSolvents()}
+<SolventCard
   bind:concentrationSoluteMolar={simulation.sample.concentrationSoluteMolar}
   bind:solvent={simulation.sample.solvent}
   bind:qRange={simulation.qRange}
