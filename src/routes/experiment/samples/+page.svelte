@@ -1,13 +1,14 @@
 <script lang="ts">
-  import { SampleExcitedCard, SampleGroundCard, SampleParametersCard } from '$lib/sample';
+  import { SampleCard, SolventCard } from '$lib/sample';
 </script>
 
 <div class="grid gap-4 md:grid-rows-1">
   <div>
-    <SampleParametersCard />
+    <SolventCard />
   </div>
   <div class="flex flex-wrap gap-4">
-    <SampleGroundCard />
-    <SampleExcitedCard />
+    <SampleCard kind="ground" />
+    <SampleCard kind="excited" />
+    <SampleCard kind="excited" />
   </div>
 </div>

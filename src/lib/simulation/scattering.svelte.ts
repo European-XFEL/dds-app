@@ -1,5 +1,6 @@
 import type { SimulationState } from '$lib/state.svelte';
 import { throttled } from '$lib/utils/throttled.svelte';
+
 import { EV_TO_JOULES, N_AVOGADRO } from './constants';
 
 export type ScatteringData = {
@@ -69,9 +70,7 @@ export function createScatteringCalculations(simulation: SimulationState) {
    * Energy difference in eV between photon and excited state.
    * Uses throttled values.
    */
-  const deltaEeV = $derived(
-    throttledPhotonEnergy.current - throttledExcitedStateEnergy.current,
-  );
+  const deltaEeV = $derived(throttledPhotonEnergy.current - throttledExcitedStateEnergy.current);
 
   /**
    * Energy difference in Joules.

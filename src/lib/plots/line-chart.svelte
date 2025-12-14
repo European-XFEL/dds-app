@@ -1,19 +1,19 @@
 <script lang="ts">
   // Tree-shakeable ECharts imports - only include what you use
-  import * as echarts from 'echarts/core';
   import { LineChart, type LineSeriesOption } from 'echarts/charts';
   import {
-    TitleComponent,
-    type TitleComponentOption,
-    TooltipComponent,
-    type TooltipComponentOption,
+    DataZoomComponent,
+    type DataZoomComponentOption,
     GridComponent,
     type GridComponentOption,
     LegendComponent,
     type LegendComponentOption,
-    DataZoomComponent,
-    type DataZoomComponentOption,
+    TitleComponent,
+    type TitleComponentOption,
+    TooltipComponent,
+    type TooltipComponentOption,
   } from 'echarts/components';
+  import * as echarts from 'echarts/core';
   import { CanvasRenderer } from 'echarts/renderers';
 
   // Register only the components you need
