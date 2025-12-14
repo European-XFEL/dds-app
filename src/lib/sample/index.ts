@@ -1,5 +1,4 @@
-import SampleExcitedCard from './SampleExcitedCard.svelte';
-import SampleGroundCard from './SampleGroundCard.svelte';
-import SampleParametersCard from './SampleParametersCard.svelte';
+import SampleCard from './SampleCard.svelte';
+import SolventCard from './SolventCard.svelte';
 
-export { SampleExcitedCard, SampleGroundCard, SampleParametersCard };
+export { SampleCard, SolventCard };
