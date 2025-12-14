@@ -15,6 +15,12 @@ export default defineConfig({
       filename: 'stats.html',
     }),
   ],
+  ssr: {
+    noExternal: ['@xyflow/svelte'],
+  },
+  optimizeDeps: {
+    include: ['@xyflow/svelte'],
+  },
   test: {
     expect: { requireAssertions: true },
     projects: [
