@@ -1,5 +1,6 @@
 <script lang="ts">
   import '$css';
+  import '@xyflow/svelte/dist/style.css';
 
   import { Separator } from '$shadcn/ui/separator';
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
@@ -19,15 +20,15 @@
   });
 </script>
 
-<Sidebar.Provider style="--sidebar-width: 19rem;">
+<Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh overflow-hidden">
   <AppSidebar {sample} />
 
-  <Sidebar.Inset>
+  <Sidebar.Inset class="overflow-hidden">
     <header class="flex h-16 shrink-0 items-center gap-2 px-4">
       <Sidebar.Trigger class="-ms-1" />
       <Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
     </header>
-    <div class="flex flex-1 flex-col gap-4 p-4">
+    <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
       {@render children?.()}
     </div>
   </Sidebar.Inset>

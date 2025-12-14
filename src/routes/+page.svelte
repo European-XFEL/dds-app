@@ -16,7 +16,7 @@
   import { DetectorCard } from '$lib/detector';
   import LineChart from '$lib/plots/line-chart.svelte';
   import { PumpSetupCard } from '$lib/pump';
-  import { SampleParametersCard } from '$lib/sample';
+  import { SolventCard } from '$lib/sample';
   import {
     createScatteringResource,
     fetchDeltaSSolute,
@@ -164,6 +164,7 @@
 
 <Resizable.PaneGroup direction="horizontal" class="max-h-svh max-w-full gap-4 rounded-lg">
   <Resizable.Pane defaultSize={70}>
+    <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
     <!-- <div class="flow-row w-max items-center gap-3">
       <Badge variant="outline"
         >Delta T (K): {result?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
@@ -177,10 +178,10 @@
     </div>
   </Resizable.Pane>
   <Resizable.Handle />
-  <Resizable.Pane defaultSize={30} class="flex min-w-110 flex-col">
+  <Resizable.Pane defaultSize={20} class="flex min-w-110 flex-col">
     <ScrollArea class="@container h-full">
       <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
-        <SampleParametersCard {short} />
+        <SolventCard {short} />
         <DetectorCard {short} />
         <PumpSetupCard {short} />
       </div>
