@@ -48,7 +48,7 @@ export type Detector = {
   pixelSize: PixelSize;
   distance: number;
   wavelength: number;
-  beamCenter: BeamCenter;
+  beamCenter: CartesianPoint;
   imageShape: Shape;
   modules: DetectorModule[];
 };

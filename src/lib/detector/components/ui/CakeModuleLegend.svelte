@@ -2,14 +2,14 @@
   import type { DetectorModule } from '$lib/types';
 
   let {
-    modulesWithColor,
+    modules,
   }: {
-    modulesWithColor: DetectorModule[];
+    modules: DetectorModule[];
   } = $props();
 </script>
 
 <div class="flex flex-wrap justify-center gap-3 text-xs text-muted-foreground">
-  {#each modulesWithColor as module (module.id)}
+  {#each modules as module (module.id)}
     <div
       class="flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 shadow-sm"
     >

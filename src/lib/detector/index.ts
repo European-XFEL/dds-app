@@ -1,4 +1,5 @@
 import DetectorCakeCard from './DetectorCakeCard.svelte';
-import DetectorCard from './DetectorSetupCard.svelte';
+import DetectorInfoCard from './DetectorInfoCard.svelte';
+import DetectorSetupCard from './DetectorSetupCard.svelte';
 
-export { DetectorCakeCard, DetectorCard };
+export { DetectorCakeCard, DetectorSetupCard, DetectorInfoCard };

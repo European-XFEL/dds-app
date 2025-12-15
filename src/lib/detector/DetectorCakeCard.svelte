@@ -1,6 +1,8 @@
 <script lang="ts">
   import { BadgeInfo } from '@lucide/svelte';
 
+  import { onMount } from 'svelte';
+
   import * as Card from '$shadcn/ui/card/index.js';
   import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
@@ -13,24 +15,25 @@
 
   const simulation = useSimulationState();
 
-  $effect(() => {
-    const modules = simulation.detector.modules;
+  let modules = $state(simulation.detector.modules);
 
+  $effect(() => {
+    // TODO: Move this to a proper state update?
     const moduleXs = modules.map((m) => m.x);
     const moduleYs = modules.map((m) => m.y);
 
     const X = Math.max(...moduleXs) - Math.min(...moduleXs);
-    const Y = Math.min(...moduleYs) - Math.max(...moduleYs);
+    const Y = Math.max(...moduleYs) - Math.min(...moduleYs);
 
     simulation.detector.imageShape = { width: X + modules[0].width, height: Y + modules[0].height };
   });
 
-  let modulesWithColor = $derived(
-    simulation.detector.modules.map((module, idx) => ({
-      ...module,
-      color: resolve_module_color(idx),
-    })),
-  );
+  onMount(() => {
+    // Assign colors to modules based on their IDs
+    modules.forEach((module, idx) => {
+      module.color = module?.color ?? resolve_module_color(idx);
+    });
+  });
 </script>
 
 <Card.Root class="@container w-full min-w-fit">
@@ -54,19 +57,19 @@
     <div class="flex grow flex-wrap justify-center-safe gap-6">
       <CakeViewCartesian
         bind:beamCenter={simulation.detector.beamCenter}
-        bind:modulesWithColor
+        bind:modules
         panelWidth={450}
         panelHeight={600}
       />
       <CakeViewPolar
         bind:beamCenter={simulation.detector.beamCenter}
-        bind:modulesWithColor
+        bind:modules
         detectorDistance={simulation.detector.distance}
         panelWidth={450}
         panelHeight={600}
         tessellationGrid={20}
       />
     </div>
-    <CakeModuleLegend {modulesWithColor} />
+    <CakeModuleLegend {modules} />
   </Card.Content>
 </Card.Root>

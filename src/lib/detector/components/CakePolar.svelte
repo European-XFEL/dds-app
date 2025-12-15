@@ -10,7 +10,7 @@
   import type { CartesianPoint, DetectorModule, TransformedModuleTessellated } from '$lib/types';
 
   let {
-    modulesWithColor = $bindable(),
+    modules = $bindable(),
     beamCenter = $bindable(),
     detectorDistance = 300,
     panelWidth = 450,
@@ -18,7 +18,7 @@
     radiusRange = [0, 250] as [number, number],
     tessellationGrid = 20,
   }: {
-    modulesWithColor: DetectorModule[];
+    modules: DetectorModule[];
     beamCenter: CartesianPoint;
     detectorDistance?: number;
     panelWidth?: number;
@@ -38,7 +38,7 @@
   let two_theta_span = $derived(Math.max(two_theta_range[1] - two_theta_range[0], Number.EPSILON));
 
   let transformed_modules = $derived<TransformedModuleTessellated[]>(
-    modulesWithColor.map((module) =>
+    modules.map((module) =>
       transformModuleTessellated(module, beamCenter, detectorDistance, tessellationGrid),
     ),
   );
