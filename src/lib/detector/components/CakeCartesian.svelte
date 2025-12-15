@@ -7,12 +7,12 @@
   import DraggableModule from './ui/CakeModule.svelte';
 
   let {
-    modulesWithColor = $bindable(),
+    modules = $bindable(),
     beamCenter = $bindable(),
     panelWidth = 450,
     panelHeight = 600,
   }: {
-    modulesWithColor: DetectorModule[];
+    modules: DetectorModule[];
     beamCenter: CartesianPoint;
     panelWidth?: number;
     panelHeight?: number;
@@ -39,7 +39,7 @@
   }
 
   function handleModuleDrag(id: string, newPos: CartesianPoint) {
-    modulesWithColor = modulesWithColor.map((module) =>
+    modules = modules.map((module) =>
       module.id === id ? { ...module, x: newPos.x, y: newPos.y } : module,
     );
   }
@@ -79,7 +79,7 @@
         stroke-dasharray="4 1"
       />
     {/each}
-    {#each modulesWithColor as module (module.id)}
+    {#each modules as module (module.id)}
       <DraggableModule {module} onDrag={handleModuleDrag} svgElement={detectorSvgElement} />
     {/each}
     <Crosshair

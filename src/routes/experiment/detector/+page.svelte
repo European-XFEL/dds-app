@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { DetectorCakeCard, DetectorCard } from '$lib/detector/';
+  import { DetectorCakeCard, DetectorInfoCard, DetectorSetupCard } from '$lib/detector/';
 </script>
 
-<DetectorCard />
-
-<DetectorCakeCard />
+<div class="flex flex-wrap gap-6">
+  <DetectorSetupCard />
+  <DetectorInfoCard />
+  <DetectorCakeCard />
+</div>
