@@ -5,8 +5,8 @@
 
   import type { Detector, QRange } from '$lib/types';
 
-  import SetupDetector from './setup-detector.svelte';
-  import SetupQRange from './setup-q-range.svelte';
+  import SetupDetector from './SetupDetector.svelte';
+  import SetupQRange from './SetupQRange.svelte';
 
   let {
     detector = $bindable(),

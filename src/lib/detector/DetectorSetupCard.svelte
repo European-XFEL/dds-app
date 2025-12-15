@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useSimulationState } from '$lib/state.svelte';
 
-  import DetectorSetupCard from './components/setup-card.svelte';
+  import DetectorSetupCard from './components/SetupCard.svelte';
 
   const simulation = useSimulationState();
 

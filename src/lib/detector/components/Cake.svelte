@@ -11,11 +11,11 @@
     radiusToTwoTheta,
     tessellatedModuleToSvgPaths,
     transformModuleTessellated,
-  } from '$lib/detector/components/cake';
+  } from '$lib/detector/components/Cake.helper';
   import type { CartesianPoint, DetectorModule, TransformedModuleTessellated } from '$lib/types';
 
-  import Crosshair from './cake-crosshair.svelte';
-  import DraggableModule from './cake-module.svelte';
+  import Crosshair from './CakeCrosshair.svelte';
+  import DraggableModule from './CakeModule.svelte';
 
   let {
     detectorModules = $bindable(),
