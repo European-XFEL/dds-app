@@ -21,7 +21,7 @@
     <Input
       type="number"
       placeholder="0.172"
-      bind:value={detector.pixel_size}
+      bind:value={detector.pixelSize}
       disabled={configure_via_q}
     />
   </div>
@@ -46,8 +46,8 @@
   <div class="flex flex-col gap-2" hidden={short}>
     <Label>Image Shape (px)</Label>
     <div class="flex flex-row gap-2">
-      <Input type="number" placeholder="512" value={detector?.image_shape?.[0]} readonly disabled />
-      <Input type="number" placeholder="512" value={detector?.image_shape?.[1]} readonly disabled />
+      <Input type="number" placeholder="512" value={detector?.imageShape?.[0]} readonly disabled />
+      <Input type="number" placeholder="512" value={detector?.imageShape?.[1]} readonly disabled />
     </div>
   </div>
   <div class="flex flex-col gap-2" hidden={short}>
@@ -56,13 +56,13 @@
       <Input
         type="number"
         placeholder="256"
-        value={detector?.beam_center?.x}
+        value={detector?.beamCenter?.x}
         disabled={configure_via_q}
       />
       <Input
         type="number"
         placeholder="256"
-        value={detector.beam_center?.y}
+        value={detector.beamCenter?.y}
         disabled={configure_via_q}
       />
     </div>
