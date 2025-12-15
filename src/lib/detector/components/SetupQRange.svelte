@@ -2,7 +2,7 @@
   import { Input } from '$shadcn/ui/input/index.js';
   import { Label } from '$shadcn/ui/label/index.js';
 
-  import * as qConvert from '$lib/detector/components/q_convert';
+  import * as qConvert from '$lib/detector/components/SetupQRange.helper';
   import type { Detector, QRange } from '$lib/types';
 
   let {

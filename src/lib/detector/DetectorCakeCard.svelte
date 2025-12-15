@@ -1,7 +1,7 @@
 <script lang="ts">
   import { useSimulationState } from '$lib/state.svelte';
 
-  import DetectorCakeVisualization from './components/cake-vis.svelte';
+  import DetectorCakeVisualization from './components/Cake.svelte';
 
   const simulation = useSimulationState();
 
