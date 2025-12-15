@@ -30,9 +30,12 @@ export interface TransformedModuleTessellated {
   color: string;
 }
 
-export type Shape = [ny: number, nx: number];
+export type Shape = {
+  width: number;
+  height: number;
+};
 export type PixelSize = number;
-export type BeamCenter = [cy: number, cx: number];
+export type BeamCenter = CartesianPoint;
 
 export interface QParams {
   min: number;
@@ -42,10 +45,10 @@ export interface QParams {
 
 export type Detector = {
   name: string;
-  pixel_size: number;
+  pixelSize: PixelSize;
   distance: number;
   wavelength: number;
-  beam_center: CartesianPoint;
-  image_shape: [number, number];
+  beamCenter: BeamCenter;
+  imageShape: Shape;
   modules: DetectorModule[];
 };

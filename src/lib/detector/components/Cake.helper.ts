@@ -215,3 +215,20 @@ export function generateCakedGridLines(
 
   return { twoThetaLines, chiLines };
 }
+
+const tailwind_gradient_tokens = [
+  '--color-red-500',
+  '--color-amber-500',
+  '--color-lime-500',
+  '--color-emerald-500',
+  '--color-sky-500',
+  '--color-indigo-500',
+  '--color-fuchsia-500',
+  '--color-rose-600',
+] as const;
+
+export function resolve_module_color(index: number, explicit?: string): string {
+  if (explicit) return explicit;
+  const token = tailwind_gradient_tokens[index % tailwind_gradient_tokens.length];
+  return `var(${token})`;
+}

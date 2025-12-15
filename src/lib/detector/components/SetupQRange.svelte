@@ -20,11 +20,11 @@
     if (configure_via_q) return;
 
     let new_q_vals = qConvert.detectorQParams(
-      detector.image_shape,
-      detector.pixel_size,
+      detector.imageShape,
+      detector.pixelSize,
       detector.distance,
       detector.wavelength,
-      [detector?.beam_center?.x, detector?.beam_center?.y],
+      [detector?.beamCenter?.x, detector?.beamCenter?.y],
     );
 
     q_range.min = new_q_vals.min;
