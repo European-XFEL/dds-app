@@ -20,8 +20,8 @@
   }
 
   let {
-    modules = $bindable(),
-    beamCenter = $bindable(),
+    modules,
+    beamCenter,
     distance = 300,
     panelWidth = 450,
     panelHeight = 600,

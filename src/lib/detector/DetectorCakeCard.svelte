@@ -72,8 +72,8 @@
       </div>
       <div class="min-w-sm">
         <CakeViewPolar
-          bind:beamCenter
-          bind:modules
+          {beamCenter}
+          {modules}
           {distance}
           panelWidth={450}
           panelHeight={600}
