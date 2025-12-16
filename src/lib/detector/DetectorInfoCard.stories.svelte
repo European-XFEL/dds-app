@@ -1,0 +1,23 @@
+<script module>
+  import { defineMeta } from '@storybook/addon-svelte-csf';
+
+  import { createSimulationSeed } from '$lib/state.svelte';
+
+  import DetectorInfoCard from './DetectorInfoCard.svelte';
+
+  const defaultState = createSimulationSeed();
+
+  const { Story } = defineMeta({
+    component: DetectorInfoCard,
+    args: {
+      modules: defaultState.detector.modules,
+      distance: defaultState.detector.distance,
+      beamCenter: defaultState.detector.beamCenter,
+      imageShape: defaultState.detector.imageShape,
+      pixelSize: defaultState.detector.pixelSize,
+      wavelength: defaultState.probe.wavelength,
+    },
+  });
+</script>
+
+<Story name="Default" />
