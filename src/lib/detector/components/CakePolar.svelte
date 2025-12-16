@@ -9,6 +9,16 @@
   } from '$lib/detector/components/Cake.helper';
   import type { CartesianPoint, DetectorModule, TransformedModuleTessellated } from '$lib/types';
 
+  interface Props {
+    modules: DetectorModule[];
+    beamCenter: CartesianPoint;
+    distance?: number;
+    panelWidth?: number;
+    panelHeight?: number;
+    radiusRange?: [number, number];
+    tessellationGrid?: number;
+  }
+
   let {
     modules = $bindable(),
     beamCenter = $bindable(),
@@ -17,15 +27,7 @@
     panelHeight = 600,
     radiusRange = [0, 250] as [number, number],
     tessellationGrid = 20,
-  }: {
-    modules: DetectorModule[];
-    beamCenter: CartesianPoint;
-    distance?: number;
-    panelWidth?: number;
-    panelHeight?: number;
-    radiusRange?: [number, number];
-    tessellationGrid?: number;
-  } = $props();
+  }: Props = $props();
 
   const chi_range: [number, number] = [-Math.PI, Math.PI];
   const two_theta_step_degrees = 5;

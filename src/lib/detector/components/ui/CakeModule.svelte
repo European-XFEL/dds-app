@@ -4,18 +4,13 @@
 
   import type { CartesianPoint, DetectorModule } from '$lib/types';
 
-  let {
-    module,
-    onDrag,
-    svgElement,
-  }: {
+  interface Props {
     module: DetectorModule;
     onDrag: (id: string, newPos: CartesianPoint) => void;
     svgElement: SVGSVGElement | null;
-  } = $props();
+  }
 
-  let is_dragging = false;
-  let drag_offset: CartesianPoint = { x: 0, y: 0 };
+  let { module, onDrag, svgElement }: Props = $props();
 
   const module_label = $derived(module.id.replace('module-', 'Module '));
   const module_color = $derived(module.color ?? 'var(--color-slate-500)');

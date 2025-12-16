@@ -4,58 +4,16 @@
 
   import type { CartesianPoint } from '$lib/types';
 
-  let {
-    x,
-    y,
-    size = 15,
-    onDrag,
-    svgElement,
-  }: {
+  interface Props {
     x: number;
     y: number;
     size?: number;
     onDrag: (newPos: CartesianPoint) => void;
     svgElement: SVGSVGElement | null;
-  } = $props();
-
-  let is_dragging = false;
-
-  function handle_mouse_down(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (!svgElement) return;
-
-    is_dragging = true;
-    window.addEventListener('mousemove', handle_mouse_move);
-    window.addEventListener('mouseup', handle_mouse_up);
   }
 
-  function handle_mouse_move(event: MouseEvent) {
-    if (!is_dragging || !svgElement) return;
+  let { x, y, size = 15, onDrag, svgElement }: Props = $props();
 
-    const rect = svgElement.getBoundingClientRect();
-    const next_x = event.clientX - rect.left;
-    const next_y = event.clientY - rect.top;
-    onDrag({ x: next_x, y: next_y });
-  }
-
-  function handle_mouse_up() {
-    if (!is_dragging) return;
-
-    is_dragging = false;
-    remove_global_listeners();
-  }
-
-  function remove_global_listeners() {
-    if (typeof window === 'undefined') return;
-
-    window.removeEventListener('mousemove', handle_mouse_move);
-    window.removeEventListener('mouseup', handle_mouse_up);
-  }
-
-  onDestroy(() => {
-    remove_global_listeners();
   });
 </script>
 

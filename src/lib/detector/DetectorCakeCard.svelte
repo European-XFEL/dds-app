@@ -12,12 +12,12 @@
   import CakeModuleLegend from './components/ui/CakeModuleLegend.svelte';
   import type { CartesianPoint, DetectorModule, Shape } from './types';
 
-  type Props = {
+  interface Props {
     modules: DetectorModule[];
     distance: number;
     beamCenter: CartesianPoint;
-    imageShape: Shape;
-  };
+    imageShape?: Shape;
+  }
 
   let {
     modules = $bindable(),
