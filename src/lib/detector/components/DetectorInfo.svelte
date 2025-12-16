@@ -2,7 +2,7 @@
   import * as Field from '$shadcn/ui/field/index.js';
   import { Input } from '$shadcn/ui/input/index.js';
 
-  import type { CartesianPoint, DetectorModule, PixelSize, QRange, Shape } from '$lib/types';
+  import type { CartesianPoint, DetectorModule, PixelSize, QParams, Shape } from '$lib/types';
 
   import * as qConvert from './DetectorInfo.helper';
 
@@ -17,7 +17,7 @@
 
   let { modules, distance, beamCenter, imageShape, pixelSize, wavelength }: Props = $props();
 
-  let qRange: QRange = $state({
+  let qRange: QParams = $state({
     min: 0,
     max: 0,
     step: 0,

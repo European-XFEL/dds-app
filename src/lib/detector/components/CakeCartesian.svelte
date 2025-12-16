@@ -6,17 +6,19 @@
   import Crosshair from './ui/CakeCrosshair.svelte';
   import DraggableModule from './ui/CakeModule.svelte';
 
+  interface Props {
+    modules: DetectorModule[];
+    beamCenter: CartesianPoint;
+    panelWidth?: number;
+    panelHeight?: number;
+  }
+
   let {
     modules = $bindable(),
     beamCenter = $bindable(),
     panelWidth = 450,
     panelHeight = 600,
-  }: {
-    modules: DetectorModule[];
-    beamCenter: CartesianPoint;
-    panelWidth?: number;
-    panelHeight?: number;
-  } = $props();
+  }: Props = $props();
 
   let detectorSvgElement = $state<SVGSVGElement | null>(null);
 

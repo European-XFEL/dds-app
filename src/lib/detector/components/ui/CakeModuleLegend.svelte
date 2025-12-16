@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { DetectorModule } from '$lib/types';
 
-  let {
-    modules,
-  }: {
+  interface Props {
     modules: DetectorModule[];
-  } = $props();
+  }
+
+  let { modules }: Props = $props();
 </script>
 
 <div class="flex flex-wrap justify-center gap-3 text-xs text-muted-foreground">
