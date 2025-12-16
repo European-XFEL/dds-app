@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
   import { draw } from 'svelte/transition';
 
   import type { CartesianPoint, DetectorModule } from '$lib/types';
+
+  import { useDrag } from './useDrag.svelte';
 
   interface Props {
     module: DetectorModule;
@@ -12,63 +13,24 @@
 
   let { module, onDrag, svgElement }: Props = $props();
 
-  const module_label = $derived(module.id.replace('module-', 'Module '));
-  const module_color = $derived(module.color ?? 'var(--color-slate-500)');
+  const moduleLabel = $derived(module.id.replace('module-', 'Module '));
+  const moduleColor = $derived(module.color ?? 'var(--color-slate-500)');
 
-  function handle_mouse_down(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (!svgElement) return;
-
-    is_dragging = true;
-
-    const rect = svgElement.getBoundingClientRect();
-    drag_offset = {
-      x: event.clientX - rect.left - module.x,
-      y: event.clientY - rect.top - module.y,
-    };
-
-    window.addEventListener('mousemove', handle_mouse_move);
-    window.addEventListener('mouseup', handle_mouse_up);
-  }
-
-  function handle_mouse_move(event: MouseEvent) {
-    if (!is_dragging || !svgElement) return;
-
-    const rect = svgElement.getBoundingClientRect();
-    const next_x = event.clientX - rect.left - drag_offset.x;
-    const next_y = event.clientY - rect.top - drag_offset.y;
-    onDrag(module.id, { x: next_x, y: next_y });
-  }
-
-  function handle_mouse_up() {
-    if (!is_dragging) return;
-
-    is_dragging = false;
-    remove_global_listeners();
-  }
-
-  function remove_global_listeners() {
-    if (typeof window === 'undefined') return;
-
-    window.removeEventListener('mousemove', handle_mouse_move);
-    window.removeEventListener('mouseup', handle_mouse_up);
-  }
-
-  onDestroy(() => {
-    remove_global_listeners();
+  const drag = useDrag({
+    getSvgElement: () => svgElement,
+    onDrag: (pos) => onDrag(module.id, pos),
+    getOffset: () => ({ x: module.x, y: module.y }),
   });
 </script>
 
 <g
   role="button"
   tabindex="0"
-  aria-label={`${module_label} detector module`}
+  aria-label={`${moduleLabel} detector module`}
   class="cursor-grab transition-[transform] outline-none active:cursor-grabbing"
   style="touch-action: none;"
   data-module-id={module.id}
-  onmousedown={handle_mouse_down}
+  onmousedown={drag.handleMouseDown}
 >
   <rect
     in:draw|global={{ duration: 1200, delay: 200 }}
@@ -76,9 +38,9 @@
     y={module.y}
     width={module.width}
     height={module.height}
-    fill={module_color}
+    fill={moduleColor}
     fill-opacity="0.25"
-    stroke={module_color}
+    stroke={moduleColor}
     stroke-width="2"
     class="hover:fill-opacity-40 pointer-events-auto transition-[fill-opacity]"
   />
@@ -87,11 +49,11 @@
     y={module.y + module.height / 2}
     text-anchor="middle"
     dominant-baseline="middle"
-    fill={module_color}
+    fill={moduleColor}
     font-size="11"
     font-weight="600"
     class="pointer-events-none tracking-tight select-none"
   >
-    {module_label.replace('Module ', 'M')}
+    {moduleLabel.replace('Module ', 'M')}
   </text>
 </g>
