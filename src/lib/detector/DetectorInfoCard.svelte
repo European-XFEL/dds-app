@@ -1,17 +1,17 @@
 <script lang="ts">
-  import * as Card from '$shadcn/ui/card/index.js';
+  import type { ComponentProps } from 'svelte';
 
-  import { useSimulationState } from '$lib/state.svelte';
+  import * as Card from '$shadcn/ui/card/index.js';
 
   import DetectorInfo from './components/DetectorInfo.svelte';
 
-  const simulation = useSimulationState();
+  type Props = ComponentProps<typeof DetectorInfo>;
 
-  let { short = false } = $props();
+  let { ...restProps }: Props = $props();
 </script>
 
-<Card.Root class="grow">
-  <Card.Content class="space-y-6">
-    <DetectorInfo detector={simulation.detector} wavelength={simulation.probe.wavelength} {short} />
+<Card.Root class="flex-1 min-w-sm">
+  <Card.Content>
+    <DetectorInfo {...restProps} />
   </Card.Content>
 </Card.Root>

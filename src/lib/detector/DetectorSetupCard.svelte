@@ -1,17 +1,16 @@
 <script lang="ts">
-  import * as Card from '$shadcn/ui/card/index.js';
+  import type { ComponentProps } from 'svelte';
 
-  import { useSimulationState } from '$lib/state.svelte';
+  import * as Card from '$shadcn/ui/card/index.js';
 
   import DetectorSetup from './components/DetectorSetup.svelte';
 
-  const simulation = useSimulationState();
-
-  let { short = false } = $props();
+  let { distance = $bindable(), beamCenter = $bindable() }: ComponentProps<typeof DetectorSetup> =
+    $props();
 </script>
 
-<Card.Root class="grow">
-  <Card.Content class="space-y-6">
-    <DetectorSetup detector={simulation.detector} {short} />
+<Card.Root class="flex-1 min-w-sm">
+  <Card.Content>
+    <DetectorSetup bind:distance bind:beamCenter />
   </Card.Content>
 </Card.Root>

@@ -18,7 +18,7 @@ const initialSeed = {
   },
   detector: {
     name: 'detector',
-    pixel_size: 0.172,
+    pixelSize: 0.172,
     distance: 200,
     wavelength: 1.54,
     modules: [
@@ -74,9 +74,8 @@ export function createSimulationSeed(_seed = initialSeed): SimulationState {
       maxY = moduleMaxY;
     }
   }
-  const image_shape: [number, number] = [maxY, maxX];
-
-  const beam_center = {
+  const imageShape = { width: maxX, height: maxY };
+  const beamCenter = {
     x: 16 + maxX / 2,
     y: 16 + maxY / 2,
   };
@@ -86,8 +85,8 @@ export function createSimulationSeed(_seed = initialSeed): SimulationState {
     ...seed,
     detector: {
       ...seed.detector,
-      image_shape,
-      beam_center,
+      imageShape,
+      beamCenter,
     },
     sample: {
       concentrationSoluteMolar: undefined,
@@ -97,9 +96,11 @@ export function createSimulationSeed(_seed = initialSeed): SimulationState {
     },
   });
 
-  setContext(APP_STATE_KEY, state);
-
   return state;
+}
+
+export function setSimulationState(state: SimulationState): void {
+  setContext<SimulationState>(APP_STATE_KEY, state);
 }
 
 export function useSimulationState(): SimulationState {

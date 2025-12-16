@@ -12,7 +12,7 @@
   let {
     modules = $bindable(),
     beamCenter = $bindable(),
-    detectorDistance = 300,
+    distance = 300,
     panelWidth = 450,
     panelHeight = 600,
     radiusRange = [0, 250] as [number, number],
@@ -20,7 +20,7 @@
   }: {
     modules: DetectorModule[];
     beamCenter: CartesianPoint;
-    detectorDistance?: number;
+    distance?: number;
     panelWidth?: number;
     panelHeight?: number;
     radiusRange?: [number, number];
@@ -32,14 +32,14 @@
   const chi_step_degrees = 45;
 
   let two_theta_range = $derived<[number, number]>([
-    radiusToTwoTheta(radiusRange[0], detectorDistance),
-    radiusToTwoTheta(radiusRange[1], detectorDistance),
+    radiusToTwoTheta(radiusRange[0], distance),
+    radiusToTwoTheta(radiusRange[1], distance),
   ]);
   let two_theta_span = $derived(Math.max(two_theta_range[1] - two_theta_range[0], Number.EPSILON));
 
   let transformed_modules = $derived<TransformedModuleTessellated[]>(
     modules.map((module) =>
-      transformModuleTessellated(module, beamCenter, detectorDistance, tessellationGrid),
+      transformModuleTessellated(module, beamCenter, distance, tessellationGrid),
     ),
   );
 

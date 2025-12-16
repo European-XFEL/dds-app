@@ -6,16 +6,25 @@
   import * as Card from '$shadcn/ui/card/index.js';
   import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
-  import { useSimulationState } from '$lib/state.svelte';
-
   import { resolve_module_color } from './components/Cake.helper';
   import CakeViewCartesian from './components/CakeCartesian.svelte';
   import CakeViewPolar from './components/CakePolar.svelte';
   import CakeModuleLegend from './components/ui/CakeModuleLegend.svelte';
+  import type { CartesianPoint, DetectorModule, Shape } from './types';
 
-  const simulation = useSimulationState();
+  type Props = {
+    modules: DetectorModule[];
+    distance: number;
+    beamCenter: CartesianPoint;
+    imageShape: Shape;
+  };
 
-  let modules = $state(simulation.detector.modules);
+  let {
+    modules = $bindable(),
+    distance = $bindable(),
+    beamCenter = $bindable(),
+    imageShape = $bindable(),
+  }: Props = $props();
 
   $effect(() => {
     // TODO: Move this to a proper state update?
@@ -25,7 +34,10 @@
     const X = Math.max(...moduleXs) - Math.min(...moduleXs);
     const Y = Math.max(...moduleYs) - Math.min(...moduleYs);
 
-    simulation.detector.imageShape = { width: X + modules[0].width, height: Y + modules[0].height };
+    imageShape = {
+      width: X + modules[0].width,
+      height: Y + modules[0].height,
+    };
   });
 
   onMount(() => {
@@ -55,20 +67,19 @@
 
   <Card.Content class="flex flex-col gap-6">
     <div class="flex grow flex-wrap justify-center-safe gap-6">
-      <CakeViewCartesian
-        bind:beamCenter={simulation.detector.beamCenter}
-        bind:modules
-        panelWidth={450}
-        panelHeight={600}
-      />
-      <CakeViewPolar
-        bind:beamCenter={simulation.detector.beamCenter}
-        bind:modules
-        detectorDistance={simulation.detector.distance}
-        panelWidth={450}
-        panelHeight={600}
-        tessellationGrid={20}
-      />
+      <div class="min-w-sm">
+        <CakeViewCartesian bind:beamCenter bind:modules panelWidth={450} panelHeight={600} />
+      </div>
+      <div class="min-w-sm">
+        <CakeViewPolar
+          bind:beamCenter
+          bind:modules
+          {distance}
+          panelWidth={450}
+          panelHeight={600}
+          tessellationGrid={20}
+        />
+      </div>
     </div>
     <CakeModuleLegend {modules} />
   </Card.Content>
