@@ -43,6 +43,10 @@ export interface QParams {
   step: number;
 }
 
+// TODO: Decide to use QRange or QParams throughout application
+/** @deprecated Use QParams instead */
+export type QRange = QParams;
+
 export type Detector = {
   name: string;
   pixelSize: PixelSize;

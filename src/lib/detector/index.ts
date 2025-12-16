@@ -3,3 +3,5 @@ import DetectorInfoCard from './DetectorInfoCard.svelte';
 import DetectorSetupCard from './DetectorSetupCard.svelte';
 
 export { DetectorCakeCard, DetectorSetupCard, DetectorInfoCard };
+
+export type * from './types';

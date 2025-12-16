@@ -9,7 +9,7 @@
     $props();
 </script>
 
-<Card.Root class="flex-1 min-w-sm">
+<Card.Root class="min-w-sm flex-1">
   <Card.Content>
     <DetectorSetup bind:distance bind:beamCenter />
   </Card.Content>

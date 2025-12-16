@@ -45,8 +45,6 @@
     r_range.max = new_q_vals.rMaxPx;
   });
 
-  $inspect(imageShape, beamCenter);
-
   let qFields = $derived([
     ['Q Min', qRange.min],
     ['Q Max', qRange.max],
@@ -88,7 +86,7 @@
         {#each qFields as [label, value]}
           <Field.Field>
             <Field.Label>{label}</Field.Label>
-            <Input bind:value={() => value, (v) => null} class="truncate opacity-50" />
+            <Input {value} readonly class="truncate opacity-50" />
           </Field.Field>
         {/each}
       </Field.Group>
