@@ -28,16 +28,16 @@
   });
 </script>
 
-<Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh overflow-hidden">
+<Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
   <AppSidebar {sample} />
 
-  <Sidebar.Inset class="overflow-hidden">
-    <header class="flex h-16 shrink-0 items-center gap-2 px-4">
+  <Sidebar.Inset class="overflow-y-auto">
+    <header class="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 bg-background px-4">
       <Sidebar.Trigger class="-ms-1" />
       <Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
     </header>
-    <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <main class="px-4 pb-4">
       {@render children?.()}
-    </div>
+    </main>
   </Sidebar.Inset>
 </Sidebar.Provider>
