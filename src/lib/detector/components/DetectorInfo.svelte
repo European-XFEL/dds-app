@@ -2,19 +2,20 @@
   import * as Field from '$shadcn/ui/field/index.js';
   import { Input } from '$shadcn/ui/input/index.js';
 
-  import type { Detector, QRange } from '$lib/types';
+  import type { CartesianPoint, DetectorModule, PixelSize, QRange, Shape } from '$lib/types';
 
   import * as qConvert from './DetectorInfo.helper';
 
-  let {
-    detector,
-    wavelength,
-    short = false,
-  }: {
-    detector: Detector;
+  type Props = {
+    modules: DetectorModule[];
+    distance: number;
+    beamCenter: CartesianPoint;
+    imageShape: Shape;
+    pixelSize: PixelSize;
     wavelength: number;
-    short?: boolean;
-  } = $props();
+  };
+
+  let { modules, distance, beamCenter, imageShape, pixelSize, wavelength }: Props = $props();
 
   let qRange: QRange = $state({
     min: 0,
@@ -29,10 +30,10 @@
 
   $effect(() => {
     let new_q_vals = qConvert.computeQRangeFromModules({
-      distance: detector.distance,
-      pixelSize: detector.pixelSize,
-      beamCenter: detector.beamCenter,
-      modules: detector.modules,
+      distance: distance,
+      pixelSize: pixelSize,
+      beamCenter: beamCenter,
+      modules: modules,
       wavelength: wavelength,
     });
 
@@ -44,7 +45,7 @@
     r_range.max = new_q_vals.rMaxPx;
   });
 
-  $inspect(detector.imageShape, detector.beamCenter);
+  $inspect(imageShape, beamCenter);
 
   let qFields = $derived([
     ['Q Min', qRange.min],
@@ -53,7 +54,7 @@
   ]);
 </script>
 
-<div class="min-w-md">
+<div>
   <Field.Group>
     <Field.Set>
       <Field.Legend>Detector Information</Field.Legend>
@@ -63,13 +64,13 @@
       <Field.Group class="flex flex-row">
         <Field.Field>
           <Field.Label>Pixel size (mm)</Field.Label>
-          <Input value={detector.pixelSize} disabled={true} />
+          <Input value={pixelSize} disabled={true} />
         </Field.Field>
         <Field.Field>
           <Field.Label>Image shape (px)</Field.Label>
           <div class="grid grid-cols-2 gap-4">
-            <Input value={detector.imageShape.width} disabled={true} />
-            <Input value={detector.imageShape.height} disabled={true} />
+            <Input value={imageShape.width} disabled={true} />
+            <Input value={imageShape.height} disabled={true} />
           </div>
         </Field.Field>
       </Field.Group>
