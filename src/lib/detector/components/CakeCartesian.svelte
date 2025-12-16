@@ -22,17 +22,6 @@
 
   let detectorSvgElement = $state<SVGSVGElement | null>(null);
 
-  function attachDetectorSvg(node: SVGSVGElement) {
-    detectorSvgElement = node;
-    return {
-      destroy() {
-        if (detectorSvgElement === node) {
-          detectorSvgElement = null;
-        }
-      },
-    };
-  }
-
   function handleCenterDrag(newPos: CartesianPoint) {
     beamCenter = {
       x: Math.max(10, Math.min(panelWidth - 10, newPos.x)),
@@ -51,7 +40,7 @@
 
 <div class="flow max-w-fit rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
   <svg
-    {@attach attachDetectorSvg}
+    bind:this={detectorSvgElement}
     width={panelWidth}
     height={panelHeight}
     class="mx-auto block rounded-lg bg-muted/30 text-muted-foreground/80"
