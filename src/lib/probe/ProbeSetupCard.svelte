@@ -1,11 +1,15 @@
 <script lang="ts">
-  import { useSimulationState } from '$lib/state.svelte';
+  import type { ComponentProps } from 'svelte';
 
-  import ProbeSetupCard from './components/setup-card.svelte';
+  import * as Card from '$shadcn/ui/card/index.js';
 
-  const simulation = useSimulationState();
+  import ProbeSetup from './components/ProbeSetup.svelte';
 
-  let { short = false } = $props();
+  let { probe = $bindable(), short = false }: ComponentProps<typeof ProbeSetup> = $props();
 </script>
 
-<ProbeSetupCard bind:probe={simulation.probe} {short} />
+<Card.Root class="min-w-sm flex-1">
+  <Card.Content>
+    <ProbeSetup bind:probe {short} />
+  </Card.Content>
+</Card.Root>
