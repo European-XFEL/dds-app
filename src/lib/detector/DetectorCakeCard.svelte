@@ -1,16 +1,15 @@
 <script lang="ts">
   import { BadgeInfo } from '@lucide/svelte';
 
-  import { onMount } from 'svelte';
-
   import * as Card from '$shadcn/ui/card/index.js';
   import * as Tooltip from '$shadcn/ui/tooltip/index.js';
+
+  import type { CartesianPoint, DetectorModule, Shape } from '$lib/types';
 
   import { resolve_module_color } from './components/Cake.helper';
   import CakeViewCartesian from './components/CakeCartesian.svelte';
   import CakeViewPolar from './components/CakePolar.svelte';
   import CakeModuleLegend from './components/ui/CakeModuleLegend.svelte';
-  import type { CartesianPoint, DetectorModule, Shape } from './types';
 
   interface Props {
     modules: DetectorModule[];
@@ -26,25 +25,33 @@
     imageShape = $bindable(),
   }: Props = $props();
 
-  $effect(() => {
-    // TODO: Move this to a proper state update?
+  // Compute image shape from module extents as derived state
+  let computedImageShape: Shape = $derived.by(() => {
+    if (modules.length === 0) return { width: 0, height: 0 };
+
     const moduleXs = modules.map((m) => m.x);
     const moduleYs = modules.map((m) => m.y);
 
     const X = Math.max(...moduleXs) - Math.min(...moduleXs);
     const Y = Math.max(...moduleYs) - Math.min(...moduleYs);
 
-    imageShape = {
+    return {
       width: X + modules[0].width,
       height: Y + modules[0].height,
     };
   });
 
-  onMount(() => {
-    // Assign colors to modules based on their IDs
-    modules.forEach((module, idx) => {
-      module.color = module?.color ?? resolve_module_color(idx);
-    });
+  $effect(() => {
+    imageShape = computedImageShape;
+  });
+
+  // Assign colors to modules based on their index if not already set
+  $effect(() => {
+    for (let i = 0; i < modules.length; i++) {
+      if (!modules[i].color) {
+        modules[i].color = resolve_module_color(i);
+      }
+    }
   });
 </script>
 
