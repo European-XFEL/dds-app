@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
-  import { draw, fade } from 'svelte/transition';
+  import { draw } from 'svelte/transition';
 
   import type { CartesianPoint } from '$lib/types';
+
+  import { useDrag } from './useDrag.svelte';
 
   interface Props {
     x: number;
@@ -14,6 +15,9 @@
 
   let { x, y, size = 15, onDrag, svgElement }: Props = $props();
 
+  const drag = useDrag({
+    getSvgElement: () => svgElement,
+    onDrag: (pos) => onDrag(pos),
   });
 </script>
 
@@ -23,7 +27,7 @@
   role="button"
   tabindex="0"
   aria-label="Beam center crosshair"
-  onmousedown={handle_mouse_down}
+  onmousedown={drag.handleMouseDown}
 >
   <line
     in:draw|global={{ duration: 1200, delay: 200 }}
