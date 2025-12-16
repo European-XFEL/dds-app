@@ -1,8 +1,4 @@
-import { all, create } from 'mathjs';
-
 import type { BeamCenter, DetectorModule, PixelSize, QParams } from '$lib/types';
-
-const math = create(all, {});
 
 /**
  * Compute q-range and a reasonable q-step from detector geometry by using
@@ -27,10 +23,10 @@ export function computeQRangeFromModules(params: {
 
   const qFromRadiusPx = (rPx: number): number => {
     const rMm = rPx * pixelSize;
-    const twoTheta = math.atan(rMm / Dmm) as number; // radians
+    const twoTheta = Math.atan(rMm / Dmm);
     const theta = 0.5 * twoTheta;
-    const q = ((4 * math.pi) / lambdaA) * (math.sin(theta) as number);
-    return q as number;
+    const q = ((4 * Math.PI) / lambdaA) * Math.sin(theta);
+    return q;
   };
 
   // Distance from point (cx,cy) to axis-aligned rectangle [x0,x1]×[y0,y1]
@@ -43,15 +39,15 @@ export function computeQRangeFromModules(params: {
     x1: number,
     y1: number,
   ): number => {
-    const dx = math.max(x0 - cx, 0, cx - x1) as number;
-    const dy = math.max(y0 - cy, 0, cy - y1) as number;
-    return math.sqrt(dx * dx + dy * dy) as number;
+    const dx = Math.max(x0 - cx, 0, cx - x1);
+    const dy = Math.max(y0 - cy, 0, cy - y1);
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   const distancePointToPointPx = (cx: number, cy: number, x: number, y: number): number => {
     const dx = x - cx;
     const dy = y - cy;
-    return math.sqrt(dx * dx + dy * dy) as number;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   let rMinPx = Number.POSITIVE_INFINITY;
