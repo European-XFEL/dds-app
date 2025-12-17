@@ -55,7 +55,7 @@
   });
 </script>
 
-<Card.Root class="@container w-full min-w-fit">
+<Card.Root class="w-full min-w-fit">
   <Card.Header class="gap-3">
     <Card.Title
       >Detector Caking Visualization
