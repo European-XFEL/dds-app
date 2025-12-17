@@ -1,20 +1,52 @@
 <script lang="ts">
-  import { useSimulationState } from '$lib/state.svelte';
+  import * as Card from '$shadcn/ui/card/index.js';
+  import { Spinner } from '$shadcn/ui/spinner/index.js';
 
-  import SolventCard from './components/solvent-card.svelte';
+  import type { listSolvents } from '$lib/data.remote';
+  import type { Sample } from '$lib/types';
 
-  const simulation = useSimulationState();
+  import SoluteConcentration from './components/SoluteConcentration.svelte';
+  import SolventSelect from './components/SolventSelect.svelte';
 
-  type Props = {
+  type Solvents = Awaited<ReturnType<typeof listSolvents>>;
+
+  interface Props {
+    solvent: Sample['solvent'];
+    concentrationSoluteMolar: Sample['concentrationSoluteMolar'];
+    solvents?: Solvents;
     short?: boolean;
-  };
+    loading: boolean;
+  }
 
-  let { short = false }: Props = $props();
+  let {
+    solvent = $bindable(),
+    concentrationSoluteMolar = $bindable(),
+    solvents,
+    short = false,
+    loading = true,
+  }: Props = $props();
 </script>
 
-<SolventCard
-  bind:concentrationSoluteMolar={simulation.sample.concentrationSoluteMolar}
-  bind:solvent={simulation.sample.solvent}
-  bind:qRange={simulation.qRange}
-  {short}
-/>
+<Card.Root class="flex-auto @sm:gap-3">
+  <Card.Header>
+    <Card.Title>
+      Sample Parameters
+      {#if loading}<div class="absolute ml-2 inline-block"><Spinner /></div>{/if}
+    </Card.Title>
+    <Card.Description hidden={short}>
+      Parameters shared by both ground and excited states.
+
+      <br /><br />
+
+      Note that the choice of solvent defines the maximum Q range.
+    </Card.Description>
+  </Card.Header>
+
+  <Card.Content>
+    <div class="flex flex-col gap-6">
+      <SolventSelect bind:solvent {solvents} {short} {loading} />
+
+      <SoluteConcentration bind:concentrationSoluteMolar />
+    </div>
+  </Card.Content>
+</Card.Root>

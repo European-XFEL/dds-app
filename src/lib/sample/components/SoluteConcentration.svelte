@@ -4,14 +4,16 @@
 
   import type { Sample } from '$lib/types';
 
-  let {
-    concentrationSoluteMolar = $bindable(),
-  }: {
+  type Props = {
     concentrationSoluteMolar: Sample['concentrationSoluteMolar'];
-  } = $props();
+  };
+
+  let { concentrationSoluteMolar = $bindable() }: Props = $props();
+
+  $inspect(concentrationSoluteMolar);
 </script>
 
-<div class="grid max-w-120 min-w-100 grow gap-2 @sm:min-w-40">
+<div class="grid grow gap-2 @sm:min-w-40">
   <Label>Solute Concentration (%)</Label>
   <div class="flex items-center justify-between gap-4">
     <Input

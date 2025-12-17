@@ -2,8 +2,6 @@
   import { listMolecules } from '../../data.remote';
   import { Upload } from '@lucide/svelte';
 
-  import { onMount } from 'svelte';
-
   import { Button } from '$shadcn/ui/button/index.js';
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
@@ -12,26 +10,16 @@
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
-  let {
-    molecules: _molecules = listMolecules(),
-    molecule = $bindable(),
-  }: {
-    molecules?: Molecules | Promise<Molecules>;
+  interface Props {
     molecule: Sample['ground'] | Sample['excited'];
-  } = $props();
+    molecules?: Molecules;
+    loading: boolean;
+  }
 
-  let molecules = $state<Molecules>([]);
-  let loading = $state(true);
-
-  onMount(() => {
-    Promise.resolve(_molecules).then((data) => {
-      molecules = data;
-      loading = false;
-    });
-  });
+  let { molecule = $bindable(), molecules, loading }: Props = $props();
 
   const triggerMolecule = $derived(
-    molecules.find((m) => m.id === molecule?.id)?.name ?? 'Select molecule',
+    molecules?.find((m) => m.id === molecule?.id)?.name ?? 'Select molecule',
   );
 </script>
 
@@ -44,7 +32,7 @@
       bind:value={
         () => molecule?.id,
         (v) => {
-          let res = molecules.find((m) => m.id === v);
+          let res = molecules?.find((m) => m.id === v);
           if (res) {
             molecule = res;
           }
