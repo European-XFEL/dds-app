@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { listMolecules } from '../../data.remote';
+  import { listMolecules } from '../data.remote';
 
   import * as Card from '$shadcn/ui/card/index.js';
   import * as Collapsible from '$shadcn/ui/collapsible/index.js';
@@ -7,39 +7,41 @@
 
   import type { Sample } from '$lib/types';
 
-  import MoleculeSelect from './molecule-select.svelte';
-  import MoleculeViz from './molecule-viz.svelte';
+  import MoleculeSelect from './components/MoleculeSelect.svelte';
+  import MoleculeViz from './components/MoleculeViz.svelte';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
-  let {
-    title,
-    molecules: _molecules,
-    molecule = $bindable(),
-    vizOpen = false,
-    vizCollapseShow = false,
-  }: {
+  type Props = {
     title: string;
-    molecules?: Molecules | Promise<Molecules>;
     molecule: Sample['ground'] | Sample['excited'];
+    molecules?: Molecules;
     vizOpen?: boolean;
     vizCollapseShow?: boolean;
-  } = $props();
+    loading: boolean;
+  };
 
-  const loading = $derived(_molecules instanceof Promise);
+  let {
+    title,
+    molecule = $bindable(),
+    molecules,
+    loading,
+    vizOpen = false,
+    vizCollapseShow = false,
+  }: Props = $props();
 </script>
 
-<Card.Root class="flex-auto @sm:gap-3">
+<Card.Root>
   <Card.Header>
-    <Card.Title
-      >{title}
+    <Card.Title>
+      {title}
       {#if loading}<div class="absolute ml-2 inline-block"><Spinner /></div>{/if}
     </Card.Title>
   </Card.Header>
 
   <Card.Content>
     <form class="flex flex-col gap-6">
-      <MoleculeSelect molecules={_molecules} bind:molecule />
+      <MoleculeSelect {molecules} bind:molecule {loading} />
 
       {#if vizCollapseShow}
         <Collapsible.Root bind:open={vizOpen} class="w-full">
@@ -53,11 +55,11 @@
             {/if}
           </Collapsible.Trigger>
           <Collapsible.Content class="w-full">
-            <MoleculeViz molecules={_molecules} bind:molecule />
+            <MoleculeViz {molecule} />
           </Collapsible.Content>
         </Collapsible.Root>
       {:else if vizOpen}
-        <MoleculeViz molecules={_molecules} bind:molecule />
+        <MoleculeViz {molecule} />
       {/if}
     </form>
   </Card.Content>
