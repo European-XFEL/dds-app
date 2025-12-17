@@ -1,9 +1,15 @@
 <script lang="ts">
-  import { useSimulationState } from '$lib/state.svelte';
+  import type { ComponentProps } from 'svelte';
 
-  import PumpSetupCard from './components/setup-card.svelte';
+  import * as Card from '$shadcn/ui/card/index.js';
 
-  const simulation = useSimulationState();
+  import PumpSetup from './components/PumpSetup.svelte';
+
+  let { pump = $bindable() }: ComponentProps<typeof PumpSetup> = $props();
 </script>
 
-<PumpSetupCard bind:pump={simulation.pump} />
+<Card.Root>
+  <Card.Content>
+    <PumpSetup bind:pump />
+  </Card.Content>
+</Card.Root>
