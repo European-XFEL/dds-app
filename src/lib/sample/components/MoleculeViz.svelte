@@ -2,12 +2,12 @@
   import { getMoleculeFileContent } from '../../data.remote';
   import { Structure } from 'matterviz';
 
-  import { blur, fade } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   import * as Field from '$shadcn/ui/field/index.js';
 
   import type { Sample } from '$lib/types';
-  import LabeledPlaceholder from '$lib/ui/components/placeholder.svelte';
+  import { Placeholder } from '$lib/ui';
 
   interface Props {
     molecule: Sample['ground'] | Sample['excited'];
@@ -74,7 +74,7 @@
       {:else}
         {#key `${placeholder_title}? + ${placeholder_description}`}
           <div class="absolute inset-0" transition:fade>
-            <LabeledPlaceholder title={placeholder_title} description={placeholder_description} />
+            <Placeholder title={placeholder_title} description={placeholder_description} />
           </div>
         {/key}
       {/if}

@@ -3,7 +3,7 @@
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
-  import AppPicker from '$lib/ui/components/app-picker.svelte';
+  import { AppPicker } from '$lib/ui';
 
   import SidebarContent from './SidebarContent.svelte';
   import SidebarFooter from './SidebarFooter.svelte';
