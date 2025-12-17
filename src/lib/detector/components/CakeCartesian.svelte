@@ -38,7 +38,7 @@
   const radius_rings = [50, 100, 150, 200] as const;
 </script>
 
-<div class="flow max-w-fit rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
+<div class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
   <svg
     bind:this={detectorSvgElement}
     width={panelWidth}
