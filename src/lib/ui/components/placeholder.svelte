@@ -1,19 +1,20 @@
 <script lang="ts">
-  import type { HTMLAttributes } from 'svelte/elements';
+  import * as Empty from '$shadcn/ui/empty/index.js';
 
-  let {
-    label,
-    ...restProps
-  }: {
-    label: string;
-  } & HTMLAttributes<HTMLDivElement> = $props();
+  interface Props {
+    title?: string;
+    description?: string;
+  }
+
+  let { title, description }: Props = $props();
 </script>
 
-<div {...restProps} class={['relative', restProps.class]}>
-  <div
-    class="h-full w-full bg-[repeating-linear-gradient(45deg,var(--muted),var(--muted)_8px,var(--border)_2px,var(--border)_10px)]"
-  ></div>
-  <div class="absolute inset-0 flex items-center justify-center">
-    <p>{label}</p>
-  </div>
-</div>
+<Empty.Root
+  class="h-full w-full bg-[repeating-linear-gradient(45deg,var(--muted),var(--muted)_8px,var(--border)_2px,var(--border)_10px)]"
+>
+  <Empty.Header>
+    <Empty.Title>{title}</Empty.Title>
+    <Empty.Description>{description}</Empty.Description>
+  </Empty.Header>
+  <Empty.Content></Empty.Content>
+</Empty.Root>
