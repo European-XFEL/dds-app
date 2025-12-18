@@ -3,7 +3,7 @@
 
   import { createSimulationSeed } from '$lib/state.svelte';
 
-  import SampleCard from './MoleculeCard.svelte';
+  import SampleCard from '$lib/sample/components/MoleculeCard.svelte';
 
   const defaultState = createSimulationSeed();
 

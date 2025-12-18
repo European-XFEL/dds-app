@@ -11,12 +11,10 @@
 
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
-  import Toggle from '$shadcn/ui/toggle/toggle.svelte';
 
-  import { DetectorCard } from '$lib/detector';
-  import LineChart from '$lib/plots/line-chart.svelte';
+  import { DetectorSetupCard } from '$lib/detector';
   import { PumpSetupCard } from '$lib/pump';
-  import { SolventCard } from '$lib/sample';
+  import { MoleculeCard, SolventCard } from '$lib/sample';
   import {
     createScatteringResource,
     fetchDeltaSSolute,
@@ -28,6 +26,7 @@
     scaleSoluteByExcitedFraction,
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
+  import { LineChart } from '$lib/ui';
 
   // Compose type for type-safe options
   type ECOption = ComposeOption<
@@ -162,32 +161,50 @@
   ]);
 </script>
 
-<Resizable.PaneGroup direction="horizontal" class="max-h-svh max-w-full gap-4 rounded-lg">
-  <Resizable.Pane defaultSize={70}>
-    <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
-    <!-- <div class="flow-row w-max items-center gap-3">
-      <Badge variant="outline"
-        >Delta T (K): {result?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
-      >
-      <Badge variant="outline"
-        >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
-      >
-    </div> -->
-    <div class="flex flex-col gap-6 pt-4">
-      <LineChart {constant_options} {xAxis} {series} />
-    </div>
-  </Resizable.Pane>
-  <Resizable.Handle />
-  <Resizable.Pane defaultSize={20} class="flex min-w-110 flex-col">
-    <ScrollArea class="@container h-full">
-      <div class="grid flex-1 gap-4 overflow-y-auto p-4 md:grid-rows-1">
-        <SolventCard {short} />
-        <DetectorCard {short} />
-        <PumpSetupCard {short} />
+<div class="h-[calc(100vh-4rem)]">
+  <Resizable.PaneGroup direction="horizontal" class="max-w-full gap-4 rounded-lg">
+    <Resizable.Pane defaultSize={70}>
+      <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
+      <!-- <div class="flow-row w-max items-center gap-3">
+        <Badge variant="outline"
+          >Delta T (K): {result?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
+        >
+        <Badge variant="outline"
+          >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
+        >
+      </div> -->
+      <div class="flex flex-col gap-6 pt-4">
+        <LineChart {constant_options} {xAxis} {series} />
       </div>
-    </ScrollArea>
-    <Toggle class="mb-4 shrink-0 border-t bg-gray-50 p-0" bind:pressed={short}>
-      {short ? 'Short Cards' : 'Detailed Cards'}
-    </Toggle>
-  </Resizable.Pane>
-</Resizable.PaneGroup>
+    </Resizable.Pane>
+    <Resizable.Handle />
+    <Resizable.Pane defaultSize={20} class="flex min-w-110 flex-col">
+      <ScrollArea class="mt-4 flex-1">
+        <div class="grid h-72 gap-4">
+          <SolventCard
+            bind:concentrationSoluteMolar={simulation.sample.concentrationSoluteMolar}
+            bind:solvent={simulation.sample.solvent}
+            {short}
+          />
+          <MoleculeCard
+            bind:molecule={simulation.sample.ground}
+            title="Ground Molecule"
+            vizOpen={false}
+            vizCollapseShow={false}
+          />
+          <MoleculeCard
+            bind:molecule={simulation.sample.excited}
+            title="Excited Molecule"
+            vizOpen={false}
+            vizCollapseShow={false}
+          />
+          <DetectorSetupCard
+            bind:distance={simulation.detector.distance}
+            bind:beamCenter={simulation.detector.beamCenter}
+          />
+          <PumpSetupCard bind:pump={simulation.pump} />
+        </div>
+      </ScrollArea>
+    </Resizable.Pane>
+  </Resizable.PaneGroup>
+</div>

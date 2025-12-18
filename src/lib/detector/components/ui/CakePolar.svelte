@@ -1,13 +1,14 @@
 <script lang="ts">
   import { draw } from 'svelte/transition';
 
+  import type { CartesianPoint, DetectorModule, TransformedModuleTessellated } from '$lib/types';
+
   import {
     generateCakedGridLines,
     radiusToTwoTheta,
     tessellatedModuleToSvgPaths,
     transformModuleTessellated,
-  } from '$lib/detector/components/Cake.helper';
-  import type { CartesianPoint, DetectorModule, TransformedModuleTessellated } from '$lib/types';
+  } from './Cake.helper';
 
   interface Props {
     modules: DetectorModule[];

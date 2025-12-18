@@ -3,15 +3,19 @@
 
   import { createSimulationSeed } from '$lib/state.svelte';
 
-  import DetectorSetupCard from './DetectorSetupCard.svelte';
+  import DetectorInfoCard from '$lib/detector/DetectorInfoCard.svelte';
 
   const defaultState = createSimulationSeed();
 
   const { Story } = defineMeta({
-    component: DetectorSetupCard,
+    component: DetectorInfoCard,
     args: {
+      modules: defaultState.detector.modules,
       distance: defaultState.detector.distance,
       beamCenter: defaultState.detector.beamCenter,
+      imageShape: defaultState.detector.imageShape,
+      pixelSize: defaultState.detector.pixelSize,
+      wavelength: defaultState.probe.wavelength,
     },
   });
 </script>

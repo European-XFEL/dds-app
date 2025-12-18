@@ -3,7 +3,7 @@
 
   import * as Card from '$shadcn/ui/card/index.js';
 
-  import DetectorInfo from './components/DetectorInfo.svelte';
+  import DetectorInfo from './ui/DetectorInfo.svelte';
 
   type Props = ComponentProps<typeof DetectorInfo>;
 

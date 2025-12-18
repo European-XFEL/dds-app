@@ -1,7 +1,5 @@
-import MoleculeCard from './MoleculeCard.svelte';
-import SolventCard from './SolventCard.svelte';
-import SolventInfoCard from './SolventInfoCard.svelte';
-
-export { MoleculeCard, SolventCard, SolventInfoCard };
+export { default as MoleculeCard } from './components/MoleculeCard.svelte';
+export { default as SolventCard } from './components/SolventCard.svelte';
+export { default as SolventInfoCard } from './components/SolventInfoCard.svelte';
 
 export type * from './types';

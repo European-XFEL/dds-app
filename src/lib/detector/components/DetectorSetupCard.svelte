@@ -3,7 +3,7 @@
 
   import * as Card from '$shadcn/ui/card/index.js';
 
-  import DetectorSetup from './components/DetectorSetup.svelte';
+  import DetectorSetup from './ui/DetectorSetup.svelte';
 
   let { distance = $bindable(), beamCenter = $bindable() }: ComponentProps<typeof DetectorSetup> =
     $props();

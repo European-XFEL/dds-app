@@ -5,12 +5,12 @@
   import { Separator } from '$shadcn/ui/separator';
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
-  import AppSidebar from '$lib/sidebar/Sidebar.svelte';
   import {
     type SimulationState,
     createSimulationSeed,
     setSimulationState,
   } from '$lib/state.svelte';
+  import { Sidebar as AppSidebar } from '$lib/ui';
 
   let { children } = $props();
 

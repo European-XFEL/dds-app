@@ -3,13 +3,13 @@
 
   import * as Card from '$shadcn/ui/card/index.js';
 
-  import PumpSetup from './components/PumpSetup.svelte';
+  import ProbeSetup from './ProbeSetup.svelte';
 
-  let { pump = $bindable() }: ComponentProps<typeof PumpSetup> = $props();
+  let { probe = $bindable(), short }: ComponentProps<typeof ProbeSetup> = $props();
 </script>
 
 <Card.Root>
   <Card.Content>
-    <PumpSetup bind:pump />
+    <ProbeSetup bind:probe {short} />
   </Card.Content>
 </Card.Root>

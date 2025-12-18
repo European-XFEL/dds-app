@@ -3,19 +3,19 @@
 
   import { createSimulationSeed } from '$lib/state.svelte';
 
-  import DetectorInfoCard from './DetectorInfoCard.svelte';
+  import DetectorCakeCard from '$lib/detector/components/DetectorCakeCard.svelte';
 
   const defaultState = createSimulationSeed();
 
   const { Story } = defineMeta({
-    component: DetectorInfoCard,
+    component: DetectorCakeCard,
     args: {
-      modules: defaultState.detector.modules,
-      distance: defaultState.detector.distance,
       beamCenter: defaultState.detector.beamCenter,
       imageShape: defaultState.detector.imageShape,
-      pixelSize: defaultState.detector.pixelSize,
-      wavelength: defaultState.probe.wavelength,
+      modules: defaultState.detector.modules,
+    },
+    parameters: {
+      layout: 'fullscreen',
     },
   });
 </script>
