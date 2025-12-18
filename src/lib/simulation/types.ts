@@ -16,5 +16,5 @@ export type SimulationDetails = Omit<
   probe: XRayProbe;
   sample: Sample;
   detector: Detector;
-  realism_flags?: RealismFlags;
+  realismFlags?: RealismFlags;
 };

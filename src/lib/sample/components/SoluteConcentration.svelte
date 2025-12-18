@@ -9,8 +9,6 @@
   };
 
   let { concentrationSoluteMolar = $bindable() }: Props = $props();
-
-  $inspect(concentrationSoluteMolar);
 </script>
 
 <div class="grid grow gap-2 @sm:min-w-40">
