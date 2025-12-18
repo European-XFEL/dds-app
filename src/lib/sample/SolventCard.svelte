@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade } from 'svelte/transition';
+
   import * as Card from '$shadcn/ui/card/index.js';
   import { Spinner } from '$shadcn/ui/spinner/index.js';
 
@@ -39,7 +41,7 @@
   <Card.Header>
     <Card.Title>
       Sample Parameters
-      {#if loading}<div class="absolute ml-2 inline-block"><Spinner /></div>{/if}
+      {#if loading}<div transition:fade class="absolute ml-2 inline-block"><Spinner /></div>{/if}
     </Card.Title>
     <Card.Description hidden={short}>
       Parameters shared by both ground and excited states.

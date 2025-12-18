@@ -20,6 +20,14 @@
 
   const simulation: SimulationState = $state(simulationSeed);
 
+  // TODO: make this consistent - sample sets the maximum q values, user can set values
+  // lower than those, which then bins the data via frontend js
+  $effect(() => {
+    simulation.qRange.min = simulation.sample.solvent?.qMin ?? 0;
+    simulation.qRange.max = simulation.sample.solvent?.qMax ?? 0;
+    simulation.qRange.step = simulation.sample.solvent?.qStep ?? 0;
+  });
+
   const sample = $derived({
     groundName: simulation.sample.ground?.name,
     excitedName: simulation.sample.excited?.name,
@@ -36,8 +44,10 @@
       <Sidebar.Trigger class="-ms-1" />
       <Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
     </header>
-    <main class="px-4 pb-4">
-      {@render children?.()}
+    <main class="mx-4 flex justify-center-safe">
+      <div class="max-w-[1920px] grow">
+        {@render children?.()}
+      </div>
     </main>
   </Sidebar.Inset>
 </Sidebar.Provider>
