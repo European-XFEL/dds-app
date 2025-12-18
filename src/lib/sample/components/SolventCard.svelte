@@ -7,8 +7,8 @@
   import { listSolvents } from '$lib/data.remote';
   import type { Sample } from '$lib/types';
 
-  import SoluteConcentration from './components/SoluteConcentration.svelte';
-  import SolventSelect from './components/SolventSelect.svelte';
+  import SoluteConcentration from './ui/SoluteConcentration.svelte';
+  import SolventSelect from './ui/SolventSelect.svelte';
 
   type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 
@@ -37,7 +37,7 @@
   }
 </script>
 
-<Card.Root class="flex-auto @sm:gap-3">
+<Card.Root class="flex-auto">
   <Card.Header>
     <Card.Title>
       Sample Parameters
@@ -45,17 +45,13 @@
     </Card.Title>
     <Card.Description hidden={short}>
       Parameters shared by both ground and excited states.
-
       <br /><br />
-
       Note that the choice of solvent defines the maximum Q range.
     </Card.Description>
   </Card.Header>
-
   <Card.Content>
     <div class="flex flex-col gap-6">
       <SolventSelect bind:solvent {solvents} {short} {loading} />
-
       <SoluteConcentration bind:concentrationSoluteMolar />
     </div>
   </Card.Content>

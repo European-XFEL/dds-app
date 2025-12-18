@@ -6,10 +6,10 @@
 
   import type { CartesianPoint, DetectorModule, Shape } from '$lib/types';
 
-  import { resolve_module_color } from './components/Cake.helper';
-  import CakeViewCartesian from './components/CakeCartesian.svelte';
-  import CakeViewPolar from './components/CakePolar.svelte';
-  import CakeModuleLegend from './components/ui/CakeModuleLegend.svelte';
+  import { resolve_module_color } from './ui/Cake.helper';
+  import CakeViewCartesian from './ui/CakeCartesian.svelte';
+  import CakeModuleLegend from './ui/CakeModuleLegend.svelte';
+  import CakeViewPolar from './ui/CakePolar.svelte';
 
   interface Props {
     modules: DetectorModule[];

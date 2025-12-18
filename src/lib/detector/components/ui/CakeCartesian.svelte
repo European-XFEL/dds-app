@@ -3,8 +3,8 @@
 
   import type { CartesianPoint, DetectorModule } from '$lib/types';
 
-  import Crosshair from './ui/CakeCrosshair.svelte';
-  import DraggableModule from './ui/CakeModule.svelte';
+  import Crosshair from './CakeCrosshair.svelte';
+  import DraggableModule from './CakeModule.svelte';
 
   interface Props {
     modules: DetectorModule[];

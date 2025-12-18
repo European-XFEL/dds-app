@@ -1,5 +1,3 @@
-import PumpSetupCard from './PumpSetupCard.svelte';
-
-export { PumpSetupCard };
+export { default as PumpSetupCard } from './components/PumpSetupCard.svelte';
 
 export type * from './types';

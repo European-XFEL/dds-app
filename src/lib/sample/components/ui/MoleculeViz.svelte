@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { getMoleculeFileContent } from '../../data.remote';
   import { Structure } from 'matterviz';
 
   import { fade } from 'svelte/transition';
 
   import * as Field from '$shadcn/ui/field/index.js';
 
+  import { getMoleculeFileContent } from '$lib/data.remote';
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
 

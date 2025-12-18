@@ -1,7 +1,5 @@
-import DetectorCakeCard from './DetectorCakeCard.svelte';
-import DetectorInfoCard from './DetectorInfoCard.svelte';
-import DetectorSetupCard from './DetectorSetupCard.svelte';
-
-export { DetectorCakeCard, DetectorSetupCard, DetectorInfoCard };
+export { default as DetectorCakeCard } from './components/DetectorCakeCard.svelte';
+export { default as DetectorInfoCard } from './components/DetectorInfoCard.svelte';
+export { default as DetectorSetupCard } from './components/DetectorSetupCard.svelte';
 
 export type * from './types';

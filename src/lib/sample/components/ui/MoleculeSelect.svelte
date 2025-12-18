@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { listMolecules } from '../../data.remote';
+  import { listMolecules } from '../../../data.remote';
   import { Upload } from '@lucide/svelte';
 
   import { Button } from '$shadcn/ui/button/index.js';

@@ -1,14 +1,13 @@
 <script lang="ts">
-  import { listMolecules } from '../data.remote';
-
   import * as Card from '$shadcn/ui/card/index.js';
   import * as Collapsible from '$shadcn/ui/collapsible/index.js';
   import { Spinner } from '$shadcn/ui/spinner';
 
+  import { listMolecules } from '$lib/data.remote';
   import type { Sample } from '$lib/types';
 
-  import MoleculeSelect from './components/MoleculeSelect.svelte';
-  import MoleculeViz from './components/MoleculeViz.svelte';
+  import MoleculeSelect from './ui/MoleculeSelect.svelte';
+  import MoleculeViz from './ui/MoleculeViz.svelte';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 

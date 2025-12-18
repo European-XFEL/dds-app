@@ -11,13 +11,13 @@
   let { solvent }: Props = $props();
 
   const tooltip = $derived.by(() => {
-    if (!solvent) return;
+    // if (!solvent) return;
     return [
-      ['ρ', 'm<sup>3</sup>/mol', solvent.rhom.toPrecision(3)],
-      ['Cpm', 'J/mol/K', solvent.cpm.toPrecision(3)],
-      ['Q Min', 'Å<sup>-1</sup>', solvent.qMin.toPrecision(3)],
-      ['Q Max', 'Å<sup>-1</sup>', solvent.qMax.toPrecision(3)],
-      ['Q Step', 'Å<sup>-1</sup>', solvent.qStep.toPrecision(3)],
+      ['ρ', 'm<sup>3</sup>/mol', solvent?.rhom.toPrecision(5)],
+      ['Cpm', 'J/mol/K', solvent?.cpm.toPrecision(3)],
+      ['Q Min', 'Å<sup>-1</sup>', solvent?.qMin.toPrecision(3)],
+      ['Q Max', 'Å<sup>-1</sup>', solvent?.qMax.toPrecision(3)],
+      ['Q Step', 'Å<sup>-1</sup>', solvent?.qStep.toPrecision(3)],
     ];
   });
 </script>
@@ -27,7 +27,7 @@
     <Card.Title>Solvent Information</Card.Title>
   </Card.Header>
 
-  <Card.Content>
+  <Card.Content class="max-w-md">
     <Table.Root>
       <Table.Body>
         {#each tooltip as [key, unit, value], i (key)}

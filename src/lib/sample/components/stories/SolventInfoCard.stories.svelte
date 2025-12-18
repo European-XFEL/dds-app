@@ -3,12 +3,12 @@
 
   import { createSimulationSeed } from '$lib/state.svelte';
 
-  import SolventCard from './SolventCard.svelte';
+  import SolventInfoCard from '$lib/sample/components/SolventInfoCard.svelte';
 
   const defaultState = createSimulationSeed();
 
   const { Story } = defineMeta({
-    component: SolventCard,
+    component: SolventInfoCard,
     args: {
       solvent: defaultState.sample.solvent,
       concentrationSoluteMolar: defaultState.sample.concentrationSoluteMolar,
