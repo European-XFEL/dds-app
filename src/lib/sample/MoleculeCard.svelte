@@ -14,21 +14,29 @@
 
   type Props = {
     title: string;
-    molecule: Sample['ground'] | Sample['excited'];
+    molecule?: Sample['ground'] | Sample['excited'];
     molecules?: Molecules;
     vizOpen?: boolean;
     vizCollapseShow?: boolean;
-    loading: boolean;
+    loading?: boolean;
   };
 
   let {
     title,
     molecule = $bindable(),
     molecules,
-    loading,
+    loading = true,
     vizOpen = false,
     vizCollapseShow = false,
   }: Props = $props();
+
+  // svelte-ignore state_referenced_locally
+  if (!molecules) {
+    listMolecules().then((data) => {
+      molecules = data;
+      loading = false;
+    });
+  }
 </script>
 
 <Card.Root>
