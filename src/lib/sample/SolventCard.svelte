@@ -2,7 +2,7 @@
   import * as Card from '$shadcn/ui/card/index.js';
   import { Spinner } from '$shadcn/ui/spinner/index.js';
 
-  import type { listSolvents } from '$lib/data.remote';
+  import { listSolvents } from '$lib/data.remote';
   import type { Sample } from '$lib/types';
 
   import SoluteConcentration from './components/SoluteConcentration.svelte';
@@ -15,7 +15,7 @@
     concentrationSoluteMolar: Sample['concentrationSoluteMolar'];
     solvents?: Solvents;
     short?: boolean;
-    loading: boolean;
+    loading?: boolean;
   }
 
   let {
@@ -25,6 +25,14 @@
     short = false,
     loading = true,
   }: Props = $props();
+
+  // svelte-ignore state_referenced_locally
+  if (!solvents) {
+    listSolvents().then((data) => {
+      solvents = data;
+      loading = false;
+    });
+  }
 </script>
 
 <Card.Root class="flex-auto @sm:gap-3">
