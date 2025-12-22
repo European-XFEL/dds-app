@@ -6,18 +6,29 @@
  * - Polar (r, φ) coordinates where r is distance from beam center and φ is azimuthal angle
  * - "Caked" (r, χ) coordinates for the transformed view
  */
-import type {
-  CartesianPoint,
-  DetectorModule,
-  PolarPoint,
-  RangeTuple,
-  TessellatedQuad,
-  TransformedModuleTessellated,
-} from '$lib/types';
+import type { CartesianPoint, DetectorModule, Shape } from '$lib/types';
 
 const DEG_PER_RAD = 180 / Math.PI;
 const TAU = Math.PI * 2;
 const EPSILON = Number.EPSILON;
+
+type RangeTuple = readonly [number, number];
+
+interface PolarPoint {
+  readonly r: number;
+  readonly phi: number;
+  readonly twoTheta: number;
+}
+
+interface TessellatedQuad {
+  readonly corners: readonly PolarPoint[];
+}
+
+export interface TessellatedModule {
+  readonly id: string;
+  readonly quads: readonly TessellatedQuad[];
+  readonly color: string;
+}
 
 function rangeSpan([min, max]: RangeTuple): number {
   return Math.max(max - min, EPSILON);
@@ -63,7 +74,10 @@ export function tessellateModule(
   gridSize = 8,
 ): TessellatedQuad[] {
   const quads: TessellatedQuad[] = [];
-  const { x, y, width, height } = module;
+  const {
+    position: { x, y },
+    shape: { width, height },
+  } = module;
 
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
@@ -94,7 +108,7 @@ export function transformModuleTessellated(
   center: CartesianPoint,
   detectorDistance: number,
   gridSize = 8,
-): TransformedModuleTessellated {
+): TessellatedModule {
   return {
     id: module.id,
     quads: tessellateModule(module, center, detectorDistance, gridSize),
@@ -105,7 +119,7 @@ export function transformModuleTessellated(
 /**
  * Check if a quad's chi values span across the ±π boundary.
  */
-function quadWrapsChiBoundary(corners: PolarPoint[]): boolean {
+function quadWrapsChiBoundary(corners: readonly PolarPoint[]): boolean {
   const phis = corners.map((c) => c.phi);
   const maxPhi = Math.max(...phis);
   const minPhi = Math.min(...phis);
@@ -116,9 +130,8 @@ function quadWrapsChiBoundary(corners: PolarPoint[]): boolean {
  * Convert a quad's corners to an SVG path string.
  */
 function quadToSvgPath(
-  corners: PolarPoint[],
-  viewWidth: number,
-  viewHeight: number,
+  corners: readonly PolarPoint[],
+  viewShape: Shape,
   twoThetaRange: RangeTuple,
   chiRange: RangeTuple,
 ): string {
@@ -128,8 +141,8 @@ function quadToSvgPath(
   const chiSpan = rangeSpan(chiRange);
 
   const svgPoints = corners.map((c) => {
-    const x = ((c.twoTheta - twoThetaMin) / thetaSpan) * viewWidth;
-    const y = ((c.phi - chiMin) / chiSpan) * viewHeight;
+    const x = ((c.twoTheta - twoThetaMin) / thetaSpan) * viewShape.width;
+    const y = ((c.phi - chiMin) / chiSpan) * viewShape.height;
     return { x, y };
   });
 
@@ -145,10 +158,9 @@ function quadToSvgPath(
  * Quads that wrap around the chi boundary are rendered twice.
  */
 export function tessellatedModuleToSvgPaths(
-  module: TransformedModuleTessellated,
-  viewWidth: number,
-  viewHeight: number,
-  twoThetaRange: RangeTuple = [0, 90],
+  module: TessellatedModule,
+  viewShape: Shape,
+  twoThetaRange: RangeTuple = [0, 180],
   chiRange: RangeTuple = [-Math.PI, Math.PI],
 ): string[] {
   const paths: string[] = [];
@@ -163,18 +175,16 @@ export function tessellatedModuleToSvgPaths(
           ...c,
           phi: c.phi < 0 ? c.phi + TAU : c.phi,
         }));
-        paths.push(quadToSvgPath(cornersShiftedUp, viewWidth, viewHeight, twoThetaRange, chiRange));
+        paths.push(quadToSvgPath(cornersShiftedUp, viewShape, twoThetaRange, chiRange));
 
         const cornersShiftedDown = quad.corners.map((c) => ({
           ...c,
           phi: c.phi > 0 ? c.phi - TAU : c.phi,
         }));
-        paths.push(
-          quadToSvgPath(cornersShiftedDown, viewWidth, viewHeight, twoThetaRange, chiRange),
-        );
+        paths.push(quadToSvgPath(cornersShiftedDown, viewShape, twoThetaRange, chiRange));
       }
     } else {
-      paths.push(quadToSvgPath(quad.corners, viewWidth, viewHeight, twoThetaRange, chiRange));
+      paths.push(quadToSvgPath(quad.corners, viewShape, twoThetaRange, chiRange));
     }
   }
 
@@ -185,8 +195,7 @@ export function tessellatedModuleToSvgPaths(
  * Generate grid lines for the caked view.
  */
 export function generateCakedGridLines(
-  viewWidth: number,
-  viewHeight: number,
+  viewShape: Shape,
   twoThetaRange: RangeTuple = [0, 90],
   chiRange: RangeTuple = [-Math.PI, Math.PI],
   twoThetaStepDegrees = 5,
@@ -200,7 +209,7 @@ export function generateCakedGridLines(
   if (twoThetaStepDegrees > 0) {
     const start = Math.ceil(twoThetaMin / twoThetaStepDegrees) * twoThetaStepDegrees;
     for (let theta = start; theta <= twoThetaMax + 1e-6; theta += twoThetaStepDegrees) {
-      const x = ((theta - twoThetaMin) / thetaSpan) * viewWidth;
+      const x = ((theta - twoThetaMin) / thetaSpan) * viewShape.width;
       twoThetaLines.push(x);
     }
   }
@@ -209,7 +218,7 @@ export function generateCakedGridLines(
   const chiLines: number[] = [];
   const chiSpan = rangeSpan(chiRange);
   for (let chi = Math.ceil(chiMin / chiStepRad) * chiStepRad; chi <= chiMax; chi += chiStepRad) {
-    const y = ((chi - chiMin) / chiSpan) * viewHeight;
+    const y = ((chi - chiMin) / chiSpan) * viewShape.height;
     chiLines.push(y);
   }
 
@@ -227,7 +236,7 @@ const tailwind_gradient_tokens = [
   '--color-rose-600',
 ] as const;
 
-export function resolve_module_color(index: number, explicit?: string): string {
+export function resolveModuleColour(index: number, explicit?: string): string {
   if (explicit) return explicit;
   const token = tailwind_gradient_tokens[index % tailwind_gradient_tokens.length];
   return `var(${token})`;

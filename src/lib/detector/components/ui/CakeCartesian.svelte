@@ -1,7 +1,7 @@
 <script lang="ts">
   import { draw } from 'svelte/transition';
 
-  import type { CartesianPoint, DetectorModule } from '$lib/types';
+  import type { CartesianPoint, DetectorModule, Shape } from '$lib/types';
 
   import Crosshair from './CakeCrosshair.svelte';
   import DraggableModule from './CakeModule.svelte';
@@ -9,29 +9,27 @@
   interface Props {
     modules: DetectorModule[];
     beamCenter: CartesianPoint;
-    panelWidth?: number;
-    panelHeight?: number;
+    panelShape?: Shape;
   }
 
   let {
     modules = $bindable(),
     beamCenter = $bindable(),
-    panelWidth = 450,
-    panelHeight = 600,
+    panelShape = { width: 450, height: 600 },
   }: Props = $props();
 
   let detectorSvgElement = $state<SVGSVGElement | null>(null);
 
   function handleCenterDrag(newPos: CartesianPoint) {
     beamCenter = {
-      x: Math.max(10, Math.min(panelWidth - 10, newPos.x)),
-      y: Math.max(10, Math.min(panelHeight - 10, newPos.y)),
+      x: Math.max(10, Math.min(panelShape.width - 10, newPos.x)),
+      y: Math.max(10, Math.min(panelShape.height - 10, newPos.y)),
     };
   }
 
   function handleModuleDrag(id: string, newPos: CartesianPoint) {
     modules = modules.map((module) =>
-      module.id === id ? { ...module, x: newPos.x, y: newPos.y } : module,
+      module.id === id ? { ...module, position: { x: newPos.x, y: newPos.y } } : module,
     );
   }
 
@@ -41,8 +39,8 @@
 <div class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
   <svg
     bind:this={detectorSvgElement}
-    width={panelWidth}
-    height={panelHeight}
+    width={panelShape.width}
+    height={panelShape.height}
     class="mx-auto block rounded-lg bg-muted/30 text-muted-foreground/80"
   >
     <defs>
@@ -56,7 +54,7 @@
         />
       </pattern>
     </defs>
-    <rect width={panelWidth} height={panelHeight} fill="url(#detectorGrid)" />
+    <rect width={panelShape.width} height={panelShape.height} fill="url(#detectorGrid)" />
     {#each radius_rings as radius (radius)}
       <circle
         in:draw|global={{ duration: 3000, delay: 500 }}
@@ -74,14 +72,13 @@
       <DraggableModule {module} onDrag={handleModuleDrag} svgElement={detectorSvgElement} />
     {/each}
     <Crosshair
-      x={beamCenter.x}
-      y={beamCenter.y}
+      pos={{ x: beamCenter.x, y: beamCenter.y }}
       onDrag={handleCenterDrag}
       svgElement={detectorSvgElement}
     />
     <text
-      x={panelWidth - 5}
-      y={panelHeight - 5}
+      x={panelShape.width - 5}
+      y={panelShape.height - 5}
       text-anchor="end"
       font-size="10"
       fill="currentColor"

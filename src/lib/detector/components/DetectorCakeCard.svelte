@@ -6,7 +6,6 @@
 
   import type { CartesianPoint, DetectorModule, Shape } from '$lib/types';
 
-  import { resolve_module_color } from './ui/Cake.helper';
   import CakeViewCartesian from './ui/CakeCartesian.svelte';
   import CakeModuleLegend from './ui/CakeModuleLegend.svelte';
   import CakeViewPolar from './ui/CakePolar.svelte';
@@ -15,44 +14,15 @@
     modules: DetectorModule[];
     distance: number;
     beamCenter: CartesianPoint;
-    imageShape?: Shape;
+    panelShape?: Shape;
   }
 
   let {
     modules = $bindable(),
     distance = $bindable(),
     beamCenter = $bindable(),
-    imageShape = $bindable(),
+    panelShape = { width: 450, height: 600 },
   }: Props = $props();
-
-  // Compute image shape from module extents as derived state
-  let computedImageShape: Shape = $derived.by(() => {
-    if (modules.length === 0) return { width: 0, height: 0 };
-
-    const moduleXs = modules.map((m) => m.x);
-    const moduleYs = modules.map((m) => m.y);
-
-    const X = Math.max(...moduleXs) - Math.min(...moduleXs);
-    const Y = Math.max(...moduleYs) - Math.min(...moduleYs);
-
-    return {
-      width: X + modules[0].width,
-      height: Y + modules[0].height,
-    };
-  });
-
-  $effect(() => {
-    imageShape = computedImageShape;
-  });
-
-  // Assign colors to modules based on their index if not already set
-  $effect(() => {
-    for (let i = 0; i < modules.length; i++) {
-      if (!modules[i].color) {
-        modules[i].color = resolve_module_color(i);
-      }
-    }
-  });
 </script>
 
 <Card.Root class="w-full min-w-fit">
@@ -75,17 +45,10 @@
   <Card.Content class="flex flex-col gap-6">
     <div class="flex grow flex-wrap justify-center-safe gap-6">
       <div class="min-w-sm">
-        <CakeViewCartesian bind:beamCenter bind:modules panelWidth={450} panelHeight={600} />
+        <CakeViewCartesian bind:beamCenter bind:modules {panelShape} />
       </div>
       <div class="min-w-sm">
-        <CakeViewPolar
-          {beamCenter}
-          {modules}
-          {distance}
-          panelWidth={450}
-          panelHeight={600}
-          tessellationGrid={20}
-        />
+        <CakeViewPolar {beamCenter} {modules} {distance} {panelShape} tessellationGrid={20} />
       </div>
     </div>
     <CakeModuleLegend {modules} />

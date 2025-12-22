@@ -1,4 +1,4 @@
-import type { BeamCenter, DetectorModule, PixelSize, QParams } from '$lib/types';
+import type { CartesianPoint, DetectorModule, QRange } from '$lib/types';
 
 /**
  * Compute q-range and a reasonable q-step from detector geometry by using
@@ -9,11 +9,11 @@ import type { BeamCenter, DetectorModule, PixelSize, QParams } from '$lib/types'
  */
 export function computeQRangeFromModules(params: {
   distance: number;
-  pixelSize: PixelSize;
-  beamCenter: BeamCenter;
+  pixelSize: number;
+  beamCenter: CartesianPoint;
   wavelength: number;
   modules: DetectorModule[];
-}): QParams & { rMinPx: number; rMaxPx: number } {
+}): QRange & { rMinPx: number; rMaxPx: number } {
   const { distance: Dmm, pixelSize, beamCenter: bc, wavelength: lambdaA, modules } = params;
 
   if (!(Dmm > 0)) throw new Error('sampleDetectorDistanceMm must be > 0');
@@ -54,14 +54,16 @@ export function computeQRangeFromModules(params: {
   let rMaxPx = 0;
 
   for (const m of modules) {
-    if (!(m.width > 0) || !(m.height > 0)) {
-      throw new Error(`Invalid module size: width/height must be > 0 (got ${m.width}×${m.height})`);
+    if (!(m.shape.width > 0) || !(m.shape.height > 0)) {
+      throw new Error(
+        `Invalid module size: width/height must be > 0 (got ${m.shape.width}×${m.shape.height})`,
+      );
     }
 
-    const x0 = m.x;
-    const y0 = m.y;
-    const x1 = m.x + m.width;
-    const y1 = m.y + m.height;
+    const x0 = m.position.x;
+    const y0 = m.position.y;
+    const x1 = m.position.x + m.shape.width;
+    const y1 = m.position.y + m.shape.height;
 
     // Minimum radius to any pixel in the module region (0 if beam centre lies inside)
     const rMinThis = distancePointToRectPx(bc.x, bc.y, x0, y0, x1, y1);
