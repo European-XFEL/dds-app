@@ -1,21 +1,22 @@
 <script lang="ts">
   import { draw } from 'svelte/transition';
 
-  import type { CartesianPoint, DetectorModule, TransformedModuleTessellated } from '$lib/types';
+  import type { CartesianPoint, DetectorModule, Shape } from '$lib/types';
 
+  import type { TessellatedModule } from './Cake.helper';
   import {
     generateCakedGridLines,
     radiusToTwoTheta,
     tessellatedModuleToSvgPaths,
     transformModuleTessellated,
   } from './Cake.helper';
+  import * as qConvert from './DetectorInfo.helper';
 
   interface Props {
     modules: DetectorModule[];
     beamCenter: CartesianPoint;
     distance?: number;
-    panelWidth?: number;
-    panelHeight?: number;
+    panelShape?: Shape;
     radiusRange?: [number, number];
     tessellationGrid?: number;
   }
@@ -24,48 +25,53 @@
     modules,
     beamCenter,
     distance = 300,
-    panelWidth = 450,
-    panelHeight = 600,
-    radiusRange = [0, 250] as [number, number],
+    panelShape = { width: 600, height: 400 },
     tessellationGrid = 20,
   }: Props = $props();
 
-  const chi_range: [number, number] = [-Math.PI, Math.PI];
-  const two_theta_step_degrees = 5;
-  const chi_step_degrees = 45;
+  const chiRange: [number, number] = [-Math.PI, Math.PI];
+  const twoThetaStepDegrees = 5;
+  const chiStepDegrees = 45;
 
-  let two_theta_range = $derived<[number, number]>([
-    radiusToTwoTheta(radiusRange[0], distance),
+  // TODO: Lift this up to state management for detector stuff,and make a
+  // distinction between user q range, sample q range, detector q range, etc...
+  let radiusRange: [number, number] = $derived.by(() => {
+    const newQVals = qConvert.computeQRangeFromModules({
+      distance: distance,
+      pixelSize: 0.1,
+      beamCenter: beamCenter,
+      modules: modules,
+      wavelength: 0.7,
+    });
+
+    return [newQVals.rMinPx, newQVals.rMaxPx];
+  });
+
+  let twoThetaRange = $derived<[number, number]>([
+    radiusToTwoTheta(Math.max(radiusRange[0] - 5, 0), distance),
     radiusToTwoTheta(radiusRange[1], distance),
   ]);
-  let two_theta_span = $derived(Math.max(two_theta_range[1] - two_theta_range[0], Number.EPSILON));
+  let twoThetaSpan = $derived(Math.max(twoThetaRange[1] - twoThetaRange[0], Number.EPSILON));
 
-  let transformed_modules = $derived<TransformedModuleTessellated[]>(
+  let transformedModules = $derived<TessellatedModule[]>(
     modules.map((module) =>
       transformModuleTessellated(module, beamCenter, distance, tessellationGrid),
     ),
   );
 
-  let grid_lines = $derived(
+  let gridLines = $derived(
     generateCakedGridLines(
-      panelWidth,
-      panelHeight,
-      two_theta_range,
-      chi_range,
-      two_theta_step_degrees,
-      chi_step_degrees,
+      panelShape,
+      twoThetaRange,
+      chiRange,
+      twoThetaStepDegrees,
+      chiStepDegrees,
     ),
   );
 
-  let transformed_paths = $derived(
-    transformed_modules.flatMap((module) => {
-      const paths = tessellatedModuleToSvgPaths(
-        module,
-        panelWidth,
-        panelHeight,
-        two_theta_range,
-        chi_range,
-      );
+  let transformedPaths = $derived(
+    transformedModules.flatMap((module) => {
+      const paths = tessellatedModuleToSvgPaths(module, panelShape, twoThetaRange, chiRange);
       return paths.map((path, idx) => ({
         id: `${module.id}-quad-${idx}`,
         color: module.color,
@@ -74,12 +80,10 @@
     }),
   );
 
-  const chi_labels = [-180, -135, -90, -45, 0, 45, 90, 135, 180];
-  let two_theta_labels = $derived.by(() =>
-    generate_two_theta_labels(two_theta_range, two_theta_step_degrees),
-  );
+  const chiLabels = [-180, -135, -90, -45, 0, 45, 90, 135, 180];
+  let twoThetaLabels = $derived.by(() => genTwoThetaLabels(twoThetaRange, twoThetaStepDegrees));
 
-  function generate_two_theta_labels(range: [number, number], step: number): number[] {
+  function genTwoThetaLabels(range: [number, number], step: number): number[] {
     const [min, max] = range;
     if (step <= 0) return [];
     const labels: number[] = [];
@@ -90,37 +94,41 @@
     return labels;
   }
 
-  function format_two_theta_label(value: number): string {
+  function formatTwoThetaLabel(value: number): string {
     const rounded = Math.round(value * 100) / 100;
     return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1).replace(/\.0$/, '');
   }
 </script>
 
 <div class="flow max-w-fit rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
-  <svg width={panelWidth} height={panelHeight} class="mx-auto block rounded-lg bg-muted/30">
-    {#each grid_lines.twoThetaLines as x, idx (idx)}
+  <svg
+    width={panelShape.width}
+    height={panelShape.height}
+    class="mx-auto block rounded-lg bg-muted/30"
+  >
+    {#each gridLines.twoThetaLines as x, idx (idx)}
       <line
         x1={x}
         y1="0"
         x2={x}
-        y2={panelHeight}
+        y2={panelShape.height}
         stroke="currentColor"
         stroke-opacity="0.15"
         stroke-width="1"
       />
     {/each}
-    {#each grid_lines.chiLines as y, idx (idx)}
+    {#each gridLines.chiLines as y, idx (idx)}
       <line
         x1="0"
         y1={y}
-        x2={panelWidth}
+        x2={panelShape.width}
         y2={y}
         stroke="currentColor"
         stroke-opacity="0.15"
         stroke-width="1"
       />
     {/each}
-    {#each transformed_paths as tp (tp.id)}
+    {#each transformedPaths as tp (tp.id)}
       <path
         in:draw|global={{ duration: 1200, delay: 200 }}
         d={tp.path}
@@ -131,22 +139,22 @@
         stroke-opacity="0.3"
       />
     {/each}
-    {#each two_theta_labels as theta (theta)}
-      {@const x = ((theta - two_theta_range[0]) / two_theta_span) * panelWidth}
+    {#each twoThetaLabels as theta (theta)}
+      {@const x = ((theta - twoThetaRange[0]) / twoThetaSpan) * panelShape.width}
       <text
         {x}
-        y={panelHeight - 4}
+        y={panelShape.height - 4}
         text-anchor="middle"
         font-size="9"
         fill="currentColor"
         fill-opacity="0.6"
       >
-        {format_two_theta_label(theta)}
+        {formatTwoThetaLabel(theta)}
       </text>
     {/each}
-    {#each chi_labels as chi (chi)}
+    {#each chiLabels as chi (chi)}
       {@const chi_rad = (chi * Math.PI) / 180}
-      {@const y = ((chi_rad - chi_range[0]) / (chi_range[1] - chi_range[0])) * panelHeight}
+      {@const y = ((chi_rad - chiRange[0]) / (chiRange[1] - chiRange[0])) * panelShape.height}
       <text
         x="6"
         {y}
@@ -160,8 +168,8 @@
       </text>
     {/each}
     <text
-      x={panelWidth / 2}
-      y={panelHeight - 14}
+      x={panelShape.width / 2}
+      y={panelShape.height - 14}
       text-anchor="middle"
       font-size="10"
       fill="currentColor"
@@ -170,7 +178,7 @@
       Scattering angle 2θ (°)
     </text>
     <text
-      x={-panelHeight / 2}
+      x={-panelShape.height / 2}
       y="12"
       text-anchor="middle"
       font-size="10"

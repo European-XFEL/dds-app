@@ -1,58 +1,25 @@
-export type RangeTuple = readonly [number, number];
+export interface Shape {
+  readonly width: number;
+  readonly height: number;
+}
 
 export interface CartesianPoint {
   x: number;
   y: number;
 }
 
-export interface PolarPoint {
-  r: number;
-  phi: number;
-  twoTheta: number;
-}
-
 export interface DetectorModule {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  readonly id: string;
+  readonly shape: Shape;
+  readonly position: CartesianPoint;
   color?: string;
 }
 
-export interface TessellatedQuad {
-  corners: PolarPoint[];
-}
-
-export interface TransformedModuleTessellated {
-  id: string;
-  quads: TessellatedQuad[];
-  color: string;
-}
-
-export type Shape = {
-  width: number;
-  height: number;
-};
-export type PixelSize = number;
-export type BeamCenter = CartesianPoint;
-
-export interface QParams {
-  min: number;
-  max: number;
-  step: number;
-}
-
-// TODO: Decide to use QRange or QParams throughout application
-/** @deprecated Use QParams instead */
-export type QRange = QParams;
-
-export type Detector = {
-  name: string;
-  pixelSize: PixelSize;
+export interface DetectorInterface {
+  readonly name: string;
+  readonly pixelSize: number;
   distance: number;
-  wavelength: number;
   beamCenter: CartesianPoint;
   imageShape: Shape;
-  modules: DetectorModule[];
-};
+  readonly modules: DetectorModule[];
+}

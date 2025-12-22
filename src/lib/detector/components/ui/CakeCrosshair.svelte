@@ -6,14 +6,13 @@
   import { useDrag } from './useDrag.svelte';
 
   interface Props {
-    x: number;
-    y: number;
+    pos: CartesianPoint;
     size?: number;
     onDrag: (newPos: CartesianPoint) => void;
     svgElement: SVGSVGElement | null;
   }
 
-  let { x, y, size = 15, onDrag, svgElement }: Props = $props();
+  let { pos, size = 15, onDrag, svgElement }: Props = $props();
 
   const drag = useDrag({
     getSvgElement: () => svgElement,
@@ -31,26 +30,26 @@
 >
   <line
     in:draw|global={{ duration: 1200, delay: 200 }}
-    x1={x}
-    y1={y - size}
-    x2={x}
-    y2={y + size}
+    x1={pos.x}
+    y1={pos.y - size}
+    x2={pos.x}
+    y2={pos.y + size}
     stroke="currentColor"
     stroke-width="2"
   />
   <line
     in:draw|global={{ duration: 1200, delay: 200 }}
-    x1={x - size}
-    y1={y}
-    x2={x + size}
-    y2={y}
+    x1={pos.x - size}
+    y1={pos.y}
+    x2={pos.x + size}
+    y2={pos.y}
     stroke="currentColor"
     stroke-width="2"
   />
   <circle
     in:draw|global={{ duration: 3000, delay: 500 }}
-    cx={x}
-    cy={y}
+    cx={pos.x}
+    cy={pos.y}
     r="6"
     fill="currentColor"
     fill-opacity="0.3"

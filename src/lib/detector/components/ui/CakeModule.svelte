@@ -19,7 +19,7 @@
   const drag = useDrag({
     getSvgElement: () => svgElement,
     onDrag: (pos) => onDrag(module.id, pos),
-    getOffset: () => ({ x: module.x, y: module.y }),
+    getOffset: () => module.position,
   });
 </script>
 
@@ -34,10 +34,10 @@
 >
   <rect
     in:draw|global={{ duration: 1200, delay: 200 }}
-    x={module.x}
-    y={module.y}
-    width={module.width}
-    height={module.height}
+    x={module.position.x}
+    y={module.position.y}
+    width={module.shape.width}
+    height={module.shape.height}
     fill={moduleColor}
     fill-opacity="0.25"
     stroke={moduleColor}
@@ -45,8 +45,8 @@
     class="hover:fill-opacity-40 pointer-events-auto transition-[fill-opacity]"
   />
   <text
-    x={module.x + module.width / 2}
-    y={module.y + module.height / 2}
+    x={module.position.x + module.shape.width / 2}
+    y={module.position.y + module.shape.height / 2}
     text-anchor="middle"
     dominant-baseline="middle"
     fill={moduleColor}
