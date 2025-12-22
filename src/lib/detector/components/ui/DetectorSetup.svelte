@@ -12,8 +12,15 @@
 
   let { distance = $bindable(), beamCenter = $bindable() }: Props = $props();
 
-  const detectors: string[] = ['LPD', 'AGIPD', 'DSSC'];
-  let detectorName: string | undefined = $state();
+  type DetectorEntry = { name: string; enabled: boolean };
+
+  const detectors: DetectorEntry[] = [
+    { name: 'LPD', enabled: true },
+    { name: 'AGIPD', enabled: false },
+    { name: 'DSSC', enabled: false },
+  ];
+
+  let detectorName: string | undefined = $state('LPD');
 </script>
 
 <div>
@@ -31,8 +38,8 @@
             </span>
           </Select.Trigger>
           <Select.Content>
-            {#each detectors as name}
-              <Select.Item value={name} label={name}>
+            {#each detectors as { name, enabled } (name)}
+              <Select.Item value={name} label={name} disabled={!enabled}>
                 {name}
               </Select.Item>
             {/each}
