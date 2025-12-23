@@ -3,7 +3,7 @@
 
   import { createSimulationSeed } from '$lib/state.svelte';
 
-  import DetectorInfoCard from '$lib/detector/DetectorInfoCard.svelte';
+  import DetectorInfoCard from '$lib/detector/components/DetectorInfoCard.svelte';
 
   const defaultState = createSimulationSeed();
 
