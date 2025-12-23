@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { draw } from 'svelte/transition';
+  import { draw, fade } from 'svelte/transition';
 
   import type { CartesianPoint, DetectorModule } from '$lib/types';
 
@@ -33,7 +33,7 @@
   onmousedown={drag.handleMouseDown}
 >
   <rect
-    in:draw|global={{ duration: 1200, delay: 200 }}
+    in:fade|global={{ duration: 800 }}
     x={module.position.x}
     y={module.position.y}
     width={module.shape.width}

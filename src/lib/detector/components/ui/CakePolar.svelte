@@ -98,95 +98,88 @@
     const rounded = Math.round(value * 100) / 100;
     return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1).replace(/\.0$/, '');
   }
+
+  // This was previously in a div wrapper:
+  // <div class="flow max-w-fit rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
 </script>
 
-<div class="flow max-w-fit rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
-  <svg
-    width={panelShape.width}
-    height={panelShape.height}
-    class="mx-auto block rounded-lg bg-muted/30"
+<svg
+  width={panelShape.width}
+  height={panelShape.height}
+  class="mx-auto block rounded-lg bg-muted/30"
+>
+  {#each gridLines.twoThetaLines as x, idx (idx)}
+    <line
+      x1={x}
+      y1="0"
+      x2={x}
+      y2={panelShape.height}
+      stroke="currentColor"
+      stroke-opacity="0.15"
+      stroke-width="1"
+    />
+  {/each}
+  {#each gridLines.chiLines as y, idx (idx)}
+    <line
+      x1="0"
+      y1={y}
+      x2={panelShape.width}
+      y2={y}
+      stroke="currentColor"
+      stroke-opacity="0.15"
+      stroke-width="1"
+    />
+  {/each}
+  {#each transformedPaths as tp (tp.id)}
+    <path
+      in:draw|global={{ duration: 1200, delay: 200 }}
+      d={tp.path}
+      fill={tp.color}
+      fill-opacity="0.35"
+      stroke={tp.color}
+      stroke-width="0.5"
+      stroke-opacity="0.3"
+    />
+  {/each}
+  {#each twoThetaLabels as theta (theta)}
+    {@const x = ((theta - twoThetaRange[0]) / twoThetaSpan) * panelShape.width}
+    <text
+      {x}
+      y={panelShape.height - 4}
+      text-anchor="middle"
+      font-size="9"
+      fill="currentColor"
+      fill-opacity="0.6"
+    >
+      {formatTwoThetaLabel(theta)}
+    </text>
+  {/each}
+  {#each chiLabels as chi (chi)}
+    {@const chi_rad = (chi * Math.PI) / 180}
+    {@const y = ((chi_rad - chiRange[0]) / (chiRange[1] - chiRange[0])) * panelShape.height}
+    <text x="6" {y} dy="3" text-anchor="start" font-size="9" fill="currentColor" fill-opacity="0.6">
+      {chi}°
+    </text>
+  {/each}
+  <text
+    x={panelShape.width / 2}
+    y={panelShape.height - 14}
+    text-anchor="middle"
+    font-size="10"
+    fill="currentColor"
+    fill-opacity="0.7"
   >
-    {#each gridLines.twoThetaLines as x, idx (idx)}
-      <line
-        x1={x}
-        y1="0"
-        x2={x}
-        y2={panelShape.height}
-        stroke="currentColor"
-        stroke-opacity="0.15"
-        stroke-width="1"
-      />
-    {/each}
-    {#each gridLines.chiLines as y, idx (idx)}
-      <line
-        x1="0"
-        y1={y}
-        x2={panelShape.width}
-        y2={y}
-        stroke="currentColor"
-        stroke-opacity="0.15"
-        stroke-width="1"
-      />
-    {/each}
-    {#each transformedPaths as tp (tp.id)}
-      <path
-        in:draw|global={{ duration: 1200, delay: 200 }}
-        d={tp.path}
-        fill={tp.color}
-        fill-opacity="0.35"
-        stroke={tp.color}
-        stroke-width="0.5"
-        stroke-opacity="0.3"
-      />
-    {/each}
-    {#each twoThetaLabels as theta (theta)}
-      {@const x = ((theta - twoThetaRange[0]) / twoThetaSpan) * panelShape.width}
-      <text
-        {x}
-        y={panelShape.height - 4}
-        text-anchor="middle"
-        font-size="9"
-        fill="currentColor"
-        fill-opacity="0.6"
-      >
-        {formatTwoThetaLabel(theta)}
-      </text>
-    {/each}
-    {#each chiLabels as chi (chi)}
-      {@const chi_rad = (chi * Math.PI) / 180}
-      {@const y = ((chi_rad - chiRange[0]) / (chiRange[1] - chiRange[0])) * panelShape.height}
-      <text
-        x="6"
-        {y}
-        dy="3"
-        text-anchor="start"
-        font-size="9"
-        fill="currentColor"
-        fill-opacity="0.6"
-      >
-        {chi}°
-      </text>
-    {/each}
-    <text
-      x={panelShape.width / 2}
-      y={panelShape.height - 14}
-      text-anchor="middle"
-      font-size="10"
-      fill="currentColor"
-      fill-opacity="0.7"
-    >
-      Scattering angle 2θ (°)
-    </text>
-    <text
-      x={-panelShape.height / 2}
-      y="12"
-      text-anchor="middle"
-      font-size="10"
-      fill="currentColor"
-      fill-opacity="0.7"
-      transform="rotate(-90)"
-    >
-      Chi χ (°)
-    </text>
-  </svg>
-</div>
+    Scattering angle 2θ (°)
+  </text>
+  <text
+    x={-panelShape.height / 2}
+    y="12"
+    text-anchor="middle"
+    font-size="10"
+    fill="currentColor"
+    fill-opacity="0.7"
+    transform="rotate(-90)"
+  >
+    Chi χ (°)
+  </text>
+</svg>

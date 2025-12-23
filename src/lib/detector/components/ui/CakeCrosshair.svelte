@@ -29,7 +29,7 @@
   onmousedown={drag.handleMouseDown}
 >
   <line
-    in:draw|global={{ duration: 1200, delay: 200 }}
+    in:draw|global={{ duration: 1200, delay: 1200 }}
     x1={pos.x}
     y1={pos.y - size}
     x2={pos.x}
@@ -38,7 +38,7 @@
     stroke-width="2"
   />
   <line
-    in:draw|global={{ duration: 1200, delay: 200 }}
+    in:draw|global={{ duration: 1200, delay: 1200 }}
     x1={pos.x - size}
     y1={pos.y}
     x2={pos.x + size}
