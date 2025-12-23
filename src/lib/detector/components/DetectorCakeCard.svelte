@@ -1,7 +1,7 @@
 <script lang="ts">
   import { BadgeInfo } from '@lucide/svelte';
 
-  import { crossfade, fade } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   import * as Card from '$shadcn/ui/card/index.js';
   import { Skeleton } from '$shadcn/ui/skeleton/index.js';
@@ -24,8 +24,6 @@
     beamCenter = $bindable(),
     panelShape = { width: 450, height: 600 },
   }: Props = $props();
-
-  const [send, receive] = crossfade({ duration: 300 });
 </script>
 
 <Card.Root class="w-full min-w-fit">
@@ -36,7 +34,7 @@
       <Tooltip.Provider>
         <Tooltip.Root>
           <Tooltip.Trigger><BadgeInfo size={16} /></Tooltip.Trigger>
-          <Tooltip.Content class="max-w-xs w-fit">
+          <Tooltip.Content class="w-fit max-w-xs">
             Drag the <span class="font-medium text-destructive">red crosshair</span> to move the
             beam center or drag the <span class="font-medium text-blue-600">colored modules</span>
             to reposition them. The caked projection updates in real time.
