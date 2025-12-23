@@ -1,9 +1,8 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
-  import { createSimulationSeed } from '$lib/state.svelte';
-
   import DetectorSetupCard from '$lib/detector/components/DetectorSetupCard.svelte';
+  import { createSimulationSeed } from '$lib/state.svelte';
 
   const defaultState = createSimulationSeed();
 
