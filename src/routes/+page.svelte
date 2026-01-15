@@ -9,6 +9,8 @@
   } from 'echarts/components';
   import type { ComposeOption } from 'echarts/core';
 
+  import { fade } from 'svelte/transition';
+
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
@@ -26,7 +28,8 @@
     scaleSoluteByExcitedFraction,
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
-  import { LineChart } from '$lib/ui';
+  import { LineChart, SetupChecklist } from '$lib/ui';
+  import Description from '$lib/ui/Description.svelte';
 
   // Compose type for type-safe options
   type ECOption = ComposeOption<
@@ -70,6 +73,15 @@
   // Combined difference scattering signal
   const deltaS = $derived(
     computeDeltaS(soluteResource.value, solventResource.value, calculations.excitedStateFraction),
+  );
+
+  const hasGroundMolecule = $derived(!!simulation.sample.ground?.id);
+  const hasExcitedMolecule = $derived(!!simulation.sample.excited?.id);
+  const hasSolvent = $derived(!!simulation.sample.solvent?.id);
+  const hasDetector = $derived(!!simulation.detector);
+  const hasPump = $derived(!!simulation.pump);
+  const hasAll = $derived(
+    hasGroundMolecule && hasExcitedMolecule && hasSolvent && hasDetector && hasPump,
   );
 
   // Solute contribution scaled by excited fraction for display
@@ -173,8 +185,26 @@
           >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
         >
       </div> -->
-      <div class="flex flex-col gap-6 pt-4">
-        <LineChart {constant_options} {xAxis} {series} />
+      <div>
+        <Description />
+      </div>
+      <div transition:fade class="relative flex flex-col gap-6 pt-4">
+        <!-- Conditionally show checklist or chart -->
+        {#if hasAll}
+          <div class="absolute inset-0" transition:fade>
+            <LineChart {constant_options} {xAxis} {series} />
+          </div>
+        {:else}
+          <div class="absolute" transition:fade>
+            <SetupChecklist
+              {hasGroundMolecule}
+              {hasExcitedMolecule}
+              {hasSolvent}
+              {hasDetector}
+              {hasPump}
+            />
+          </div>
+        {/if}
       </div>
     </Resizable.Pane>
     <Resizable.Handle />
