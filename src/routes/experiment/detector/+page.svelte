@@ -22,5 +22,6 @@
     bind:modules={detector.modules}
     bind:beamCenter={detector.beamCenter}
     bind:distance={detector.distance}
+    radiusRange={detector.radiusRange}
   />
 </div>
