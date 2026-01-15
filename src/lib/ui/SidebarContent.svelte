@@ -32,6 +32,7 @@
             title: 'Flow',
             url: '/flow',
             icon: Flower,
+            disabled: true,
           },
         ],
       },
@@ -111,7 +112,9 @@
       <Sidebar.Menu>
         {#each group.items as item (item.title)}
           <Sidebar.MenuItem>
-            <Sidebar.MenuButton>
+            <Sidebar.MenuButton
+              {...item?.disabled ? { 'aria-disabled': 'true', tabindex: -1 } : {}}
+            >
               {#snippet tooltipContent()}
                 {item.title}
               {/snippet}
