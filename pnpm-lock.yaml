@@ -60,8 +60,8 @@ importers:
         specifier: ^0.15.15
         version: 0.15.15
       '@lucide/svelte':
-        specifier: ^0.544.0
-        version: 0.544.0(svelte@5.45.8)
+        specifier: ^0.561.0
+        version: 0.561.0(svelte@5.45.8)
       '@paralleldrive/cuid2':
         specifier: ^3.0.4
         version: 3.0.4
@@ -129,8 +129,11 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(svelte@5.45.8)
       bits-ui:
-        specifier: ^2.14.3
+        specifier: ^2.14.4
         version: 2.14.4(@internationalized/date@3.10.0)(@sveltejs/kit@2.49.2(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.8)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)))(svelte@5.45.8)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)))(svelte@5.45.8)
+      chromatic:
+        specifier: ^13.3.4
+        version: 13.3.4
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -173,9 +176,15 @@ importers:
       globals:
         specifier: ^16.4.0
         version: 16.5.0
+      mathjs:
+        specifier: ^15.1.0
+        version: 15.1.0
       matterviz:
         specifier: ^0.1.14
         version: 0.1.15(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.8)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)))(@types/three@0.181.0)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      mode-watcher:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@5.45.8)
       paneforge:
         specifier: ^1.0.2
         version: 1.0.2(svelte@5.45.8)
@@ -212,14 +221,14 @@ importers:
       svelte-check:
         specifier: ^4.3.3
         version: 4.3.4(picomatch@4.0.3)(svelte@5.45.8)(typescript@5.9.3)
-      svelte-sonner:
-        specifier: ^1.0.6
-        version: 1.0.7(svelte@5.45.8)
+      svelte-inspect-value:
+        specifier: ^0.10.0
+        version: 0.10.0(svelte@5.45.8)
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
       tailwind-variants:
-        specifier: ^3.1.1
+        specifier: ^3.2.2
         version: 3.2.2(tailwind-merge@3.4.0)(tailwindcss@4.1.17)
       tailwindcss:
         specifier: ^4.1.14
@@ -986,8 +995,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@lucide/svelte@0.544.0':
-    resolution: {integrity: sha512-9f9O6uxng2pLB01sxNySHduJN3HTl5p0HDu4H26VR51vhZfiMzyOMe9Mhof3XAk4l813eTtl+/DYRvGyoRR+yw==}
+  '@lucide/svelte@0.561.0':
+    resolution: {integrity: sha512-vofKV2UFVrKE6I4ewKJ3dfCXSV6iP6nWVmiM83MLjsU91EeJcEg7LoWUABLp/aOTxj1HQNbJD1f3g3L0JQgH9A==}
     peerDependencies:
       svelte: ^5
 
@@ -2036,6 +2045,9 @@ packages:
   commondir@1.0.1:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
 
+  complex.js@2.4.3:
+    resolution: {integrity: sha512-UrQVSUur14tNX6tiP4y8T4w4FeJAX3bi2cIv0pu/DTLFNxoq7z2Yh83Vfzztj6Px3X/lubqQ9IrPp7Bpn6p4MQ==}
+
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
@@ -2204,6 +2216,9 @@ packages:
     peerDependenciesMeta:
       supports-color:
         optional: true
+
+  decimal.js@10.6.0:
+    resolution: {integrity: sha512-YpgQiITW3JXGntzdUmyUR1V812Hn8T1YVXhCu+wO3OpS4eU9l4YdD3qjyiKdV6mvV29zapkMeD390UVEf2lkUg==}
 
   dedent-js@1.0.1:
     resolution: {integrity: sha512-OUepMozQULMLUmhxS95Vudo0jb0UchLimi3+pQ2plj61Fcy8axbP9hbiD4Sz6DPqn6XG3kfmziVfQ1rSys5AJQ==}
@@ -2462,6 +2477,9 @@ packages:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
     engines: {node: '>=6'}
 
+  escape-latex@1.2.0:
+    resolution: {integrity: sha512-nV5aVWW1K0wEiUIEdZ4erkGGH8mDxGyxSeqPzRNtWP7ataw+/olFObw7hujFWlVjNsaDFw5VZ5NzVSIqRgfTiw==}
+
   escape-string-regexp@4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
@@ -2624,6 +2642,9 @@ packages:
   formdata-polyfill@4.0.10:
     resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
     engines: {node: '>=12.20.0'}
+
+  fraction.js@5.3.4:
+    resolution: {integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==}
 
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
@@ -3012,8 +3033,20 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
+  many-keys-map@2.0.1:
+    resolution: {integrity: sha512-DHnZAD4phTbZ+qnJdjoNEVU1NecYoSdbOOoVmTDH46AuxDkEVh3MxTVpXq10GtcTC6mndN9dkv1rNfpjRcLnOw==}
+
+  mathjs@15.1.0:
+    resolution: {integrity: sha512-HfnAcScQm9drGryodlDqeS3WAl4gUTYGDcOtcqL/8s23MZ28Ib1i8XnYK3ZdjNuaW/L4BAp9lIp8vxAMrcuu1w==}
+    engines: {node: '>= 18'}
+    hasBin: true
+
   matterviz@0.1.15:
     resolution: {integrity: sha512-PBUlNfwcSYsMJzoUvGUe+AXV7zLYy+wdNZwngkW5IZVOM/D1nROJ4Kz6XtIM4g15ro9Mk+uaYY7EgT1RRYKyxg==}
+
+  memoize@10.2.0:
+    resolution: {integrity: sha512-DeC6b7QBrZsRs3Y02A6A7lQyzFbsQbqgjI6UW0GigGWV+u1s25TycMr0XHZE4cJce7rY/vyw2ctMQqfDkIhUEA==}
+    engines: {node: '>=18'}
 
   meshoptimizer@0.22.0:
     resolution: {integrity: sha512-IebiK79sqIy+E4EgOr+CAw+Ke8hAspXKzBd0JdgEmPHiAwmvEj2S4h1rfvo+o/BnfEYd/jAOg5IeeIjzlzSnDg==}
@@ -3021,6 +3054,10 @@ packages:
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
+
+  mimic-function@5.0.1:
+    resolution: {integrity: sha512-VP79XUPxV2CigYP3jWwAUFSku2aKqBH7uTAapFWCBqutsbmDo96KY5o8uh6U+/YSIn5OxJnXp73beVkpqMIGhA==}
+    engines: {node: '>=18'}
 
   min-indent@1.0.1:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
@@ -3043,6 +3080,11 @@ packages:
 
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+
+  mode-watcher@1.1.0:
+    resolution: {integrity: sha512-mUT9RRGPDYenk59qJauN1rhsIMKBmWA3xMF+uRwE8MW/tjhaDSCCARqkSuDTq8vr4/2KcAxIGVjACxTjdk5C3g==}
+    peerDependencies:
+      svelte: ^5.27.0
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -3413,8 +3455,8 @@ packages:
     peerDependencies:
       svelte: ^5.7.0
 
-  runed@0.28.0:
-    resolution: {integrity: sha512-k2xx7RuO9hWcdd9f+8JoBeqWtYrm5CALfgpkg2YDB80ds/QE4w0qqu34A7fqiAwiBBSBQOid7TLxwxVC27ymWQ==}
+  runed@0.25.0:
+    resolution: {integrity: sha512-7+ma4AG9FT2sWQEA0Egf6mb7PBT2vHyuHail1ie8ropfSjvZGtEAx8YTmUjv/APCsdRRxEVvArNjALk9zFSOrg==}
     peerDependencies:
       svelte: ^5.7.0
 
@@ -3450,6 +3492,9 @@ packages:
 
   scule@1.3.0:
     resolution: {integrity: sha512-6FtHJEvt+pVMIB9IBY+IcCJ6Z5f1iQnytgyfKMhDKgmzYG+TeH/wx1y3l27rshSbLiSanrR9ffZDrEsmjlQF2g==}
+
+  seedrandom@3.0.5:
+    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
 
   semver-compare@1.0.0:
     resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}
@@ -3573,15 +3618,15 @@ packages:
       svelte:
         optional: true
 
+  svelte-inspect-value@0.10.0:
+    resolution: {integrity: sha512-yLpXL+GEu9fPCKL7FqfjEoVVWz6rsMZDPd45UmuV8fTXB7L5Qk/T+IfCeZAsUn8fAiaLyeDLG3zSHEVesMjCsQ==}
+    peerDependencies:
+      svelte: ^5.29.0
+
   svelte-multiselect@11.3.0:
     resolution: {integrity: sha512-DcDFBnyYMG1qG1rQ+G4cKYYn7mGDKWOhk0/AXE/yCLrRBrSVHY+DMbZ3jcgNnC5uSyjAqDfllb/4dOUb396s2Q==}
     peerDependencies:
       svelte: ^5.35.6
-
-  svelte-sonner@1.0.7:
-    resolution: {integrity: sha512-1EUFYmd7q/xfs2qCHwJzGPh9n5VJ3X6QjBN10fof2vxgy8fYE7kVfZ7uGnd7i6fQaWIr5KvXcwYXE/cmTEjk5A==}
-    peerDependencies:
-      svelte: ^5.0.0
 
   svelte-toolbelt@0.10.6:
     resolution: {integrity: sha512-YWuX+RE+CnWYx09yseAe4ZVMM7e7GRFZM6OYWpBKOb++s+SQ8RBIMMe+Bs/CznBMc0QPLjr+vDBxTAkozXsFXQ==}
@@ -3672,6 +3717,9 @@ packages:
 
   three@0.181.2:
     resolution: {integrity: sha512-k/CjiZ80bYss6Qs7/ex1TBlPD11whT9oKfT8oTGiHa34W4JRd1NiH/Tr1DbHWQ2/vMUypxksLnF2CfmlmM5XFQ==}
+
+  tiny-emitter@2.1.0:
+    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
 
   tiny-invariant@1.3.3:
     resolution: {integrity: sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==}
@@ -3764,6 +3812,10 @@ packages:
   type-fest@2.19.0:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
+
+  typed-function@4.2.2:
+    resolution: {integrity: sha512-VwaXim9Gp1bngi/q3do8hgttYn2uC3MoT/gfuMWylnj1IeZBUAyPddHZlo1K05BDoj8DYPpMdiHqH1dDYdJf2A==}
+    engines: {node: '>= 18'}
 
   typescript-eslint@8.49.0:
     resolution: {integrity: sha512-zRSVH1WXD0uXczCXw+nsdjGPUdx4dfrs5VQoHnUWmv1U3oNlAKv4FUNdLDhVUg+gYn+a5hUESqch//Rv5wVhrg==}
@@ -4671,7 +4723,7 @@ snapshots:
   '@libsql/win32-x64-msvc@0.5.22':
     optional: true
 
-  '@lucide/svelte@0.544.0(svelte@5.45.8)':
+  '@lucide/svelte@0.561.0(svelte@5.45.8)':
     dependencies:
       svelte: 5.45.8
 
@@ -5773,6 +5825,8 @@ snapshots:
 
   commondir@1.0.1: {}
 
+  complex.js@2.4.3: {}
+
   concat-map@0.0.1: {}
 
   cookie@0.6.0: {}
@@ -5956,6 +6010,8 @@ snapshots:
   debug@4.4.3:
     dependencies:
       ms: 2.1.3
+
+  decimal.js@10.6.0: {}
 
   dedent-js@1.0.1: {}
 
@@ -6163,6 +6219,8 @@ snapshots:
 
   escalade@3.2.0: {}
 
+  escape-latex@1.2.0: {}
+
   escape-string-regexp@4.0.0: {}
 
   eslint-config-prettier@10.1.8(eslint@9.39.1(jiti@2.6.1)):
@@ -6346,6 +6404,8 @@ snapshots:
   formdata-polyfill@4.0.10:
     dependencies:
       fetch-blob: 3.2.0
+
+  fraction.js@5.3.4: {}
 
   fsevents@2.3.2:
     optional: true
@@ -6673,6 +6733,20 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  many-keys-map@2.0.1: {}
+
+  mathjs@15.1.0:
+    dependencies:
+      '@babel/runtime': 7.28.4
+      complex.js: 2.4.3
+      decimal.js: 10.6.0
+      escape-latex: 1.2.0
+      fraction.js: 5.3.4
+      javascript-natural-sort: 0.7.1
+      seedrandom: 3.0.5
+      tiny-emitter: 2.1.0
+      typed-function: 4.2.2
+
   matterviz@0.1.15(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.8)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)))(@types/three@0.181.0)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)):
     dependencies:
       '@spglib/moyo-wasm': 0.7.3
@@ -6704,12 +6778,18 @@ snapshots:
       - '@types/three'
       - vite
 
+  memoize@10.2.0:
+    dependencies:
+      mimic-function: 5.0.1
+
   meshoptimizer@0.22.0: {}
 
   micromatch@4.0.8:
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
+
+  mimic-function@5.0.1: {}
 
   min-indent@1.0.1: {}
 
@@ -6728,6 +6808,12 @@ snapshots:
       brace-expansion: 2.0.2
 
   mitt@3.0.1: {}
+
+  mode-watcher@1.1.0(svelte@5.45.8):
+    dependencies:
+      runed: 0.25.0(svelte@5.45.8)
+      svelte: 5.45.8
+      svelte-toolbelt: 0.7.1(svelte@5.45.8)
 
   mri@1.2.0: {}
 
@@ -7057,7 +7143,7 @@ snapshots:
       esm-env: 1.2.2
       svelte: 5.45.8
 
-  runed@0.28.0(svelte@5.45.8):
+  runed@0.25.0(svelte@5.45.8):
     dependencies:
       esm-env: 1.2.2
       svelte: 5.45.8
@@ -7089,6 +7175,8 @@ snapshots:
   scheduler@0.27.0: {}
 
   scule@1.3.0: {}
+
+  seedrandom@3.0.5: {}
 
   semver-compare@1.0.0: {}
 
@@ -7215,14 +7303,18 @@ snapshots:
     optionalDependencies:
       svelte: 5.45.8
 
+  svelte-inspect-value@0.10.0(svelte@5.45.8):
+    dependencies:
+      esm-env: 1.2.2
+      fast-deep-equal: 3.1.3
+      highlight.js: 11.11.1
+      many-keys-map: 2.0.1
+      memoize: 10.2.0
+      svelte: 5.45.8
+
   svelte-multiselect@11.3.0(svelte@5.41.4):
     dependencies:
       svelte: 5.41.4
-
-  svelte-sonner@1.0.7(svelte@5.45.8):
-    dependencies:
-      runed: 0.28.0(svelte@5.45.8)
-      svelte: 5.45.8
 
   svelte-toolbelt@0.10.6(@sveltejs/kit@2.49.2(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.45.8)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)))(svelte@5.45.8)(vite@7.2.7(@types/node@22.19.2)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)))(svelte@5.45.8):
     dependencies:
@@ -7356,6 +7448,8 @@ snapshots:
 
   three@0.181.2: {}
 
+  tiny-emitter@2.1.0: {}
+
   tiny-invariant@1.3.3: {}
 
   tinybench@2.9.0: {}
@@ -7434,6 +7528,8 @@ snapshots:
       prelude-ls: 1.2.1
 
   type-fest@2.19.0: {}
+
+  typed-function@4.2.2: {}
 
   typescript-eslint@8.49.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3):
     dependencies:
