@@ -16,6 +16,7 @@
     distance: number;
     beamCenter: CartesianPoint;
     panelShape?: Shape;
+    radiusRange: { min: number; max: number };
   }
 
   let {
@@ -23,6 +24,7 @@
     distance = $bindable(),
     beamCenter = $bindable(),
     panelShape = { width: 450, height: 600 },
+    radiusRange,
   }: Props = $props();
 </script>
 
@@ -67,7 +69,14 @@
             />
           {:then { default: CakeViewPolar }}
             <div in:fade|global={{ duration: 200 }}>
-              <CakeViewPolar {beamCenter} {modules} {distance} {panelShape} tessellationGrid={20} />
+              <CakeViewPolar
+                {beamCenter}
+                {modules}
+                {distance}
+                {panelShape}
+                {radiusRange}
+                tessellationGrid={20}
+              />
             </div>
           {/await}
         </div>

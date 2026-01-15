@@ -1,10 +1,6 @@
 import { resolveModuleColour } from './components/ui/Cake.helper';
-import {
-  type CartesianPoint,
-  type DetectorInterface,
-  type DetectorModule,
-  type Shape,
-} from './types';
+import * as qConvert from './components/ui/DetectorInfo.helper';
+import { type CartesianPoint, type Detector, type DetectorModule, type Shape } from './types';
 
 const DEFAULT_DETECTORS = {
   LPD: {
@@ -45,7 +41,7 @@ function calculateImageShape(modules: DetectorModule[]): Shape {
   };
 }
 
-export class Detector implements DetectorInterface {
+export class DetectorState implements Detector {
   readonly name: string;
   readonly pixelSize: number;
   readonly modules: DetectorModule[];
@@ -53,9 +49,22 @@ export class Detector implements DetectorInterface {
   distance: number;
   beamCenter: CartesianPoint;
 
+  readonly qRange = $derived.by(() => {
+    return qConvert.computeQRangeFromModules({
+      distance: this.distance,
+      pixelSize: this.pixelSize,
+      beamCenter: this.beamCenter,
+      modules: this.modules,
+      wavelength: 0.7,
+    });
+  });
+
   readonly imageShape: Shape = $derived.by(() => {
-    const shape = calculateImageShape(this.modules);
-    return { width: shape.width, height: shape.height };
+    return calculateImageShape(this.modules);
+  });
+
+  readonly radiusRange = $derived.by(() => {
+    return { min: this.qRange.rMinPx, max: this.qRange.rMaxPx };
   });
 
   constructor(name: keyof typeof DEFAULT_DETECTORS) {

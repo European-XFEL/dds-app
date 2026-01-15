@@ -10,14 +10,13 @@
     tessellatedModuleToSvgPaths,
     transformModuleTessellated,
   } from './Cake.helper';
-  import * as qConvert from './DetectorInfo.helper';
 
   interface Props {
     modules: DetectorModule[];
     beamCenter: CartesianPoint;
     distance?: number;
     panelShape?: Shape;
-    radiusRange?: [number, number];
+    radiusRange: { min: number; max: number };
     tessellationGrid?: number;
   }
 
@@ -26,6 +25,7 @@
     beamCenter,
     distance = 300,
     panelShape = { width: 600, height: 400 },
+    radiusRange,
     tessellationGrid = 20,
   }: Props = $props();
 
@@ -33,23 +33,9 @@
   const twoThetaStepDegrees = 5;
   const chiStepDegrees = 45;
 
-  // TODO: Lift this up to state management for detector stuff,and make a
-  // distinction between user q range, sample q range, detector q range, etc...
-  let radiusRange: [number, number] = $derived.by(() => {
-    const newQVals = qConvert.computeQRangeFromModules({
-      distance: distance,
-      pixelSize: 0.1,
-      beamCenter: beamCenter,
-      modules: modules,
-      wavelength: 0.7,
-    });
-
-    return [newQVals.rMinPx, newQVals.rMaxPx];
-  });
-
   let twoThetaRange = $derived<[number, number]>([
-    radiusToTwoTheta(Math.max(radiusRange[0] - 5, 0), distance),
-    radiusToTwoTheta(radiusRange[1], distance),
+    radiusToTwoTheta(Math.max(radiusRange.min - 5, 0), distance),
+    radiusToTwoTheta(radiusRange.max, distance),
   ]);
   let twoThetaSpan = $derived(Math.max(twoThetaRange[1] - twoThetaRange[0], Number.EPSILON));
 
