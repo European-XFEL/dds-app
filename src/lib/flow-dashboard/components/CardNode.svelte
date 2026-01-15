@@ -3,15 +3,21 @@
 
   import { ProbeSetupCard } from '$lib/probe';
   import { PumpSetupCard } from '$lib/pump/';
-  import { SampleCard, SolventCard } from '$lib/sample';
+  import { MoleculeCard, SolventCard, SolventInfoCard } from '$lib/sample';
 
-  type CardType = 'SampleCard' | 'SolventCard' | 'PumpSetupCard' | 'ProbeSetupCard';
+  type CardType =
+    | 'MoleculeCard'
+    | 'ProbeSetupCard'
+    | 'PumpSetupCard'
+    | 'SolventCard'
+    | 'SolventInfoCard';
 
   const cardByType = {
-    SampleCard,
-    SolventCard,
-    PumpSetupCard,
+    MoleculeCard,
     ProbeSetupCard,
+    PumpSetupCard,
+    SolventCard,
+    SolventInfoCard,
   } satisfies Record<CardType, any>;
 
   let { data, type }: NodeProps = $props();

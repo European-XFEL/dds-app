@@ -35,13 +35,13 @@
     },
     {
       id: 'ground',
-      type: 'SampleCard',
+      type: 'MoleculeCard',
       data: { kind: 'ground', vizOpen: false, vizCollapseShow: true },
       position: { x: 0, y: 0 },
     },
     {
       id: 'excited',
-      type: 'SampleCard',
+      type: 'MoleculeCard',
       data: { kind: 'excited', vizOpen: false, vizCollapseShow: true },
       position: { x: 0, y: 0 },
     },
@@ -148,7 +148,7 @@
 
 <style>
   .flow-dashboard {
-    width: 100%;
-    height: 100%;
+    width: 1000px;
+    height: 1000px;
   }
 </style>

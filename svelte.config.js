@@ -18,6 +18,7 @@ const config = {
     },
   },
   compilerOptions: {
+    runes: true,
     experimental: {
       async: false,
     },
