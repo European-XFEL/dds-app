@@ -7,7 +7,6 @@
     LayoutDashboard,
     Microscope,
     Projector,
-    Radiation,
     TestTube,
     Upload,
   } from '@lucide/svelte';

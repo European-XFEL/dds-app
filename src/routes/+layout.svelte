@@ -2,6 +2,8 @@
   import '$css';
   import '@xyflow/svelte/dist/style.css';
 
+  // import Inspect from 'svelte-inspect-value';
+
   import { Separator } from '$shadcn/ui/separator';
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
@@ -51,3 +53,5 @@
     </main>
   </Sidebar.Inset>
 </Sidebar.Provider>
+
+<!-- <Inspect.Panel values={{ ...simulation }} /> -->
