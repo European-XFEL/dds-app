@@ -24,6 +24,6 @@ export interface Detector {
   beamCenter: CartesianPoint;
   imageShape: Shape;
   readonly modules: DetectorModule[];
-  readonly radiusRange: {min: number, max: number};
+  readonly radiusRange: { min: number; max: number };
   readonly qRange: QRange;
 }

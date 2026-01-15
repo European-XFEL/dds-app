@@ -5,12 +5,10 @@
   import { Spinner } from '$shadcn/ui/spinner/index.js';
 
   import { listSolvents } from '$lib/data.remote';
-  import type { Sample } from '$lib/types';
+  import type { Sample, Solvents } from '$lib/types';
 
   import SoluteConcentration from './ui/SoluteConcentration.svelte';
   import SolventSelect from './ui/SolventSelect.svelte';
-
-  type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 
   interface Props {
     solvent: Sample['solvent'];

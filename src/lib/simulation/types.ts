@@ -1,5 +1,7 @@
+import type { DetectorState } from '$lib/detector/state.svelte';
+import type { SampleState } from '$lib/sample/state.svelte';
 import type * as protoSim from '$lib/server/grpc/gen/simulation_pb';
-import type { Detector, Pump, QRange, RealismFlags, Sample, XRayProbe } from '$lib/types';
+import type { Pump, QRange, RealismFlags, XRayProbe } from '$lib/types';
 
 export type SimulationDetails = Omit<
   protoSim.SimulationRequest,
@@ -8,7 +10,7 @@ export type SimulationDetails = Omit<
   qRange: QRange;
   pump: Pump;
   probe: XRayProbe;
-  sample: Sample;
-  detector: Detector;
+  sample: SampleState;
+  detector: DetectorState;
   realismFlags?: RealismFlags;
 };

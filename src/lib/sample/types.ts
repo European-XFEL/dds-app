@@ -8,9 +8,9 @@ export type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
 export type Molecule = Molecules[number];
 
-export type Sample = {
+export interface Sample {
   concentrationSoluteMolar: number | undefined;
   solvent: Solvent | undefined;
   ground: Molecule | undefined;
   excited: Molecule | undefined;
-};
+}
