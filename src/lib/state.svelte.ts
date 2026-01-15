@@ -1,6 +1,7 @@
 import { getContext, hasContext, setContext } from 'svelte';
 
-import { Detector } from '$lib/detector/state.svelte';
+import { DetectorState } from '$lib/detector/state.svelte';
+import { SampleState } from '$lib/sample/state.svelte.ts';
 import type { SimulationDetails } from '$lib/types';
 
 const initialSeed = {
@@ -26,18 +27,11 @@ export type SimulationState = SimulationDetails;
 export function createSimulationSeed(_seed = initialSeed): SimulationState {
   const seed = structuredClone(_seed);
 
-  const detector = new Detector('LPD');
-
   // Wrap with $state() to make it deeply reactive for bindings
   const state: SimulationState = $state({
     ...seed,
-    detector: detector,
-    sample: {
-      concentrationSoluteMolar: undefined,
-      solvent: undefined,
-      excited: undefined,
-      ground: undefined,
-    },
+    detector: new DetectorState('LPD'),
+    sample: new SampleState(),
   });
 
   return state;

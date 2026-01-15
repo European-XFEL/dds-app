@@ -22,9 +22,10 @@
   });
 </script>
 
-<Card.Root class="flex-auto @sm:gap-3">
+<Card.Root class="flex-auto gap-3">
   <Card.Header>
     <Card.Title>Solvent Information</Card.Title>
+    <Card.Description>Summary of solvent information.</Card.Description>
   </Card.Header>
 
   <Card.Content class="max-w-md">
