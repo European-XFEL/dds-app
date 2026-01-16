@@ -1,7 +1,8 @@
+import { DrizzleQueryError } from 'drizzle-orm';
 import Papa from 'papaparse';
 import z from 'zod';
 
-import { prerender } from '$app/server';
+import { command, prerender } from '$app/server';
 
 import { env } from '$env/dynamic/private';
 
@@ -25,6 +26,38 @@ export const listMolecules = prerender(
   {
     inputs: () => [],
     dynamic: true,
+  },
+);
+
+export const uploadMolecule = command(
+  z.object({
+    name: z.string(),
+    filename: z.string(),
+    contents: z.string(),
+  }),
+  async ({ name, filename, contents }) => {
+    console.log('Uploading molecule:', filename, name, contents.length);
+
+    try {
+      const result = await db
+        .insert(schema.molecules)
+        .values({
+          name,
+          filename,
+          contents,
+        })
+        .returning(schema.moleculesInfo);
+      return { success: true, result: result[0] };
+    } catch (error) {
+      console.error('Failed to insert molecule:', error);
+      if (error instanceof DrizzleQueryError) {
+        const cause = error.cause as { code?: string } | undefined;
+        if (cause?.code === '23505') {
+          return { success: false, error: 'A molecule with this name already exists.' };
+        }
+      }
+      throw error;
+    }
   },
 );
 

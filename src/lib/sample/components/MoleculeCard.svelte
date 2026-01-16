@@ -48,7 +48,7 @@
 
   <Card.Content>
     <form class="flex flex-col gap-6">
-      <MoleculeSelect {molecules} bind:molecule {loading} />
+      <MoleculeSelect bind:molecules bind:molecule {loading} />
 
       {#if vizCollapseShow}
         <Collapsible.Root bind:open={vizOpen} class="w-full">
