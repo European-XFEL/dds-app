@@ -1,6 +1,7 @@
 <script lang="ts" module>
   import {
     Beaker,
+    BookOpen,
     Flower,
     Fullscreen,
     History,
@@ -32,6 +33,11 @@
             url: '/flow',
             icon: Flower,
             disabled: true,
+          },
+          {
+            title: 'Docs',
+            url: '/docs',
+            icon: BookOpen,
           },
         ],
       },
