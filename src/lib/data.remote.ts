@@ -24,6 +24,7 @@ export const listMolecules = prerender(
   },
   {
     inputs: () => [],
+    dynamic: true,
   },
 );
 
@@ -33,6 +34,7 @@ export const listSolvents = prerender(
   },
   {
     inputs: () => [],
+    dynamic: true,
   },
 );
 
@@ -50,6 +52,7 @@ export const getMoleculeFileContent = prerender(
     inputs: () => {
       return db.query.molecules.findMany().then((molecules) => molecules.map((m) => m.id));
     },
+    dynamic: true,
   },
 );
 
@@ -96,6 +99,7 @@ export const getSolventIQ = prerender(
     inputs: () => {
       return db.query.solvents.findMany().then((solvents) => solvents.map((s) => s.id));
     },
+    dynamic: true,
   },
 );
 
@@ -186,5 +190,6 @@ export const getDebyeResult = prerender(
         }));
       });
     },
+    dynamic: true,
   },
 );
