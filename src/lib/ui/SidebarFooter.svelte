@@ -1,4 +1,6 @@
 <script lang="ts">
+  import todos from '../../data/todos.json';
+
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
   let {
@@ -14,10 +16,24 @@
 </script>
 
 <Sidebar.Footer
-  class="grid gap-1 text-sm text-muted-foreground group-data-[collapsible=icon]:hidden"
+  class="flex flex-col text-sm text-muted-foreground group-data-[collapsible=icon]:hidden"
 >
-  <span>Ground: {sample.groundName ?? ''}</span>
-  <span>Excited: {sample.excitedName ?? ''}</span>
-  <span>Solvent: {sample.solventName ?? ''}</span>
-  <span>Solute Concentration: {sample.concentrationSoluteMolar ?? ''}%</span>
+  <section class="flex-1 pb-24">
+    <h2 class="font-semibold">Todos</h2>
+
+    <ul>
+      {#each todos as todo}
+        <li>
+          <p class="text-xs text-muted-foreground">{todo.text}</p>
+        </li>
+      {/each}
+    </ul>
+  </section>
+
+  <section class="flex flex-1 flex-col">
+    <div>Ground: {sample.groundName ?? ''}</div>
+    <div>Excited: {sample.excitedName ?? ''}</div>
+    <div>Solvent: {sample.solventName ?? ''}</div>
+    <div>Solute Concentration: {sample.concentrationSoluteMolar ?? ''}%</div>
+  </section>
 </Sidebar.Footer>

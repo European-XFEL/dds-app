@@ -3,7 +3,6 @@
   import * as Table from '$shadcn/ui/table/index.js';
 
   import type { Sample } from '$lib/types';
-  import Todo from '$lib/ui/Todo.svelte';
 
   interface Props {
     solvent: Sample['solvent'];
@@ -25,12 +24,11 @@
 
 <Card.Root class="flex-auto gap-3">
   <Card.Header>
-    <Card.Title>
-      Solvent Information
-      <Todo text="TODO: Add reference link to where solvent files downloaded from " />
-    </Card.Title>
+    <Card.Title>Solvent Information</Card.Title>
     <Card.Description>Summary of solvent information.</Card.Description>
   </Card.Header>
+
+  <!-- TODO: Add reference link to where solvent files downloaded from  -->
 
   <Card.Content class="max-w-md">
     <Table.Root>
