@@ -1,12 +1,12 @@
 <script lang="ts">
   import { listMolecules } from '../../../data.remote';
-  import { Upload } from '@lucide/svelte';
 
-  import { Button } from '$shadcn/ui/button/index.js';
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
 
   import type { Sample } from '$lib/types';
+
+  import MoleculeUpload from './MoleculeUpload.svelte';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
@@ -16,7 +16,7 @@
     loading: boolean;
   }
 
-  let { molecule = $bindable(), molecules, loading }: Props = $props();
+  let { molecule = $bindable(), molecules = $bindable(), loading }: Props = $props();
 
   const triggerMolecule = $derived(
     molecules?.find((m) => m.id === molecule?.id)?.name ?? 'Select molecule',
@@ -50,8 +50,6 @@
         {/each}
       </Select.Content>
     </Select.Root>
-    <Button type="button" variant="outline" class="whitespace-nowrap" disabled>
-      <Upload class="mr-2 h-4 w-4" /> Upload file
-    </Button>
+    <MoleculeUpload bind:molecules />
   </Field.Content>
 </Field.Field>
