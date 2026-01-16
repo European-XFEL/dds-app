@@ -20,6 +20,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@xyflow/svelte'],
+    exclude: ['@electric-sql/pglite'],
   },
   test: {
     expect: { requireAssertions: true },
