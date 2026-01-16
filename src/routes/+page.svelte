@@ -1,240 +1,201 @@
 <script lang="ts">
-  import type { LineSeriesOption } from 'echarts/charts';
-  import type {
-    DataZoomComponentOption,
-    GridComponentOption,
-    LegendComponentOption,
-    TitleComponentOption,
-    TooltipComponentOption,
-  } from 'echarts/components';
-  import type { ComposeOption } from 'echarts/core';
-
-  import { fade } from 'svelte/transition';
-
-  import * as Resizable from '$shadcn/ui/resizable/index.js';
-  import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
-
-  import { DetectorSetupCard } from '$lib/detector';
-  import { PumpSetupCard } from '$lib/pump';
-  import { MoleculeCard, SolventCard } from '$lib/sample';
   import {
-    createScatteringResource,
-    fetchDeltaSSolute,
-    fetchDeltaSSolvent,
-  } from '$lib/simulation/scattering-fetcher.svelte';
-  import {
-    computeDeltaS,
-    createScatteringCalculations,
-    scaleSoluteByExcitedFraction,
-  } from '$lib/simulation/scattering.svelte';
-  import { useSimulationState } from '$lib/state.svelte';
-  import { LineChart, SetupChecklist } from '$lib/ui';
-  import Description from '$lib/ui/Description.svelte';
+    ArrowRight,
+    Atom,
+    BarChart3,
+    Beaker,
+    BookOpen,
+    FlaskConical,
+    Fullscreen,
+    Microscope,
+    Radiation,
+  } from '@lucide/svelte';
 
-  // Compose type for type-safe options
-  type ECOption = ComposeOption<
-    | LineSeriesOption
-    | TitleComponentOption
-    | TooltipComponentOption
-    | GridComponentOption
-    | LegendComponentOption
-    | DataZoomComponentOption
-  >;
+  import { Button } from '$shadcn/ui/button';
+  import * as Card from '$shadcn/ui/card';
 
-  const simulation = useSimulationState();
-
-  let short = $state(true);
-
-  // Use extracted calculations module
-  const calculations = createScatteringCalculations(simulation);
-
-  // Reactive scattering data fetching using resource pattern
-  const soluteResource = createScatteringResource(
-    () =>
-      fetchDeltaSSolute(
-        simulation.qRange,
-        simulation.sample.ground!.id,
-        simulation.sample.excited!.id,
-      ),
-    () => !!(simulation.sample.ground?.id && simulation.sample.excited?.id && simulation.qRange),
-  );
-
-  const solventResource = createScatteringResource(
-    () =>
-      fetchDeltaSSolvent(
-        simulation.sample.solvent!.id,
-        calculations.ratioSolventSolute!,
-        calculations.deltaT!,
-      ),
-    () =>
-      !!(simulation.sample.solvent?.id && calculations.ratioSolventSolute && calculations.deltaT),
-  );
-
-  // Combined difference scattering signal
-  const deltaS = $derived(
-    computeDeltaS(soluteResource.value, solventResource.value, calculations.excitedStateFraction),
-  );
-
-  const hasGroundMolecule = $derived(!!simulation.sample.ground?.id);
-  const hasExcitedMolecule = $derived(!!simulation.sample.excited?.id);
-  const hasSolvent = $derived(!!simulation.sample.solvent?.id);
-  const hasDetector = $derived(!!simulation.detector);
-  const hasPump = $derived(!!simulation.pump);
-  const hasAll = $derived(
-    hasGroundMolecule && hasExcitedMolecule && hasSolvent && hasDetector && hasPump,
-  );
-
-  // Solute contribution scaled by excited fraction for display
-  const deltaSSoluteScaled = $derived(
-    scaleSoluteByExcitedFraction(soluteResource.value, calculations.excitedStateFraction),
-  );
-
-  const constant_options: ECOption = {
-    title: { text: 'Difference Scattering Signals ΔS(q)' },
-    legend: { top: 'bottom' },
-    grid: {
-      left: '10%',
-      right: '10%',
-      bottom: '15%',
-    },
-    xAxis: {
-      id: 'q',
-      name: 'q (Å⁻¹)',
-      data: [],
-      axisLabel: {
-        formatter: (value: number) => Number(value).toPrecision(3),
-      },
-    },
-    yAxis: { type: 'value', animationDuration: 150 },
-    dataZoom: [
-      {
-        type: 'inside',
-        xAxisIndex: 0,
-        filterMode: 'none',
-      },
-      {
-        type: 'inside',
-        yAxisIndex: 0,
-        filterMode: 'none',
-      },
-      {
-        type: 'slider',
-        xAxisIndex: 0,
-        filterMode: 'none',
-        height: 20,
-        bottom: 10,
-      },
-      {
-        type: 'slider',
-        yAxisIndex: 0,
-        filterMode: 'none',
-        width: 20,
-        right: 10,
-      },
-    ],
-    series: [],
-    animationDuration: 150,
-    tooltip: { trigger: 'axis' },
-  };
-
-  let xAxis = $derived<ECOption['xAxis']>({
-    id: 'q',
-    data: deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
-  });
-
-  const series_common: LineSeriesOption = {
-    type: 'line',
-    showSymbol: false,
-    symbol: 'none',
-    smooth: true,
-    animationDuration: 150,
-    animationEasing: 'cubicOut',
-  };
-
-  let series = $derived.by<ECOption['series']>(() => [
-    {
-      id: 'deltaS',
-      name: 'ΔS (Total)',
-      data: deltaS?.i ?? [],
-      ...series_common,
-    },
-    {
-      id: 'deltaSSoluteExFrac',
-      name: 'ΔS Solute (α·ΔS)',
-      data: deltaSSoluteScaled ?? [],
-      ...series_common,
-    },
-    {
-      id: 'deltaSSolvent',
-      name: 'ΔS Solvent',
-      data: solventResource.value?.i ?? [],
-      ...series_common,
-    },
-  ]);
+  import { Latex } from '$lib/ui';
 </script>
 
-<div class="h-[calc(100vh-4rem)]">
-  <Resizable.PaneGroup direction="horizontal" class="max-w-full gap-4 rounded-lg">
-    <Resizable.Pane defaultSize={70}>
-      <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
-      <!-- <div class="flow-row w-max items-center gap-3">
-        <Badge variant="outline"
-          >Delta T (K): {result?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
-        >
-        <Badge variant="outline"
-          >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
-        >
-      </div> -->
-      <div>
-        <Description />
+<div class="flex grow justify-center-safe">
+  <div class="flex w-full max-w-5xl flex-col gap-20 py-12">
+    <!-- Hero Section -->
+    <section class="flex flex-col items-center gap-8 text-center lg:mt-12">
+      <div class="flex flex-col gap-2">
+        <h1 class="text-4xl font-bold tracking-tight text-balance md:text-5xl">
+          X-Ray Solution Scattering Simulator
+        </h1>
+        <p class="mx-auto max-w-2xl text-lg text-pretty text-muted-foreground">
+          Proof of concept web interface for X-ray solution scattering simulation
+        </p>
       </div>
-      <div transition:fade class="relative flex flex-col gap-6 pt-4">
-        <!-- Conditionally show checklist or chart -->
-        {#if hasAll}
-          <div class="absolute inset-0" transition:fade>
-            <LineChart {constant_options} {xAxis} {series} />
-          </div>
-        {:else}
-          <div class="absolute" transition:fade>
-            <SetupChecklist
-              {hasGroundMolecule}
-              {hasExcitedMolecule}
-              {hasSolvent}
-              {hasDetector}
-              {hasPump}
-            />
-          </div>
-        {/if}
+      <div class="flex flex-wrap justify-center gap-3">
+        <Button href="/dashboard" class="gap-2">
+          Open Dashboard
+          <ArrowRight class="h-4 w-4" />
+        </Button>
+        <Button href="/docs" variant="outline" class="gap-2">
+          <BookOpen class="h-4 w-4" />
+          Documentation
+        </Button>
       </div>
-    </Resizable.Pane>
-    <Resizable.Handle />
-    <Resizable.Pane defaultSize={20} class="flex min-w-110 flex-col">
-      <ScrollArea class="mt-4 flex-1">
-        <div class="grid h-72 gap-4">
-          <SolventCard
-            bind:concentrationSoluteMolar={simulation.sample.concentrationSoluteMolar}
-            bind:solvent={simulation.sample.solvent}
-            {short}
-          />
-          <MoleculeCard
-            bind:molecule={simulation.sample.ground}
-            title="Ground Molecule"
-            vizOpen={false}
-            vizCollapseShow={false}
-          />
-          <MoleculeCard
-            bind:molecule={simulation.sample.excited}
-            title="Excited Molecule"
-            vizOpen={false}
-            vizCollapseShow={false}
-          />
-          <DetectorSetupCard
-            bind:distance={simulation.detector.distance}
-            bind:beamCenter={simulation.detector.beamCenter}
-          />
-          <PumpSetupCard bind:pump={simulation.pump} />
-        </div>
-      </ScrollArea>
-    </Resizable.Pane>
-  </Resizable.PaneGroup>
+    </section>
+
+    <section class="flex flex-col gap-8">
+      <div class="flex flex-col gap-2 text-center">
+        <h2 class="text-2xl font-semibold">Simulation Pipeline</h2>
+        <p class="text-muted-foreground">
+          Combine solute structural changes with solvent thermal response
+        </p>
+      </div>
+      <div class="grid gap-6 md:grid-cols-2">
+        <Card.Root>
+          <Card.Header>
+            <Card.Action
+              class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10"
+            >
+              <Atom class="h-6 w-6 text-blue-500" />
+            </Card.Action>
+            <Card.Title>Solute Difference</Card.Title>
+            <Card.Description>
+              Compute intensity difference between excited and ground state molecular structures
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div class="rounded px-3 py-2 text-center">
+              <Latex
+                math={String.raw`\Delta I = I_{\text{exc}} - I_{\text{gnd}}`}
+                displayMode={true}
+              />
+            </div>
+          </Card.Content>
+        </Card.Root>
+
+        <Card.Root>
+          <Card.Header>
+            <Card.Action
+              class="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10"
+            >
+              <FlaskConical class="h-6 w-6 text-amber-500" />
+            </Card.Action>
+            <Card.Title>Solvent Response</Card.Title>
+            <Card.Description>
+              Account for thermal expansion from pump laser energy deposition
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div class="rounded px-3 py-2 text-center">
+              <Latex
+                math={String.raw`\frac{\partial S}{\partial T} \cdot \Delta T`}
+                displayMode={true}
+              />
+            </div>
+          </Card.Content>
+        </Card.Root>
+
+        <Card.Root>
+          <Card.Header>
+            <Card.Action
+              class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/10"
+            >
+              <BarChart3 class="h-6 w-6 text-green-500" />
+            </Card.Action>
+            <Card.Title>Combined Signal</Card.Title>
+            <Card.Description>
+              Predict the total difference scattering as measured at the detector
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div class="rounded px-3 py-2 text-center">
+              <Latex
+                math={String.raw`\Delta S \approx \alpha \Delta S_{\text{sol}} + \Delta S_{\text{slv}}`}
+                displayMode={true}
+              />
+            </div>
+          </Card.Content>
+        </Card.Root>
+
+        <Card.Root>
+          <Card.Header>
+            <Card.Action
+              class="flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10"
+            >
+              <Fullscreen class="h-6 w-6 text-red-500" />
+            </Card.Action>
+            <Card.Title>Image Recreation</Card.Title>
+            <Card.Description>
+              Simulate detector images based on detector information (geometry, masks, etc...) and
+              combined scattering signal
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <div class="rounded px-3 py-2 text-center">...</div>
+          </Card.Content>
+        </Card.Root>
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="flex flex-col gap-8">
+      <div class="flex flex-col gap-2 text-center">
+        <h2 class="text-2xl font-semibold">Configure Your Experiment</h2>
+        <p class="text-muted-foreground">
+          Set up all parameters needed for accurate scattering predictions
+        </p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card.Root>
+          <Card.Header>
+            <Card.Title class="text-base">Molecular Structures</Card.Title>
+            <Card.Action>
+              <Atom class="h-5 w-5 text-primary" />
+            </Card.Action>
+            <Card.Description class="text-sm text-muted-foreground">
+              Upload XYZ for ground and excited states. Supports arbitrary molecular geometries.
+              <!-- TODO: limit q and atoms -->
+            </Card.Description>
+          </Card.Header>
+        </Card.Root>
+
+        <Card.Root>
+          <Card.Header>
+            <Card.Title class="text-base">Solvent Library</Card.Title>
+            <Card.Action>
+              <Beaker class="h-5 w-5 text-primary" />
+            </Card.Action>
+            <Card.Description class="text-sm text-muted-foreground">
+              Pre-loaded <Latex math={String.raw`\partial S/\partial T`} /> data for common solvents with
+              temperature-dependent response curves.
+            </Card.Description>
+          </Card.Header>
+        </Card.Root>
+
+        <Card.Root>
+          <Card.Header>
+            <Card.Title class="text-base">Pump Parameters</Card.Title>
+            <Card.Action>
+              <Radiation class="h-5 w-5 text-primary" />
+            </Card.Action>
+            <Card.Description class="text-sm text-muted-foreground">
+              Configure photon energy, excited state energy, and excitation fraction (<Latex
+                math={String.raw`\alpha`}
+              />) for your optical pump.
+            </Card.Description>
+          </Card.Header>
+        </Card.Root>
+
+        <Card.Root>
+          <Card.Header>
+            <Card.Title class="text-base">Detector Geometry</Card.Title>
+            <Card.Action>
+              <Microscope class="h-5 w-5 text-primary" />
+            </Card.Action>
+            <Card.Description class="text-sm text-muted-foreground">
+              Support for European XFEL detectors with configurable sample-detector distance.
+            </Card.Description>
+          </Card.Header>
+        </Card.Root>
+      </div>
+    </section>
+  </div>
 </div>
