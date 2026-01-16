@@ -5,7 +5,8 @@
 
   import * as Field from '$shadcn/ui/field';
   import { Input } from '$shadcn/ui/input';
-  import { Label } from '$shadcn/ui/label';
+
+  import Todo from '$lib/ui/Todo.svelte';
 
   type Props = {
     pump: Pump;
@@ -35,10 +36,12 @@
 </script>
 
 <Field.Set>
-  <Field.Legend>IR Optical Pump Configuration</Field.Legend>
+  <Field.Legend>
+    IR Optical Pump Configuration
+    <Todo text="TODO: Allow setting dE/dT directly instead of via energies" />
+  </Field.Legend>
   <Field.Description>Configure the IR optical pump settings for the simulation.</Field.Description>
 
-  <!-- TODO: Consider allowing setting delta E/delta T directly instead of via energies -->
   <Field.Group>
     {#each fields as { label, key, input } (key)}
       <Field.Field orientation="responsive">
