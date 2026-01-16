@@ -2,9 +2,8 @@
   import '$css';
   import '@xyflow/svelte/dist/style.css';
 
-  // import Inspect from 'svelte-inspect-value';
+  import { onMount } from 'svelte';
 
-  import { Separator } from '$shadcn/ui/separator';
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
   import {
@@ -52,16 +51,10 @@
   <AppSidebar {sample} />
 
   <Sidebar.Inset class="overflow-y-auto">
-    <header class="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 bg-background px-4">
-      <Sidebar.Trigger class="-ms-1" />
-      <Separator orientation="vertical" class="me-2 data-[orientation=vertical]:h-4" />
-    </header>
-    <main class="mx-4 flex justify-center-safe">
+    <main class="m-8 flex justify-center-safe">
       <div class="max-w-[1920px] grow">
         {@render children?.()}
       </div>
     </main>
   </Sidebar.Inset>
 </Sidebar.Provider>
-
-<!-- <Inspect.Panel values={{ ...simulation }} /> -->
