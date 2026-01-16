@@ -29,7 +29,6 @@
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
   import { LineChart, SetupChecklist } from '$lib/ui';
-  import Description from '$lib/ui/Description.svelte';
   import Todo from '$lib/ui/Todo.svelte';
 
   // Compose type for type-safe options
