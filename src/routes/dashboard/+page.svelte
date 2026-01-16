@@ -29,7 +29,6 @@
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
   import { LineChart, SetupChecklist } from '$lib/ui';
-  import Todo from '$lib/ui/Todo.svelte';
 
   // Compose type for type-safe options
   type ECOption = ComposeOption<
@@ -185,14 +184,12 @@
         >
       </div> -->
       <div transition:fade class="relative flex flex-col gap-6 pt-4">
+        <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
+        <!-- TODO: Re-enable temperature result badges -->
+        <!-- TODO: Improve plot axis/zooming -->
         <!-- Conditionally show checklist or chart -->
         {#if hasAll}
           <div class="absolute inset-0" transition:fade>
-            <Todo
-              text="TODO: Add warning based on the expected temperature range that the dSdT data can apply to?"
-            />
-            <Todo text="TODO: Re-enable temperature result badges" />
-            <Todo text="TODO: Improve plot axis/zooming" />
             <LineChart {constant_options} {xAxis} {series} />
           </div>
         {:else}

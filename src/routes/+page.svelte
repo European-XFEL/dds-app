@@ -152,7 +152,7 @@
             </Card.Action>
             <Card.Description class="text-sm text-muted-foreground">
               Upload XYZ for ground and excited states. Supports arbitrary molecular geometries.
-              <!-- TODO: limit q and atoms -->
+              <!-- TODO: Limit upload file by no. of atoms -->
             </Card.Description>
           </Card.Header>
         </Card.Root>

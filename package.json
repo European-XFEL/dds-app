@@ -83,6 +83,7 @@
     "eslint-plugin-svelte": "^3.12.4",
     "globals": "^16.4.0",
     "katex": "^0.16.27",
+    "leasot": "^14.4.0",
     "mathjs": "^15.1.0",
     "matterviz": "^0.1.14",
     "paneforge": "^1.0.2",

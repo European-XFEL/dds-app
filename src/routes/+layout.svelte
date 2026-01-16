@@ -21,8 +21,7 @@
 
   const simulation: SimulationState = $state(simulationSeed);
 
-  // TODO: make this consistent - sample sets the maximum q values, user can set values
-  // lower than those, which then bins the data via frontend js
+  // TODO: make this consistent - sample sets the maximum q values, user can set values lower than those, which then bins the data via frontend js
   $effect(() => {
     simulation.qRange.min = simulation.sample.solvent?.qMin ?? 0;
     simulation.qRange.max = simulation.sample.solvent?.qMax ?? 0;
