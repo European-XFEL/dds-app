@@ -20,20 +20,14 @@ const qRange = {
   qStep: numeric({ mode: 'number' }).notNull(),
 };
 
-export const molecules = pgTable(
-  'molecules',
-  {
-    id: char({ length: 32 })
-      .primaryKey()
-      .$defaultFn(() => createId()),
-    name: text().unique().notNull(),
-    ...fileData,
-    ...timestamps,
-  },
-  (table) => ({
-    filenameUnique: unique().on(table.filename),
-  }),
-);
+export const molecules = pgTable('molecules', {
+  id: char({ length: 32 })
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: text().unique().notNull(),
+  ...fileData,
+  ...timestamps,
+});
 
 const { contents: _m_contents, ...moleculesInfo } = getTableColumns(molecules);
 
