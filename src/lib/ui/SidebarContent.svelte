@@ -4,6 +4,7 @@
     BookOpen,
     Flower,
     Fullscreen,
+    GitCompare,
     History,
     LayoutDashboard,
     Microscope,
@@ -25,12 +26,12 @@
         items: [
           {
             title: 'Dashboard',
-            url: '/',
+            url: '/dashboard',
             icon: LayoutDashboard,
           },
           {
             title: 'Flow',
-            url: '/flow',
+            // url: '/flow',
             icon: Flower,
             disabled: true,
           },
@@ -66,15 +67,17 @@
         title: 'Results',
         url: '#',
         items: [
-          // {
-          // 	title: 'Compare',
-          // 	url: '/results/patterns',
-          // 	icon: GitCompare
-          // },
+          {
+            title: 'Compare',
+            // url: '/results/compare',
+            icon: GitCompare,
+            disabled: true,
+          },
           {
             title: 'History',
-            url: '/results/history',
+            // url: '/results/history',
             icon: History,
+            disabled: true,
           },
         ],
       },
@@ -84,19 +87,21 @@
         items: [
           {
             title: 'Molecular Files',
-            url: '/define/upload',
+            // url: '/define/upload',
             icon: Upload,
-            isActive: true,
+            disabled: true,
           },
           {
             title: 'Solvents',
-            url: '/define/solvent',
+            // url: '/define/solvent',
             icon: Beaker,
+            disabled: true,
           },
           {
             title: 'Detectors',
-            url: '/define/detectors',
+            // url: '/define/detectors',
             icon: Microscope,
+            disabled: true,
           },
         ],
       },
@@ -124,7 +129,7 @@
                 {item.title}
               {/snippet}
               {#snippet child({ props })}
-                <a href={item.url} {...props}>
+                <a href={item?.url} {...props}>
                   <item.icon />
                   <span>{item.title}</span>
                 </a>
