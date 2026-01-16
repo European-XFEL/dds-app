@@ -36,6 +36,16 @@
     solventName: simulation.sample.solvent?.name,
     concentrationSoluteMolar: simulation.sample.concentrationSoluteMolar,
   });
+
+  function applySystemTheme() {
+    document.documentElement.classList.toggle(
+      'dark',
+      localStorage.theme === 'dark' ||
+        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    );
+  }
+
+  onMount(() => applySystemTheme());
 </script>
 
 <Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
