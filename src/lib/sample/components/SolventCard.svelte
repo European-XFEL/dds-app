@@ -49,7 +49,7 @@
   </Card.Header>
   <Card.Content>
     <div class="flex flex-col gap-6">
-      <SolventSelect bind:solvent {solvents} {short} {loading} />
+      <SolventSelect bind:solvent {solvents} {loading} />
       <SoluteConcentration bind:concentrationSoluteMolar />
     </div>
   </Card.Content>
