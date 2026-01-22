@@ -4,6 +4,9 @@
 
   import { onMount } from 'svelte';
 
+  import { resolve } from '$app/paths';
+  import { page } from '$app/state';
+
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
   import {
@@ -44,16 +47,22 @@
   }
 
   onMount(() => applySystemTheme());
+
+  const heroRoute = resolve('/');
 </script>
 
-<Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
-  <AppSidebar {sample} />
+{#if page.url.pathname !== heroRoute}
+  <Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
+    <AppSidebar {sample} />
 
-  <Sidebar.Inset class="overflow-y-auto">
-    <main class="m-8 flex justify-center-safe">
-      <div class="max-w-[1920px] grow">
-        {@render children?.()}
-      </div>
-    </main>
-  </Sidebar.Inset>
-</Sidebar.Provider>
+    <Sidebar.Inset class="overflow-y-auto">
+      <main class="m-8 flex justify-center-safe">
+        <div class="max-w-[1920px] grow">
+          {@render children?.()}
+        </div>
+      </main>
+    </Sidebar.Inset>
+  </Sidebar.Provider>
+{:else}
+  {@render children?.()}
+{/if}
