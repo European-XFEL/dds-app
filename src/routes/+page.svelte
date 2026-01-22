@@ -16,12 +16,13 @@
   import { Button } from '$shadcn/ui/button';
   import * as Card from '$shadcn/ui/card';
 
-  import { Latex } from '$lib/ui';
+  import { Latex, ScatteringBackground } from '$lib/ui';
 </script>
 
-<div class="flex grow justify-center-safe">
-  <div class="pointer-events-none absolute inset-0 overflow-hidden"></div>
-  <div class="flex w-full max-w-5xl flex-col gap-20 py-12">
+<ScatteringBackground />
+
+<div class="relative flex grow justify-center-safe overflow-hidden">
+  <div class="relative z-10 flex w-full max-w-5xl flex-col gap-20 py-12">
     <!-- Hero Section -->
     <section class="flex flex-col items-center gap-8 text-center lg:mt-12">
       <div class="flex flex-col gap-2">
