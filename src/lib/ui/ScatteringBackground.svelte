@@ -5,7 +5,8 @@
 
   // Detector configuration
   const PIXEL_SIZE = 8;
-  const PHOTON_RATE = 80;
+  const PHOTON_RATE_HIGH = 15000; // Rate during pulse
+  const PHOTON_RATE_LOW = 1000; // Rate during gap
   const MAX_INTENSITY = 40;
   const BEAM_CENTER_FRACTION = { x: 0.5, y: 0.4 };
 
@@ -13,8 +14,15 @@
   const RING_WIDTH = 0.04; // Narrower rings for sharper appearance
   const BACKGROUND_DECAY = 3.0; // Faster falloff
 
-  const PULSE_DURATION = 8; // Frames for pulse to fade
+  const PULSE_DURATION = 8; // Frames for pixel pulse to fade
   const PULSE_INTENSITY = 0.6; // How bright the pulse is (0-1)
+
+  // X-ray pulse timing (simulating FEL pulse structure)
+  const XRAY_PULSE_FRAMES = 10; // Duration of high-rate period
+  const XRAY_GAP_FRAMES = 30; // Duration of low-rate gap
+  const INTENSITY_DECAY_RATE = 0.92; // Per-frame multiplier for intensity decay (lower = faster fade)
+  let frameCounter = 0;
+  let PHOTON_RATE = PHOTON_RATE_LOW; // Declare PHOTON_RATE variable
 
   let canvas: HTMLCanvasElement = $state()!;
   let ctx: CanvasRenderingContext2D | null = null;
@@ -33,7 +41,7 @@
 
   function getPixelColor(counts: number, pulseT: number): string {
     if (counts === 0) {
-      return 'rgba(255, 255, 255, 0)'; // Transparent for empty pixels
+      return 'rgba(41, 36, 36, 0)'; // Transparent for empty pixels
     }
 
     const t = Math.min(counts / MAX_INTENSITY, 1);
@@ -136,22 +144,30 @@
   }
 
   function accumulatePhotons() {
-    for (let i = 0; i < pulseTimers.length; i++) {
+    // Decay all pixel intensities and update pulse timers
+    for (let i = 0; i < detectorPixels.length; i++) {
+      // Apply exponential decay to pixel intensity
+      if (detectorPixels[i] > 0.1) {
+        detectorPixels[i] *= INTENSITY_DECAY_RATE;
+      } else {
+        detectorPixels[i] = 0;
+      }
+
+      // Update pulse timers
       if (pulseTimers[i] > 0) {
         pulseTimers[i] -= 1 / PULSE_DURATION;
         if (pulseTimers[i] < 0) pulseTimers[i] = 0;
       }
     }
 
-    // Add new photon hits
+    // Add new photon hits at the current rate
     for (let i = 0; i < PHOTON_RATE; i++) {
       const hit = generatePhotonHit();
       if (hit) {
         const idx = hit.py * pixelsX + hit.px;
-        if (detectorPixels[idx] < MAX_INTENSITY) {
-          detectorPixels[idx] += 1;
-          pulseTimers[idx] = 1;
-        }
+        // Add intensity instead of capping, decay will handle the balance
+        detectorPixels[idx] = Math.min(detectorPixels[idx] + 2, MAX_INTENSITY);
+        pulseTimers[idx] = 1;
       }
     }
   }
@@ -178,9 +194,21 @@
   }
 
   function animate() {
+    // Update photon rate based on frame counter
+    if (frameCounter < XRAY_PULSE_FRAMES) {
+      PHOTON_RATE = PHOTON_RATE_HIGH;
+    } else {
+      PHOTON_RATE = PHOTON_RATE_LOW;
+    }
+
     accumulatePhotons();
     renderDetector();
     animationId = requestAnimationFrame(animate);
+
+    frameCounter++;
+    if (frameCounter >= XRAY_PULSE_FRAMES + XRAY_GAP_FRAMES) {
+      frameCounter = 0;
+    }
   }
 
   onMount(() => {
