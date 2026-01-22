@@ -110,6 +110,8 @@
 </script>
 
 <script lang="ts">
+  import { resolve } from '$app/paths';
+
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 </script>
 
@@ -129,7 +131,7 @@
                 {item.title}
               {/snippet}
               {#snippet child({ props })}
-                <a href={item?.url} {...props}>
+                <a href={item?.url ? resolve(item?.url) : undefined} {...props}>
                   <item.icon />
                   <span>{item.title}</span>
                 </a>
