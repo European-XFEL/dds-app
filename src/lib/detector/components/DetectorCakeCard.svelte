@@ -28,6 +28,8 @@
   }: Props = $props();
 </script>
 
+<!-- TODO: Realistic constraints for module movement -->
+
 <Card.Root class="w-full min-w-fit">
   <Card.Header class="relative gap-0">
     <Card.Title>Detector Caking Visualization</Card.Title>
