@@ -3,30 +3,67 @@
 
   import { browser } from '$app/environment';
 
-  // Detector configuration
-  const PIXEL_SIZE = 8;
-  const PHOTON_RATE_HIGH = 15000; // Rate during pulse
-  const PHOTON_RATE_LOW = 1000; // Rate during gap
-  const MAX_INTENSITY = 40;
-  const BEAM_CENTER_FRACTION = { x: 0.5, y: 0.4 };
+  const CONFIG = {
+    pixelSize: 8,
+    maxIntensity: 100,
+    beamCenter: { x: 0.5, y: 0.4 },
+    // Scattering pattern
+    rings: [0.12, 0.28, 0.48, 0.72] as const,
+    ringWidth: 0.04,
+    backgroundDecay: 3.0,
+    beamStopRadius: 0.04,
+    // Pulse timing (FEL structure)
+    pulseFrames: 15,
+    gapFrames: 60,
+    photonRateHigh: 20_000,
+    photonRateLow: 1_000,
+    // Visual
+    intensityDecay: 0.92,
+    pulseFadeDuration: 8,
+    pulseBoost: 0.6,
+  } as const;
 
-  const Q_RINGS = [0.12, 0.28, 0.48, 0.72];
-  const RING_WIDTH = 0.04; // Narrower rings for sharper appearance
-  const BACKGROUND_DECAY = 3.0; // Faster falloff
+  // === Precomputed color LUT (256 entries) ===
+  const COLOR_LUT = new Uint8Array(256 * 4); // RGBA for each intensity level
+  (function buildColorLUT() {
+    for (let i = 0; i < 256; i++) {
+      const t = i / 255;
+      let r: number, g: number, b: number, a: number;
 
-  const PULSE_DURATION = 8; // Frames for pixel pulse to fade
-  const PULSE_INTENSITY = 0.6; // How bright the pulse is (0-1)
+      if (t < 0.3) {
+        const s = t / 0.3;
+        r = 245 - s * 45;
+        g = 240 - s * 80;
+        b = 255 - s * 30;
+        a = (0.3 + s * 0.3) * 255;
+      } else if (t < 0.6) {
+        const s = (t - 0.3) / 0.3;
+        r = 200 - s * 70;
+        g = 160 - s * 80;
+        b = 225 - s * 25;
+        a = (0.6 + s * 0.2) * 255;
+      } else {
+        const s = (t - 0.6) / 0.4;
+        r = 130 - s * 50;
+        g = 80 - s * 50;
+        b = 200 + s * 30;
+        a = (0.8 + s * 0.2) * 255;
+      }
 
-  // X-ray pulse timing (simulating FEL pulse structure)
-  const XRAY_PULSE_FRAMES = 10; // Duration of high-rate period
-  const XRAY_GAP_FRAMES = 30; // Duration of low-rate gap
-  const INTENSITY_DECAY_RATE = 0.92; // Per-frame multiplier for intensity decay (lower = faster fade)
-  let frameCounter = 0;
-  let PHOTON_RATE = PHOTON_RATE_LOW; // Declare PHOTON_RATE variable
+      const idx = i * 4;
+      COLOR_LUT[idx] = r;
+      COLOR_LUT[idx + 1] = g;
+      COLOR_LUT[idx + 2] = b;
+      COLOR_LUT[idx + 3] = a;
+    }
+  })();
 
+  // === State ===
   let canvas: HTMLCanvasElement = $state()!;
   let ctx: CanvasRenderingContext2D | null = null;
+  let imageData: ImageData;
   let animationId: number;
+
   let width = 0;
   let height = 0;
   let pixelsX = 0;
@@ -34,68 +71,86 @@
   let beamCenterX = 0;
   let beamCenterY = 0;
   let maxRadius = 0;
+  let frameCounter = 0;
 
-  // Detector pixel array - stores accumulated photon counts
-  let detectorPixels: Float32Array;
+  // Typed arrays for detector state
+  let intensities: Float32Array;
   let pulseTimers: Float32Array;
+  let probabilityMap: Float32Array; // Precomputed scattering probabilities
+  let cumulativeProb: Float32Array; // For weighted random sampling
 
-  function getPixelColor(counts: number, pulseT: number): string {
-    if (counts === 0) {
-      return 'rgba(41, 36, 36, 0)'; // Transparent for empty pixels
+  // === Scattering intensity function (called once per pixel on init) ===
+  function computeScatteringIntensity(normalizedRadius: number): number {
+    let intensity = Math.exp(-normalizedRadius * CONFIG.backgroundDecay);
+
+    // Ring features
+    const sigma = CONFIG.ringWidth * 0.3;
+    const twoSigmaSq = 2 * sigma * sigma;
+    for (const qRing of CONFIG.rings) {
+      const distance = Math.abs(normalizedRadius - qRing);
+      if (distance < CONFIG.ringWidth * 2) {
+        intensity += Math.exp(-(distance * distance) / twoSigmaSq) * 0.8 * (1 - qRing * 0.5);
+      }
     }
 
-    const t = Math.min(counts / MAX_INTENSITY, 1);
-
-    // Base color progression: light lavender -> purple -> deep violet
-    let r: number, g: number, b: number, a: number;
-
-    if (t < 0.3) {
-      // Light lavender
-      const s = t / 0.3;
-      r = Math.floor(245 - s * 45);
-      g = Math.floor(240 - s * 80);
-      b = Math.floor(255 - s * 30);
-      a = 0.3 + s * 0.3;
-    } else if (t < 0.6) {
-      // Lavender to purple
-      const s = (t - 0.3) / 0.3;
-      r = Math.floor(200 - s * 70);
-      g = Math.floor(160 - s * 80);
-      b = Math.floor(225 - s * 25);
-      a = 0.6 + s * 0.2;
-    } else {
-      // Purple to deep violet
-      const s = (t - 0.6) / 0.4;
-      r = Math.floor(130 - s * 50);
-      g = Math.floor(80 - s * 50);
-      b = Math.floor(200 + s * 30);
-      a = 0.8 + s * 0.2;
+    // Beam stop
+    if (normalizedRadius < CONFIG.beamStopRadius) {
+      intensity *= normalizedRadius / CONFIG.beamStopRadius;
     }
 
-    if (pulseT > 0) {
-      const pulseBoost = pulseT * PULSE_INTENSITY;
-      r = Math.min(255, r + Math.floor(pulseBoost * (255 - r)));
-      g = Math.min(255, g + Math.floor(pulseBoost * (255 - g)));
-      b = Math.min(255, b + Math.floor(pulseBoost * 100));
-      a = Math.min(1, a + pulseBoost * 0.3);
-    }
-
-    return `rgba(${r},${g},${b},${a})`;
+    return Math.min(intensity, 1);
   }
 
+  // === Initialize detector and precompute probability map ===
   function initDetector() {
-    pixelsX = Math.ceil(width / PIXEL_SIZE);
-    pixelsY = Math.ceil(height / PIXEL_SIZE);
-    beamCenterX = pixelsX * BEAM_CENTER_FRACTION.x;
-    beamCenterY = pixelsY * BEAM_CENTER_FRACTION.y;
+    pixelsX = Math.ceil(width / CONFIG.pixelSize);
+    pixelsY = Math.ceil(height / CONFIG.pixelSize);
+    beamCenterX = pixelsX * CONFIG.beamCenter.x;
+    beamCenterY = pixelsY * CONFIG.beamCenter.y;
     maxRadius = Math.sqrt(pixelsX * pixelsX + pixelsY * pixelsY) / 2;
 
-    detectorPixels = new Float32Array(pixelsX * pixelsY);
-    pulseTimers = new Float32Array(pixelsX * pixelsY);
+    const numPixels = pixelsX * pixelsY;
+    intensities = new Float32Array(numPixels);
+    pulseTimers = new Float32Array(numPixels);
+    probabilityMap = new Float32Array(numPixels);
+    cumulativeProb = new Float32Array(numPixels);
+
+    // Precompute scattering probability for each pixel
+    let cumulative = 0;
+    for (let py = 0; py < pixelsY; py++) {
+      for (let px = 0; px < pixelsX; px++) {
+        const idx = py * pixelsX + px;
+        const dx = px - beamCenterX;
+        const dy = py - beamCenterY;
+        const normalizedRadius = Math.sqrt(dx * dx + dy * dy) / maxRadius;
+        const prob = computeScatteringIntensity(normalizedRadius);
+        probabilityMap[idx] = prob;
+        cumulative += prob;
+        cumulativeProb[idx] = cumulative;
+      }
+    }
+
+    // Normalize cumulative distribution
+    if (cumulative > 0) {
+      for (let i = 0; i < numPixels; i++) {
+        cumulativeProb[i] /= cumulative;
+      }
+    }
+
+    // Create ImageData for direct pixel manipulation
+    imageData = ctx!.createImageData(width, height);
+    // Fill with background color (off-white)
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = 250;
+      data[i + 1] = 250;
+      data[i + 2] = 252;
+      data[i + 3] = 255;
+    }
   }
 
   function resize() {
-    if (!canvas) return;
+    if (!canvas || !ctx) return;
     width = canvas.offsetWidth;
     height = canvas.offsetHeight;
     canvas.width = width;
@@ -103,118 +158,128 @@
     initDetector();
   }
 
-  function scatteringIntensity(normalizedRadius: number): number {
-    let intensity = Math.exp(-normalizedRadius * BACKGROUND_DECAY);
-
-    // Sharper ring features with stronger peaks
-    for (const qRing of Q_RINGS) {
-      const distance = Math.abs(normalizedRadius - qRing);
-      if (distance < RING_WIDTH * 2) {
-        // Sharper Gaussian ring
-        const sigma = RING_WIDTH * 0.3;
-        const ringIntensity = Math.exp(-(distance * distance) / (2 * sigma * sigma));
-        intensity += ringIntensity * 0.8 * (1 - qRing * 0.5);
-      }
-    }
-
-    // Beam stop region
-    if (normalizedRadius < 0.04) {
-      intensity *= normalizedRadius / 0.04;
-    }
-
-    return Math.min(intensity, 1);
-  }
-
-  function generatePhotonHit(): { px: number; py: number } | null {
-    for (let attempt = 0; attempt < 10; attempt++) {
-      const px = Math.floor(Math.random() * pixelsX);
-      const py = Math.floor(Math.random() * pixelsY);
-
-      const dx = px - beamCenterX;
-      const dy = py - beamCenterY;
-      const radius = Math.sqrt(dx * dx + dy * dy);
-      const normalizedRadius = radius / maxRadius;
-
-      const intensity = scatteringIntensity(normalizedRadius);
-      if (Math.random() < intensity) {
-        return { px, py };
-      }
-    }
-    return null;
-  }
-
-  function accumulatePhotons() {
-    // Decay all pixel intensities and update pulse timers
-    for (let i = 0; i < detectorPixels.length; i++) {
-      // Apply exponential decay to pixel intensity
-      if (detectorPixels[i] > 0.1) {
-        detectorPixels[i] *= INTENSITY_DECAY_RATE;
+  // === Binary search for weighted random pixel selection ===
+  function samplePhotonPixel(): number {
+    const r = Math.random();
+    let lo = 0;
+    let hi = cumulativeProb.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >>> 1;
+      if (cumulativeProb[mid] < r) {
+        lo = mid + 1;
       } else {
-        detectorPixels[i] = 0;
+        hi = mid;
       }
+    }
+    return lo;
+  }
 
-      // Update pulse timers
+  // === Main update loop ===
+  function update() {
+    const decayRate = CONFIG.intensityDecay;
+    const pulseFade = 1 / CONFIG.pulseFadeDuration;
+    const numPixels = intensities.length;
+
+    // Decay intensities and pulse timers (single pass)
+    for (let i = 0; i < numPixels; i++) {
+      if (intensities[i] > 0.1) {
+        intensities[i] *= decayRate;
+      } else {
+        intensities[i] = 0;
+      }
       if (pulseTimers[i] > 0) {
-        pulseTimers[i] -= 1 / PULSE_DURATION;
-        if (pulseTimers[i] < 0) pulseTimers[i] = 0;
+        pulseTimers[i] = Math.max(0, pulseTimers[i] - pulseFade);
       }
     }
 
-    // Add new photon hits at the current rate
-    for (let i = 0; i < PHOTON_RATE; i++) {
-      const hit = generatePhotonHit();
-      if (hit) {
-        const idx = hit.py * pixelsX + hit.px;
-        // Add intensity instead of capping, decay will handle the balance
-        detectorPixels[idx] = Math.min(detectorPixels[idx] + 2, MAX_INTENSITY);
-        pulseTimers[idx] = 1;
-      }
+    // Add photons based on current pulse phase
+    const isInPulse = frameCounter < CONFIG.pulseFrames;
+    const photonCount = isInPulse ? CONFIG.photonRateHigh : CONFIG.photonRateLow;
+
+    for (let i = 0; i < photonCount; i++) {
+      const idx = samplePhotonPixel();
+      intensities[idx] = Math.min(intensities[idx] + 2, CONFIG.maxIntensity);
+      pulseTimers[idx] = 1;
     }
   }
 
-  function renderDetector() {
-    if (!ctx) return;
+  // === Render to ImageData (much faster than fillRect calls) ===
+  function render() {
+    if (!ctx || !imageData) return;
 
-    ctx.fillStyle = 'rgb(250, 250, 252)';
-    ctx.fillRect(0, 0, width, height);
+    const data = imageData.data;
+    const ps = CONFIG.pixelSize;
+    const maxInt = CONFIG.maxIntensity;
+    const pulseBoost = CONFIG.pulseBoost;
 
-    // Render each detector pixel
+    // Reset to background
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = 250;
+      data[i + 1] = 250;
+      data[i + 2] = 252;
+      data[i + 3] = 255;
+    }
+
+    // Render detector pixels
     for (let py = 0; py < pixelsY; py++) {
       for (let px = 0; px < pixelsX; px++) {
         const idx = py * pixelsX + px;
-        const counts = detectorPixels[idx];
-        const pulseT = pulseTimers[idx];
+        const intensity = intensities[idx];
 
-        if (counts > 0) {
-          ctx.fillStyle = getPixelColor(counts, pulseT);
-          ctx.fillRect(px * PIXEL_SIZE, py * PIXEL_SIZE, PIXEL_SIZE - 1, PIXEL_SIZE - 1);
+        if (intensity < 0.1) continue;
+
+        // Look up base color from LUT
+        const lutIdx = Math.min(255, Math.floor((intensity / maxInt) * 255)) * 4;
+        let r = COLOR_LUT[lutIdx];
+        let g = COLOR_LUT[lutIdx + 1];
+        let b = COLOR_LUT[lutIdx + 2];
+        let a = COLOR_LUT[lutIdx + 3];
+
+        // Apply pulse boost
+        const pulse = pulseTimers[idx];
+        if (pulse > 0) {
+          const boost = pulse * pulseBoost;
+          r = Math.min(255, r + boost * (255 - r));
+          g = Math.min(255, g + boost * (255 - g));
+          b = Math.min(255, b + boost * 100);
+          a = Math.min(255, a + boost * 76);
+        }
+
+        // Fill pixel block (leaving 1px gap for grid effect)
+        const startX = px * ps;
+        const startY = py * ps;
+        const endX = Math.min(startX + ps - 1, width);
+        const endY = Math.min(startY + ps - 1, height);
+
+        for (let y = startY; y < endY; y++) {
+          for (let x = startX; x < endX; x++) {
+            const i = (y * width + x) * 4;
+            // Alpha blend with background
+            const alpha = a / 255;
+            data[i] = Math.floor(r * alpha + 250 * (1 - alpha));
+            data[i + 1] = Math.floor(g * alpha + 250 * (1 - alpha));
+            data[i + 2] = Math.floor(b * alpha + 252 * (1 - alpha));
+            data[i + 3] = 255;
+          }
         }
       }
     }
+
+    ctx.putImageData(imageData, 0, 0);
   }
 
   function animate() {
-    // Update photon rate based on frame counter
-    if (frameCounter < XRAY_PULSE_FRAMES) {
-      PHOTON_RATE = PHOTON_RATE_HIGH;
-    } else {
-      PHOTON_RATE = PHOTON_RATE_LOW;
-    }
+    update();
+    render();
 
-    accumulatePhotons();
-    renderDetector();
+    frameCounter = (frameCounter + 1) % (CONFIG.pulseFrames + CONFIG.gapFrames);
     animationId = requestAnimationFrame(animate);
-
-    frameCounter++;
-    if (frameCounter >= XRAY_PULSE_FRAMES + XRAY_GAP_FRAMES) {
-      frameCounter = 0;
-    }
   }
 
   onMount(() => {
     if (!browser) return;
 
-    ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d', { alpha: false });
     resize();
     animate();
 
@@ -222,9 +287,7 @@
 
     return () => {
       window.removeEventListener('resize', resize);
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-      }
+      cancelAnimationFrame(animationId);
     };
   });
 </script>
