@@ -22,7 +22,7 @@
 <ScatteringBackground />
 
 <div class="relative flex grow justify-center-safe overflow-hidden">
-  <div class="relative z-10 flex w-full max-w-5xl flex-col gap-20 py-12">
+  <div class="relative z-10 flex w-full max-w-5xl flex-col gap-10">
     <!-- Hero Section -->
     <section class="flex flex-col items-center gap-8 text-center lg:mt-12">
       <div class="flex flex-col gap-2">
