@@ -2,4 +2,4 @@ export { default as DetectorCakeCard } from './components/DetectorCakeCard.svelt
 export { default as DetectorInfoCard } from './components/DetectorInfoCard.svelte';
 export { default as DetectorSetupCard } from './components/DetectorSetupCard.svelte';
 
-export type * from './types';
+export type * from './types.ts';

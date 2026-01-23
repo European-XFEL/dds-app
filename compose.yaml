@@ -1,0 +1,99 @@
+services:
+  db:
+    image: postgres:18
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${DB_USER:?error}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?error}
+      POSTGRES_DB: ${DB_NAME:?error}
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  backend:
+    build: ./backend
+    ports:
+      - "50051:50051"
+
+  web-dev:
+    build:
+      context: .
+      target: dev
+    profiles: ["dev"]
+    ports:
+      - "5173:5173"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "5173"
+      DB_HOST: "db:5432"
+      DB_USER: "${DB_USER:?error}"
+      DB_PASSWORD: "${DB_PASSWORD:?error}"
+      DB_NAME: "${DB_NAME:?error}"
+      BACKEND_URL: "http://backend:50051"
+    depends_on:
+      - db
+      - backend
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+        - action: rebuild
+          path: ./deno.json
+        - action: rebuild
+          path: ./deno.lock
+        - action: rebuild
+          path: ./package.json
+
+  web-preview:
+    build:
+      context: .
+      target: preview
+    profiles: ["preview"]
+    ports:
+      - "4173:4173"
+
+  web:
+    build:
+      context: .
+      target: prod
+    profiles: ["prod"]
+    ports:
+      - "3000:3000"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "3000"
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    profiles: ["ts"]
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "false"
+    command: >
+      sh -lc '
+        tailscaled --state=${TS_STATE_DIR}/tailscaled.state &
+        until tailscale status >/dev/null 2>&1; do sleep 0.5; done
+
+        # Proxy HTTPS on :443 to your internal app:4173
+        tailscale serve https / http://web-dev:4173
+
+        # Make it publicly reachable (unencrypted-inbound is still HTTPS to users)
+        tailscale funnel 443 on
+
+        # keep container alive
+        tail -f /dev/null
+      '
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  tailscale-state:

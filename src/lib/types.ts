@@ -1,11 +1,11 @@
-import type * as protoFiles from '$lib/server/grpc/gen/files_pb';
-import type * as protoSim from '$lib/server/grpc/gen/simulation_pb';
+import type * as protoFiles from './server/grpc/gen/files_pb.ts';
+import type * as protoSim from './server/grpc/gen/simulation_pb.ts';
 
-export * from './detector/types';
-export * from './probe/types';
-export * from './pump/types';
-export * from './sample/types';
-export * from './simulation/types';
+export * from './detector/types.ts';
+export * from './probe/types.ts';
+export * from './pump/types.ts';
+export * from './sample/types.ts';
+export * from './simulation/types.ts';
 
 export type RealismFlags = {
   applyGeometryMask: boolean;
