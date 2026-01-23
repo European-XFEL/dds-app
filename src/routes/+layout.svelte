@@ -1,10 +1,8 @@
 <script lang="ts">
   import '$css';
-  import '@xyflow/svelte/dist/style.css';
 
   import { onMount } from 'svelte';
 
-  import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
@@ -47,22 +45,18 @@
   }
 
   onMount(() => applySystemTheme());
-
-  const heroRoute = resolve('/');
 </script>
 
-{#if page.url.pathname !== heroRoute}
-  <Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
+<Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
+  {#if page.url.pathname !== '/'}
     <AppSidebar {sample} />
+  {/if}
 
-    <Sidebar.Inset class="overflow-y-auto">
-      <main class="m-8 flex justify-center-safe">
-        <div class="max-w-[1920px] grow">
-          {@render children?.()}
-        </div>
-      </main>
-    </Sidebar.Inset>
-  </Sidebar.Provider>
-{:else}
-  {@render children?.()}
-{/if}
+  <Sidebar.Inset class="overflow-y-auto">
+    <main class="m-8 flex justify-center-safe">
+      <div class="max-w-[1920px] grow">
+        {@render children?.()}
+      </div>
+    </main>
+  </Sidebar.Inset>
+</Sidebar.Provider>
