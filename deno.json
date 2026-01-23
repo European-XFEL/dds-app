@@ -1,0 +1,13 @@
+{
+  "exclude": [
+    ".storybook",
+    ".svelte-kit",
+    "backend/",
+    "src/lib/server/grpc/gen/",
+    "src/lib/shadcn"
+  ],
+  "fmt": {
+    "semiColons": true,
+    "singleQuote": true
+  }
+}

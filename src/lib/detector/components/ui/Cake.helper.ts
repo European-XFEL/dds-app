@@ -37,7 +37,10 @@ function rangeSpan([min, max]: RangeTuple): number {
 /**
  * Convert a radial distance on the detector plane to the scattering angle 2θ (degrees).
  */
-export function radiusToTwoTheta(radius: number, detectorDistance: number): number {
+export function radiusToTwoTheta(
+  radius: number,
+  detectorDistance: number,
+): number {
   if (detectorDistance === 0) {
     return 0;
   }
@@ -148,7 +151,9 @@ function quadToSvgPath(
 
   return (
     svgPoints
-      .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+      .map((p, i) =>
+        `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`
+      )
       .join(' ') + ' Z'
   );
 }
@@ -175,16 +180,22 @@ export function tessellatedModuleToSvgPaths(
           ...c,
           phi: c.phi < 0 ? c.phi + TAU : c.phi,
         }));
-        paths.push(quadToSvgPath(cornersShiftedUp, viewShape, twoThetaRange, chiRange));
+        paths.push(
+          quadToSvgPath(cornersShiftedUp, viewShape, twoThetaRange, chiRange),
+        );
 
         const cornersShiftedDown = quad.corners.map((c) => ({
           ...c,
           phi: c.phi > 0 ? c.phi - TAU : c.phi,
         }));
-        paths.push(quadToSvgPath(cornersShiftedDown, viewShape, twoThetaRange, chiRange));
+        paths.push(
+          quadToSvgPath(cornersShiftedDown, viewShape, twoThetaRange, chiRange),
+        );
       }
     } else {
-      paths.push(quadToSvgPath(quad.corners, viewShape, twoThetaRange, chiRange));
+      paths.push(
+        quadToSvgPath(quad.corners, viewShape, twoThetaRange, chiRange),
+      );
     }
   }
 
@@ -207,8 +218,13 @@ export function generateCakedGridLines(
   const thetaSpan = rangeSpan(twoThetaRange);
   const twoThetaLines: number[] = [];
   if (twoThetaStepDegrees > 0) {
-    const start = Math.ceil(twoThetaMin / twoThetaStepDegrees) * twoThetaStepDegrees;
-    for (let theta = start; theta <= twoThetaMax + 1e-6; theta += twoThetaStepDegrees) {
+    const start = Math.ceil(twoThetaMin / twoThetaStepDegrees) *
+      twoThetaStepDegrees;
+    for (
+      let theta = start;
+      theta <= twoThetaMax + 1e-6;
+      theta += twoThetaStepDegrees
+    ) {
       const x = ((theta - twoThetaMin) / thetaSpan) * viewShape.width;
       twoThetaLines.push(x);
     }
@@ -217,7 +233,11 @@ export function generateCakedGridLines(
   const chiStepRad = (chiStepDegrees * Math.PI) / 180;
   const chiLines: number[] = [];
   const chiSpan = rangeSpan(chiRange);
-  for (let chi = Math.ceil(chiMin / chiStepRad) * chiStepRad; chi <= chiMax; chi += chiStepRad) {
+  for (
+    let chi = Math.ceil(chiMin / chiStepRad) * chiStepRad;
+    chi <= chiMax;
+    chi += chiStepRad
+  ) {
     const y = ((chi - chiMin) / chiSpan) * viewShape.height;
     chiLines.push(y);
   }
@@ -238,6 +258,7 @@ const tailwind_gradient_tokens = [
 
 export function resolveModuleColour(index: number, explicit?: string): string {
   if (explicit) return explicit;
-  const token = tailwind_gradient_tokens[index % tailwind_gradient_tokens.length];
+  const token =
+    tailwind_gradient_tokens[index % tailwind_gradient_tokens.length];
   return `var(${token})`;
 }

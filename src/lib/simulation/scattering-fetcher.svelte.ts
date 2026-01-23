@@ -29,7 +29,8 @@ export async function fetchDeltaSSolute(
 
   // Validate Q ranges match
   if (
-    ground.q.map((v) => v.toFixed(6)).toString() !== excited.q.map((v) => v.toFixed(6)).toString()
+    ground.q.map((v) => v.toFixed(6)).toString() !==
+      excited.q.map((v) => v.toFixed(6)).toString()
   ) {
     throw new Error('Q ranges of ground and excited states do not match.');
   }
@@ -57,7 +58,12 @@ export async function fetchDeltaSSolvent(
 export function createScatteringResource<T>(
   fetcher: () => Promise<T | null>,
   deps: () => boolean,
-): { value: T | null; loading: boolean; error: Error | null; refetch: () => void } {
+): {
+  value: T | null;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => void;
+} {
   let value = $state<T | null>(null);
   let loading = $state(false);
   let error = $state<Error | null>(null);
