@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { listMolecules } from '../../../data.remote';
+  import { listMolecules } from '$lib/data.remote';
 
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';

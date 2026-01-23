@@ -1,8 +1,9 @@
 **
 !/src/**
 !/static/**
+!/deno.json
+!/deno.lock
 !/package.json
-!/pnpm-lock.yaml
 !/vite.config.ts
 !/svelte.config.js
 !/drizzle.config.ts

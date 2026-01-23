@@ -1,62 +1,48 @@
 # syntax=docker/dockerfile:1.20
 
-# Base
-FROM node:22-alpine AS base
-
+FROM denoland/deno:2.6.5 AS deps
 WORKDIR /app
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-ENV NODE_ENV="production"
-ENV DATABASE_URL="/app/local.db"
+COPY deno.json* deno.lock* package.json* ./
 
-RUN corepack enable pnpm
+RUN --mount=type=cache,target=/deno-dir \
+    deno install
 
-# Dependencies
-FROM base AS deps
 
-COPY package.json pnpm-lock.yaml ./
+FROM deps AS dev
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm fetch --frozen-lockfile && \
-    pnpm install --frozen-lockfile
+COPY . .
 
-# Seed
-FROM deps AS db-seed
+EXPOSE 5173
+ENV HOST=0.0.0.0
+ENV PORT=5173
 
-COPY --parents ./drizzle.config.ts ./src/data ./src/lib/server/db ./src/lib/server/thermo.ts ./
+CMD ["deno", "task", "dev", "--host", "0.0.0.0", "--port", "5173"]
 
-RUN pnpm run db:push --force && pnpm run db:seed
 
-# Build
-FROM base AS build
+FROM dev AS build
 
-COPY . ./
+RUN deno task build
 
-RUN pnpm run build
 
-# Development/Preview
-FROM build AS dev
+FROM build AS preview
+
+COPY --from=build /app/ /app/
 
 EXPOSE 4173
+ENV HOST=0.0.0.0
+ENV PORT=4173
 
-CMD [ "pnpm", "run", "preview", "--host", "0.0.0.0" ]
+CMD ["deno", "task", "preview"]
 
-# Production
-FROM base AS prod
 
-ENV DATABASE_URL="/app/local.db"
+FROM denoland/deno:2.6.5 AS prod
 
-# Copy package files and install production dependencies only
-COPY --from=build /app/package.json /app/pnpm-lock.yaml ./
-
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile --prod
-
-# Copy build output and database
-COPY --from=build /app/build ./build
-COPY --from=build /app/local.db ./local.db
+COPY --from=build /app/.deno-deploy ./.deno-deploy
+COPY --from=build /app/deno.json* /app/deno.lock* /app/package.json ./
 
 EXPOSE 3000
+ENV HOST=0.0.0.0
+ENV PORT=3000
 
-CMD [ "node", "build" ]
+CMD ["deno", "run", "-A", "./.deno-deploy/server.ts"]

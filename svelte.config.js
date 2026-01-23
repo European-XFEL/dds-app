@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from "@deno/svelte-adapter";
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -12,6 +12,7 @@ const config = {
       $css: './src/app.css',
       $components: './src/components',
       $shadcn: './src/lib/shadcn/components',
+      $data: './src/data',
     },
     experimental: {
       remoteFunctions: true,

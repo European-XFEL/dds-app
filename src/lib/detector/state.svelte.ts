@@ -1,6 +1,6 @@
-import { resolveModuleColour } from './components/ui/Cake.helper';
-import * as qConvert from './components/ui/DetectorInfo.helper';
-import { type CartesianPoint, type Detector, type DetectorModule, type Shape } from './types';
+import { resolveModuleColour } from './components/ui/Cake.helper.ts';
+import * as qConvert from './components/ui/DetectorInfo.helper.ts';
+import { type CartesianPoint, type Detector, type DetectorModule, type Shape } from './types.ts';
 
 const DEFAULT_DETECTORS = {
   LPD: {

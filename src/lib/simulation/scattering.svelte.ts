@@ -1,7 +1,7 @@
 import type { SimulationState } from '$lib/state.svelte';
 import { throttled } from '$lib/utils/throttled.svelte';
 
-import { EV_TO_JOULES, N_AVOGADRO } from './constants';
+import { EV_TO_JOULES, N_AVOGADRO } from './constants.ts';
 
 export type ScatteringData = {
   q: number[];

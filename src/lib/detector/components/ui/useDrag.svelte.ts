@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import { onDestroy } from 'svelte';
 
 import type { CartesianPoint } from '$lib/types';
@@ -45,8 +46,8 @@ export function useDrag(options: DragOptions): DragState {
       };
     }
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    globalThis.addEventListener('mousemove', handleMouseMove);
+    globalThis.addEventListener('mouseup', handleMouseUp);
   }
 
   function handleMouseMove(event: MouseEvent) {
@@ -67,10 +68,10 @@ export function useDrag(options: DragOptions): DragState {
   }
 
   function removeGlobalListeners() {
-    if (typeof window === 'undefined') return;
+    if (typeof globalThis === 'undefined') return;
 
-    window.removeEventListener('mousemove', handleMouseMove);
-    window.removeEventListener('mouseup', handleMouseUp);
+    globalThis.removeEventListener('mousemove', handleMouseMove);
+    globalThis.removeEventListener('mouseup', handleMouseUp);
   }
 
   onDestroy(() => {

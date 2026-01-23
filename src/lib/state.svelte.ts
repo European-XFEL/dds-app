@@ -1,7 +1,7 @@
 import { getContext, hasContext, setContext } from 'svelte';
 
 import { DetectorState } from '$lib/detector/state.svelte';
-import { SampleState } from '$lib/sample/state.svelte.ts';
+import { SampleState } from '$lib/sample/state.svelte';
 import type { SimulationDetails } from '$lib/types';
 
 const initialSeed = {
