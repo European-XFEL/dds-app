@@ -1,12 +1,21 @@
 import { createId } from '@paralleldrive/cuid2';
 import { getTableColumns } from 'drizzle-orm';
-import { char, numeric, pgTable, text, timestamp, unique } from 'drizzle-orm/pg-core';
+import {
+  char,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+} from 'drizzle-orm/pg-core';
 
 const timestamps = {
   createdAt: timestamp({ mode: 'date', precision: 3 })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() => new Date()),
+  updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() =>
+    new Date()
+  ),
 };
 
 const fileData = {

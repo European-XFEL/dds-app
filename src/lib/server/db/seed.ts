@@ -1,19 +1,19 @@
-import solvents_data from "$data/solvents.json" with { type: "json" };
-import fs from "node:fs/promises";
-import Papa from "papaparse";
-import * as path from "node:path";
+import solvents_data from '$data/solvents.json' with { type: 'json' };
+import fs from 'node:fs/promises';
+import Papa from 'papaparse';
+import * as path from 'node:path';
 
-import { molecules, solvents } from "./schema.ts";
-import { type DB, db } from "./index.ts";
-import process from "node:process";
+import { molecules, solvents } from './schema.ts';
+import { type DB, db } from './index.ts';
+import process from 'node:process';
 
 /**
  * Bootstrap the database with initial molecule and solvent data from files.
  * Uses onConflictDoNothing to safely handle duplicate entries.
  */
 export async function bootstrap(
-  molecules_dir = "./src/data/molecules",
-  solvents_dir = "./src/data/solvents",
+  molecules_dir = './src/data/molecules',
+  solvents_dir = './src/data/solvents',
 ) {
   // Run molecule and solvent seeding in parallel
   await Promise.all([
@@ -28,14 +28,14 @@ export async function bootstrap(
  */
 async function seedMolecules(db: DB, directory: string) {
   const files = await fs.readdir(directory);
-  const xyzFiles = files.filter((file) => file.endsWith(".xyz"));
+  const xyzFiles = files.filter((file) => file.endsWith('.xyz'));
 
   // Read all files in parallel
   const moleculeData = await Promise.all(
     xyzFiles.map(async (filename) => {
       const filePath = path.join(directory, filename);
-      const contents = await fs.readFile(filePath, "utf-8");
-      const name = path.basename(filename, ".xyz");
+      const contents = await fs.readFile(filePath, 'utf-8');
+      const name = path.basename(filename, '.xyz');
       return { name, filename, contents };
     }),
   );
@@ -59,14 +59,14 @@ type SolventDifferentials = {
 };
 
 const solvent_name_map: { [key: string]: string } = {
-  CCl4: "carbon tetrachloride",
-  CH2Cl2: "dichloromethane",
-  CHCl3: "chloroform",
-  Cyclohexane: "cyclohexane",
-  EtOH: "ethanol",
-  "KMnO4-H2O": "potassium permanganate",
-  MeOH: "methanol",
-  MeCN: "acetonitrile",
+  CCl4: 'carbon tetrachloride',
+  CH2Cl2: 'dichloromethane',
+  CHCl3: 'chloroform',
+  Cyclohexane: 'cyclohexane',
+  EtOH: 'ethanol',
+  'KMnO4-H2O': 'potassium permanganate',
+  MeOH: 'methanol',
+  MeCN: 'acetonitrile',
 };
 
 /**
@@ -76,22 +76,22 @@ const solvent_name_map: { [key: string]: string } = {
 async function seedSolvents(db: DB, directory: string) {
   const files = await fs.readdir(directory);
   const solventFiles = files.filter(
-    (file) => file.endsWith(".txt") && !file.endsWith("-error.txt"),
+    (file) => file.endsWith('.txt') && !file.endsWith('-error.txt'),
   );
 
   // Read all files and start chemical queries in parallel
   const solventDataPromises = solventFiles.map(async (filename) => {
     const filePath = path.join(directory, filename);
-    const contents = await fs.readFile(filePath, "utf-8");
+    const contents = await fs.readFile(filePath, 'utf-8');
     const fileName = path.parse(filename).name;
     const name = solvent_name_map[fileName] || fileName;
 
     let rhom = undefined;
     let cpm = undefined;
 
-    const contentsCsv = "Q\tdSdT\tdSdRho\n" + contents.replaceAll(/#.*\n/g, "");
+    const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents.replaceAll(/#.*\n/g, '');
     const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
-      delimiter: "\t",
+      delimiter: '\t',
       dynamicTyping: false,
       header: true,
       skipEmptyLines: true,
@@ -117,7 +117,7 @@ async function seedSolvents(db: DB, directory: string) {
       rhom = parseFloat(saved_solvent_data.rhom);
       cpm = parseFloat(saved_solvent_data.cpm);
     } else {
-      const queryChemicalPyodide = await import("../thermo.ts").then(
+      const queryChemicalPyodide = await import('../thermo.ts').then(
         (mod) => mod.queryChemicalPyodide,
       );
       const chemPromise = queryChemicalPyodide(name);
@@ -157,10 +157,10 @@ async function seedSolvents(db: DB, directory: string) {
 // Run bootstrap when executed directly
 bootstrap()
   .then(() => {
-    console.log("Database seeded successfully");
+    console.log('Database seeded successfully');
     process.exit(0);
   })
   .catch((error) => {
-    console.error("Error seeding database:", error);
+    console.error('Error seeding database:', error);
     process.exit(1);
   });

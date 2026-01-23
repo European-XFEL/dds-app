@@ -14,23 +14,23 @@ services:
   backend:
     build: ./backend
     ports:
-      - "50051:50051"
+      - '50051:50051'
 
   web-dev:
     build:
       context: .
       target: dev
-    profiles: ["dev"]
+    profiles: ['dev']
     ports:
-      - "5173:5173"
+      - '5173:5173'
     environment:
-      HOST: "0.0.0.0"
-      PORT: "5173"
-      DB_HOST: "db:5432"
-      DB_USER: "${DB_USER:?error}"
-      DB_PASSWORD: "${DB_PASSWORD:?error}"
-      DB_NAME: "${DB_NAME:?error}"
-      BACKEND_URL: "http://backend:50051"
+      HOST: '0.0.0.0'
+      PORT: '5173'
+      DB_HOST: 'db:5432'
+      DB_USER: '${DB_USER:?error}'
+      DB_PASSWORD: '${DB_PASSWORD:?error}'
+      DB_NAME: '${DB_NAME:?error}'
+      BACKEND_URL: 'http://backend:50051'
     depends_on:
       - db
       - backend
@@ -50,24 +50,24 @@ services:
     build:
       context: .
       target: preview
-    profiles: ["preview"]
+    profiles: ['preview']
     ports:
-      - "4173:4173"
+      - '4173:4173'
 
   web:
     build:
       context: .
       target: prod
-    profiles: ["prod"]
+    profiles: ['prod']
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
-      HOST: "0.0.0.0"
-      PORT: "3000"
+      HOST: '0.0.0.0'
+      PORT: '3000'
 
   tailscale:
     image: tailscale/tailscale:latest
-    profiles: ["ts"]
+    profiles: ['ts']
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -77,7 +77,7 @@ services:
     environment:
       TS_AUTHKEY: ${TS_AUTHKEY}
       TS_STATE_DIR: /var/lib/tailscale
-      TS_USERSPACE: "false"
+      TS_USERSPACE: 'false'
     command: >
       sh -lc '
         tailscaled --state=${TS_STATE_DIR}/tailscaled.state &

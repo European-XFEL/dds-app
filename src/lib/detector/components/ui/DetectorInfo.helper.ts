@@ -14,7 +14,13 @@ export function computeQRangeFromModules(params: {
   wavelength: number;
   modules: DetectorModule[];
 }): QRange & { rMinPx: number; rMaxPx: number } {
-  const { distance: Dmm, pixelSize, beamCenter: bc, wavelength: lambdaA, modules } = params;
+  const {
+    distance: Dmm,
+    pixelSize,
+    beamCenter: bc,
+    wavelength: lambdaA,
+    modules,
+  } = params;
 
   if (!(Dmm > 0)) throw new Error('sampleDetectorDistanceMm must be > 0');
   if (!(pixelSize > 0)) throw new Error('pixelSizeMm must be > 0');
@@ -44,7 +50,12 @@ export function computeQRangeFromModules(params: {
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-  const distancePointToPointPx = (cx: number, cy: number, x: number, y: number): number => {
+  const distancePointToPointPx = (
+    cx: number,
+    cy: number,
+    x: number,
+    y: number,
+  ): number => {
     const dx = x - cx;
     const dy = y - cy;
     return Math.sqrt(dx * dx + dy * dy);

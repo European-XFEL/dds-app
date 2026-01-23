@@ -20,7 +20,10 @@
  * </script>
  * ```
  */
-export function throttled<T>(getValue: () => T, interval = 150): { readonly current: T } {
+export function throttled<T>(
+  getValue: () => T,
+  interval = 150,
+): { readonly current: T } {
   let value = $state<T>(getValue());
   let lastUpdateTime = 0;
   let pendingTimeoutId: ReturnType<typeof setTimeout> | undefined;

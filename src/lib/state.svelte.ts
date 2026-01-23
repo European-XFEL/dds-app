@@ -43,7 +43,9 @@ export function setSimulationState(state: SimulationState): void {
 
 export function useSimulationState(): SimulationState {
   if (!hasContext(APP_STATE_KEY)) {
-    throw new Error('Simulation state has not been provided in this component tree.');
+    throw new Error(
+      'Simulation state has not been provided in this component tree.',
+    );
   }
 
   return getContext<SimulationState>(APP_STATE_KEY);
