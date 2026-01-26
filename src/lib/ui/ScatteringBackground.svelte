@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
 
   import { browser } from '$app/environment';
 
   const CONFIG = {
     pixelSize: 8,
     maxIntensity: 100,
-    beamCenter: { x: 0.5, y: 0.4 },
+    beamCenter: { x: 0.5, y: 0.45 },
     // Scattering pattern
     rings: [0.12, 0.28, 0.48, 0.72] as const,
     ringWidth: 0.04,

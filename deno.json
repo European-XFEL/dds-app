@@ -9,5 +9,6 @@
   "fmt": {
     "semiColons": true,
     "singleQuote": true
-  }
+  },
+  "workspace": ["./stories"]
 }
