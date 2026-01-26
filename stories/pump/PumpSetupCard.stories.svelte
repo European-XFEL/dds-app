@@ -3,7 +3,7 @@
 
   import { createSimulationSeed } from '$lib/state.svelte';
 
-  import PumpSetupCard from './PumpSetupCard.svelte';
+  import PumpSetupCard from '$lib/pump/components/PumpSetupCard.svelte';
 
   const defaultState = createSimulationSeed();
 

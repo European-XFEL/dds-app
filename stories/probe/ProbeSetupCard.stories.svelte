@@ -3,7 +3,7 @@
 
   import { createSimulationSeed } from '$lib/state.svelte';
 
-  import ProbeSetupCard from './ProbeSetupCard.svelte';
+  import ProbeSetupCard from '$lib/probe/components/ProbeSetupCard.svelte';
 
   const defaultState = createSimulationSeed();
 
