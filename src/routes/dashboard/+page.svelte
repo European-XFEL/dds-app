@@ -172,17 +172,17 @@
   ]);
 </script>
 
-<div class="h-[calc(100vh-4rem)]">
+<div class="h-lvh">
   <Resizable.PaneGroup direction="horizontal" class="max-w-full gap-4 rounded-lg">
     <Resizable.Pane defaultSize={70}>
       <!-- <div class="flow-row w-max items-center gap-3">
-        <Badge variant="outline"
-          >Delta T (K): {result?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
-        >
-        <Badge variant="outline"
-          >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
-        >
-      </div> -->
+          <Badge variant="outline"
+            >Delta T (K): {result?.deltaTemperatureK.toExponential(3) ?? 'N/A'}</Badge
+          >
+          <Badge variant="outline"
+            >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
+          >
+        </div> -->
       <div transition:fade class="relative flex flex-col gap-6 pt-4">
         <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
         <!-- TODO: Re-enable temperature result badges -->
