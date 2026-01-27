@@ -2,13 +2,15 @@ import { DrizzleQueryError } from 'drizzle-orm';
 import Papa from 'papaparse';
 import z from 'zod';
 
-import { command, prerender } from '$app/server';
+import { command, query } from '$app/server';
 
 import { env } from '$env/dynamic/private';
 
-import { db } from '$lib/server/db';
+import { db } from '$lib/server/db/index';
 import * as schema from '$lib/server/db/schema';
-import { SimulationService, createClient, createConnectTransport } from '$lib/server/grpc';
+import { SimulationService, createClient, createConnectTransport } from '$lib/server/grpc/index';
+
+import { sha256HexFromText } from './server/db/util.ts';
 
 const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:50051';
 
@@ -19,15 +21,9 @@ const transport = createConnectTransport({
 
 const simulation_client = createClient(SimulationService, transport);
 
-export const listMolecules = prerender(
-  async () => {
-    return await db.select(schema.moleculesInfo).from(schema.molecules);
-  },
-  {
-    inputs: () => [],
-    dynamic: true,
-  },
-);
+export const listMolecules = query(async () => {
+  return await db.select(schema.moleculesInfo).from(schema.molecules);
+});
 
 export const uploadMolecule = command(
   z.object({
@@ -38,22 +34,28 @@ export const uploadMolecule = command(
   async ({ name, filename, contents }) => {
     console.log('Uploading molecule:', filename, name, contents.length);
 
+    const id = await sha256HexFromText(contents);
+
     try {
       const result = await db
         .insert(schema.molecules)
         .values({
+          id,
           name,
           filename,
           contents,
         })
         .returning(schema.moleculesInfo);
-      return { success: true, result: result[0] };
+      return { success: true, result: result?.[0] };
     } catch (error) {
       console.error('Failed to insert molecule:', error);
       if (error instanceof DrizzleQueryError) {
         const cause = error.cause as { code?: string } | undefined;
         if (cause?.code === '23505') {
-          return { success: false, error: 'A molecule with this name already exists.' };
+          return {
+            success: false,
+            error: 'A molecule with this name already exists.',
+          };
         }
       }
       throw error;
@@ -61,33 +63,19 @@ export const uploadMolecule = command(
   },
 );
 
-export const listSolvents = prerender(
-  async () => {
-    return await db.select(schema.solventsInfo).from(schema.solvents);
-  },
-  {
-    inputs: () => [],
-    dynamic: true,
-  },
-);
+export const listSolvents = query(async () => {
+  return await db.select(schema.solventsInfo).from(schema.solvents);
+});
 
-export const getMoleculeFileContent = prerender(
-  z.string(),
-  async (id: string) => {
-    return await db.query.molecules.findFirst({
-      where: { id },
-      columns: {
-        contents: true,
-      },
-    });
-  },
-  {
-    inputs: () => {
-      return db.query.molecules.findMany().then((molecules) => molecules.map((m) => m.id));
+export const getMoleculeFileContent = query(z.string(), async (id: string) => {
+  console.log('Fetching molecule contents for id:', id);
+  return await db.query.molecules.findFirst({
+    where: { id },
+    columns: {
+      contents: true,
     },
-    dynamic: true,
-  },
-);
+  });
+});
 
 type SolventDifferentials = {
   Q: number;
@@ -95,46 +83,37 @@ type SolventDifferentials = {
   dSdRho: number;
 };
 
-export const getSolventIQ = prerender(
-  z.string(),
-  async (id: string) => {
-    const contents = await db.query.solvents
-      .findFirst({
-        where: { id },
-        columns: {
-          contents: true,
-        },
-      })
-      .then(
-        (s) =>
-          s?.contents ??
-          (() => {
-            throw new Error('Solvent not found');
-          })(),
-      );
+export const getSolventIQ = query(z.string(), async (id: string) => {
+  const contents = await db.query.solvents
+    .findFirst({
+      where: { id },
+      columns: {
+        contents: true,
+      },
+    })
+    .then(
+      (s) =>
+        s?.contents ??
+        (() => {
+          throw new Error('Solvent not found');
+        })(),
+    );
 
-    const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents.replaceAll(/#.*\n/g, '');
-    const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
-      delimiter: '\t',
-      dynamicTyping: false,
-      header: true,
-      skipEmptyLines: true,
-    });
+  const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents?.replaceAll(/#.*\n/g, '');
+  const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
+    delimiter: '\t',
+    dynamicTyping: false,
+    header: true,
+    skipEmptyLines: true,
+  });
 
-    const { data } = parsed;
+  const { data } = parsed;
 
-    const q = data.map((row) => row.Q);
-    const dSdT = data.map((row) => row.dSdT);
+  const q = data.map((row) => row.Q);
+  const dSdT = data.map((row) => row.dSdT);
 
-    return { q, dSdT };
-  },
-  {
-    inputs: () => {
-      return db.query.solvents.findMany().then((solvents) => solvents.map((s) => s.id));
-    },
-    dynamic: true,
-  },
-);
+  return { q, dSdT };
+});
 
 const simulation_request = z.object({
   fileId: z.string(),
@@ -147,7 +126,7 @@ const simulation_request = z.object({
 
 const encoder = new TextEncoder();
 
-export const getDebyeResult = prerender(
+export const getDebyeResult = query(
   simulation_request,
   async (request: z.infer<typeof simulation_request>) => {
     const fetched = await db.query.intensities.findFirst({
@@ -207,22 +186,5 @@ export const getDebyeResult = prerender(
       console.error('Simulation error:', error);
       throw error;
     }
-  },
-  {
-    inputs: () => {
-      const qRange = {
-        min: 0.005253,
-        max: 8.498164,
-        step: 0.006044,
-      };
-
-      return db.query.molecules.findMany().then((molecules) => {
-        return molecules.map((m) => ({
-          fileId: m.id,
-          qRange: qRange,
-        }));
-      });
-    },
-    dynamic: true,
   },
 );
