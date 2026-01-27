@@ -1,3 +1,4 @@
+import deno from '@deno/vite-plugin';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -9,6 +10,7 @@ export default defineConfig({
     lucidePreprocess(),
     tailwindcss(),
     sveltekit(),
+    deno(),
     visualizer({
       emitFile: true,
       filename: 'stats.html',
