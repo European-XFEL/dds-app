@@ -1,18 +1,18 @@
 {
   "exclude": [
+    ".deno-deploy",
     ".storybook",
     ".svelte-kit",
     "backend/",
     "src/lib/server/grpc/gen/",
-    "src/lib/shadcn"
+    "src/lib/shadcn",
+    "storybook-static"
   ],
   "fmt": {
     "semiColons": true,
     "singleQuote": true
   },
-  "unstable": [
-    "fmt-component"
-  ],
+  "unstable": ["fmt-component", "sloppy-imports"],
   "imports": {
     "$data/": "./src/data/",
     "$lib/": "./src/lib/",
@@ -22,11 +22,14 @@
     "@std/path": "jsr:@std/path@^1.1.4"
   },
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "dom.asynciterable",
-      "deno.ns"
-    ]
+    "checkJs": true,
+    "strict": true,
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "types": ["./.svelte-kit/ambient.d.ts"]
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-sloppy-imports"]
+    }
   }
 }
