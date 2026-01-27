@@ -3,6 +3,7 @@
 
   import { onMount } from 'svelte';
 
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
@@ -49,15 +50,18 @@
     applySystemTheme();
     preloadMatterviz();
   });
+
+  const heroPathname = resolve('/').replace('./', '/');
+  const showSidebar = $derived(page.url.pathname !== heroPathname);
 </script>
 
-<Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
-  {#if page.url.pathname !== '/'}
+<Sidebar.Provider style="--sidebar-width: 19rem;">
+  {#if showSidebar}
     <AppSidebar {sample} />
   {/if}
 
   <Sidebar.Inset class="overflow-y-auto">
-    <main class="m-8 flex justify-center-safe">
+    <main class="m-0 mr-8 ml-8 flex justify-center-safe">
       <div class="max-w-[1920px] grow">
         {@render children?.()}
       </div>
