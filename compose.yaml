@@ -14,7 +14,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - '50051:50051'
+      - 50051:50051
 
   web-dev:
     build:
@@ -65,35 +65,5 @@ services:
       HOST: '0.0.0.0'
       PORT: '3000'
 
-  tailscale:
-    image: tailscale/tailscale:latest
-    profiles: ['ts']
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    volumes:
-      - tailscale-state:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun
-    environment:
-      TS_AUTHKEY: ${TS_AUTHKEY}
-      TS_STATE_DIR: /var/lib/tailscale
-      TS_USERSPACE: 'false'
-    command: >
-      sh -lc '
-        tailscaled --state=${TS_STATE_DIR}/tailscaled.state &
-        until tailscale status >/dev/null 2>&1; do sleep 0.5; done
-
-        # Proxy HTTPS on :443 to your internal app:4173
-        tailscale serve https / http://web-dev:4173
-
-        # Make it publicly reachable (unencrypted-inbound is still HTTPS to users)
-        tailscale funnel 443 on
-
-        # keep container alive
-        tail -f /dev/null
-      '
-    restart: unless-stopped
-
 volumes:
   pgdata:
-  tailscale-state:
