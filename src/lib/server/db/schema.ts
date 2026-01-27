@@ -30,9 +30,7 @@ const qRange = {
 };
 
 export const molecules = pgTable('molecules', {
-  id: char({ length: 32 })
-    .primaryKey()
-    .$defaultFn(() => createId()),
+  id: char({ length: 64 }).primaryKey().notNull(),
   name: text().unique().notNull(),
   ...fileData,
   ...timestamps,
@@ -45,7 +43,7 @@ export { moleculesInfo };
 export const intensities = pgTable(
   'intensities',
   {
-    moleculeId: char({ length: 32 })
+    moleculeId: char({ length: 64 })
       .references(() => molecules.id)
       .notNull(),
     ...qRange,

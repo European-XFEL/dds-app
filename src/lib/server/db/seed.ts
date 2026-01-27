@@ -1,11 +1,37 @@
+/// <reference lib="deno.ns" />
 import solvents_data from '$data/solvents.json' with { type: 'json' };
-import fs from 'node:fs/promises';
+import '@std/dotenv/load';
+import * as path from '@std/path';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import Papa from 'papaparse';
-import * as path from 'node:path';
 
-import { molecules, solvents } from './schema.ts';
-import { type DB, db } from './index.ts';
 import process from 'node:process';
+
+import { relations } from './relations.ts';
+import * as schema from './schema.ts';
+import { molecules, solvents } from './schema.ts';
+import { sha256HexFromText } from './util.ts';
+
+const env = Deno.env.toObject();
+
+const DB_USER = env['DB_USER'];
+const DB_PASSWORD = env['DB_PASSWORD'];
+const DB_HOST = env['DB_HOST'];
+const DB_NAME = env['DB_NAME'];
+
+if (!DB_USER || !DB_PASSWORD) {
+  throw new Error('Missing DB credentials: set DB_USER and DB_PASSWORD environment variables');
+}
+
+if (!DB_HOST || !DB_NAME) {
+  throw new Error('Missing DB host info: set DB_HOST and DB_NAME environment variables');
+}
+
+const DATABASE_URL = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+
+console.log('Connecting to db with', { DB_USER, DB_HOST, DB_NAME });
+
+const db = drizzle(DATABASE_URL, { schema, relations });
 
 /**
  * Bootstrap the database with initial molecule and solvent data from files.
@@ -15,39 +41,34 @@ export async function bootstrap(
   molecules_dir = './src/data/molecules',
   solvents_dir = './src/data/solvents',
 ) {
-  // Run molecule and solvent seeding in parallel
-  await Promise.all([
-    seedMolecules(db, molecules_dir),
-    seedSolvents(db, solvents_dir),
-  ]);
+  await Promise.all([seedMolecules(molecules_dir), seedSolvents(solvents_dir)]);
 }
 
 /**
  * Seed molecules from .xyz files in the specified directory.
- * Each file is stored in the files table and linked to a molecule entry.
+ * Each file is stored in the molecules table with its id as the sha256 hash of its contents.
  */
-async function seedMolecules(db: DB, directory: string) {
-  const files = await fs.readdir(directory);
-  const xyzFiles = files.filter((file) => file.endsWith('.xyz'));
+async function seedMolecules(directory: string) {
+  const xyzFiles: string[] = [];
 
-  // Read all files in parallel
-  const moleculeData = await Promise.all(
+  for await (const entry of Deno.readDir(directory)) {
+    if (entry.isFile && entry.name.endsWith('.xyz')) xyzFiles.push(entry.name);
+  }
+
+  await Promise.all(
     xyzFiles.map(async (filename) => {
       const filePath = path.join(directory, filename);
-      const contents = await fs.readFile(filePath, 'utf-8');
+      const contents = await Deno.readTextFile(filePath);
       const name = path.basename(filename, '.xyz');
-      return { name, filename, contents };
-    }),
-  );
 
-  // Insert all molecules in parallel
-  await Promise.all(
-    moleculeData.map(async ({ name, filename, contents }) => {
-      console.log(`Seeding molecule: ${name} from file: ${filename}`);
+      const id = await sha256HexFromText(contents);
+
+      console.log(`Seeding molecule: ${name} from file: ${filename} (id=${id})`);
+
       await db
         .insert(molecules)
-        .values({ name, filename, contents })
-        .onConflictDoNothing({ target: molecules.name });
+        .values({ id, name, filename, contents })
+        .onConflictDoNothing({ target: molecules.id });
     }),
   );
 }
@@ -59,30 +80,33 @@ type SolventDifferentials = {
 };
 
 const solvent_name_map: { [key: string]: string } = {
-  CCl4: 'carbon tetrachloride',
-  CH2Cl2: 'dichloromethane',
-  CHCl3: 'chloroform',
-  Cyclohexane: 'cyclohexane',
-  EtOH: 'ethanol',
-  'KMnO4-H2O': 'potassium permanganate',
-  MeOH: 'methanol',
-  MeCN: 'acetonitrile',
+  MeCN: 'Acetonitrile',
+  CCl4: 'Carbon tetrachloride',
+  CHCl3: 'Chloroform',
+  Cyclohexane: 'Cyclohexane',
+  CH2Cl2: 'Dichloromethane',
+  EtOH: 'Ethanol',
+  MeOH: 'Methanol',
+  'KMnO4-H2O': 'Water (w/ Potassium permanganate)',
 };
 
 /**
  * Seed solvents from .txt files in the specified directory.
  * Only non-error files are processed (files ending in -error.txt are skipped).
  */
-async function seedSolvents(db: DB, directory: string) {
-  const files = await fs.readdir(directory);
-  const solventFiles = files.filter(
-    (file) => file.endsWith('.txt') && !file.endsWith('-error.txt'),
-  );
+async function seedSolvents(directory: string) {
+  const solventFiles: string[] = [];
+
+  for await (const entry of Deno.readDir(directory)) {
+    if (entry.isFile && entry.name.endsWith('.txt') && !entry.name.endsWith('-error.txt')) {
+      solventFiles.push(entry.name);
+    }
+  }
 
   // Read all files and start chemical queries in parallel
   const solventDataPromises = solventFiles.map(async (filename) => {
     const filePath = path.join(directory, filename);
-    const contents = await fs.readFile(filePath, 'utf-8');
+    const contents = await Deno.readTextFile(filePath);
     const fileName = path.parse(filename).name;
     const name = solvent_name_map[fileName] || fileName;
 
@@ -103,16 +127,10 @@ async function seedSolvents(db: DB, directory: string) {
 
     const qMin = Math.min(...q);
     const qMax = Math.max(...q);
-    const qSteps = q.map((
-      val,
-      idx,
-      arr,
-    ) => (idx === 0 ? 0 : val - arr[idx - 1])).slice(1);
-    const qStep = Math.min(...qSteps); // Check if the solvent is in the predefined solvents_data, if so, use that data directly
+    const qSteps = q.map((val, idx, arr) => (idx === 0 ? 0 : val - arr[idx - 1])).slice(1);
+    const qStep = qSteps.length ? Math.min(...qSteps) : 0;
 
-    const saved_solvent_data = solvents_data.find((solvent) =>
-      solvent.filename === filename
-    );
+    const saved_solvent_data = solvents_data.find((solvent) => solvent.filename === filename);
     if (saved_solvent_data) {
       rhom = parseFloat(saved_solvent_data.rhom);
       cpm = parseFloat(saved_solvent_data.cpm);
@@ -128,11 +146,11 @@ async function seedSolvents(db: DB, directory: string) {
       name,
       filename,
       contents,
-      rhom: rhom,
-      cpm: cpm,
-      qMin: qMin,
-      qMax: qMax,
-      qStep: qStep,
+      rhom,
+      cpm,
+      qMin,
+      qMax,
+      qStep,
     };
   });
 
