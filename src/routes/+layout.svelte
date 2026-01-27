@@ -13,6 +13,7 @@
     setSimulationState,
   } from '$lib/state.svelte';
   import { Sidebar as AppSidebar } from '$lib/ui';
+  import { preloadMatterviz } from '$lib/utils/matterviz';
 
   let { children } = $props();
 
@@ -44,7 +45,10 @@
     );
   }
 
-  onMount(() => applySystemTheme());
+  onMount(() => {
+    applySystemTheme();
+    preloadMatterviz();
+  });
 </script>
 
 <Sidebar.Provider style="--sidebar-width: 19rem;" class="h-svh">
