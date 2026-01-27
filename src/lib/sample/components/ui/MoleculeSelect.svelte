@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { listMolecules } from '$lib/data.remote';
-
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
 
+  import { listMolecules } from '$lib/data.remote';
   import type { Sample } from '$lib/types';
 
   import MoleculeUpload from './MoleculeUpload.svelte';
@@ -16,7 +15,11 @@
     loading: boolean;
   }
 
-  let { molecule = $bindable(), molecules = $bindable(), loading }: Props = $props();
+  let {
+    molecule = $bindable(),
+    molecules = $bindable(),
+    loading,
+  }: Props = $props();
 
   const triggerMolecule = $derived(
     molecules?.find((m) => m.id === molecule?.id)?.name ?? 'Select molecule',

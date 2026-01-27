@@ -16,7 +16,6 @@
 <Sidebar.Footer
   class="flex flex-col text-sm text-muted-foreground group-data-[collapsible=icon]:hidden"
 >
-
   <section class="flex flex-1 flex-col">
     <div>Ground: {sample.groundName ?? ''}</div>
     <div>Excited: {sample.excitedName ?? ''}</div>

@@ -20,11 +20,15 @@ const DB_HOST = env['DB_HOST'];
 const DB_NAME = env['DB_NAME'];
 
 if (!DB_USER || !DB_PASSWORD) {
-  throw new Error('Missing DB credentials: set DB_USER and DB_PASSWORD environment variables');
+  throw new Error(
+    'Missing DB credentials: set DB_USER and DB_PASSWORD environment variables',
+  );
 }
 
 if (!DB_HOST || !DB_NAME) {
-  throw new Error('Missing DB host info: set DB_HOST and DB_NAME environment variables');
+  throw new Error(
+    'Missing DB host info: set DB_HOST and DB_NAME environment variables',
+  );
 }
 
 const DATABASE_URL = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
@@ -63,7 +67,9 @@ async function seedMolecules(directory: string) {
 
       const id = await sha256HexFromText(contents);
 
-      console.log(`Seeding molecule: ${name} from file: ${filename} (id=${id})`);
+      console.log(
+        `Seeding molecule: ${name} from file: ${filename} (id=${id})`,
+      );
 
       await db
         .insert(molecules)
@@ -98,7 +104,11 @@ async function seedSolvents(directory: string) {
   const solventFiles: string[] = [];
 
   for await (const entry of Deno.readDir(directory)) {
-    if (entry.isFile && entry.name.endsWith('.txt') && !entry.name.endsWith('-error.txt')) {
+    if (
+      entry.isFile &&
+      entry.name.endsWith('.txt') &&
+      !entry.name.endsWith('-error.txt')
+    ) {
       solventFiles.push(entry.name);
     }
   }
@@ -127,10 +137,14 @@ async function seedSolvents(directory: string) {
 
     const qMin = Math.min(...q);
     const qMax = Math.max(...q);
-    const qSteps = q.map((val, idx, arr) => (idx === 0 ? 0 : val - arr[idx - 1])).slice(1);
+    const qSteps = q
+      .map((val, idx, arr) => (idx === 0 ? 0 : val - arr[idx - 1]))
+      .slice(1);
     const qStep = qSteps.length ? Math.min(...qSteps) : 0;
 
-    const saved_solvent_data = solvents_data.find((solvent) => solvent.filename === filename);
+    const saved_solvent_data = solvents_data.find(
+      (solvent) => solvent.filename === filename,
+    );
     if (saved_solvent_data) {
       rhom = parseFloat(saved_solvent_data.rhom);
       cpm = parseFloat(saved_solvent_data.cpm);

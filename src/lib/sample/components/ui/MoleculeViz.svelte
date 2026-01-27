@@ -59,7 +59,9 @@
   let placeholder_title = $derived.by(() => {
     if (!Structure) return 'Loading MatterViz...';
     if (!molecule?.id) return 'No molecule selected';
-    if (molecule?.id && !loading_structure && !structure_string) return 'Molecule file not found';
+    if (molecule?.id && !loading_structure && !structure_string) {
+      return 'Molecule file not found';
+    }
   });
 
   let placeholder_description = $derived.by(() => {
@@ -81,12 +83,15 @@
     <div class="relative aspect-square w-full max-w-3xl border border-muted/50">
       {#if structure_string}
         <div class="absolute inset-0" transition:fade>
-          <Structure {structure_string} style="height: 100%; width: 100%;" />
+          <Structure {structure_string} style="height: 100%; width: 100%" />
         </div>
       {:else}
         {#key `${placeholder_title}? + ${placeholder_description}`}
           <div class="absolute inset-0" transition:fade>
-            <Placeholder title={placeholder_title} description={placeholder_description} />
+            <Placeholder
+              title={placeholder_title}
+              description={placeholder_description}
+            />
           </div>
         {/key}
       {/if}

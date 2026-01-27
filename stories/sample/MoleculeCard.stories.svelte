@@ -20,4 +20,7 @@
 
 <Story name="Excited State" args={{ kind: 'excited', molecule: undefined }} />
 
-<Story name="With Viz Collapsed" args={{ vizOpen: false, vizCollapseShow: true }} />
+<Story
+  name="With Viz Collapsed"
+  args={{ vizOpen: false, vizCollapseShow: true }}
+/>

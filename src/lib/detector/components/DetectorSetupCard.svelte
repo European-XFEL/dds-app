@@ -5,8 +5,10 @@
 
   import DetectorSetup from './ui/DetectorSetup.svelte';
 
-  let { distance = $bindable(), beamCenter = $bindable() }: ComponentProps<typeof DetectorSetup> =
-    $props();
+  let {
+    distance = $bindable(),
+    beamCenter = $bindable(),
+  }: ComponentProps<typeof DetectorSetup> = $props();
 </script>
 
 <Card.Root class="min-w-sm flex-1">

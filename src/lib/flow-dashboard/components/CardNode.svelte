@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Handle, type NodeProps, NodeResizeControl, Position } from '@xyflow/svelte';
+  import {
+    Handle,
+    type NodeProps,
+    NodeResizeControl,
+    Position,
+  } from '@xyflow/svelte';
 
   import { ProbeSetupCard } from '$lib/probe';
   import { PumpSetupCard } from '$lib/pump/';
@@ -22,7 +27,9 @@
 
   let { data, type }: NodeProps = $props();
 
-  const cardType = $derived(typeof type === 'string' ? (type as CardType) : undefined);
+  const cardType = $derived(
+    typeof type === 'string' ? (type as CardType) : undefined,
+  );
   const Card = $derived<any>(cardType ? cardByType[cardType] : undefined);
 </script>
 
@@ -44,7 +51,11 @@
 
   <div class="resize-corner">
     <div class="resize-corner-inner">
-      <NodeResizeControl minWidth={420} minHeight={30} color="rgb(255, 64, 0)" />
+      <NodeResizeControl
+        minWidth={420}
+        minHeight={30}
+        color="rgb(255, 64, 0)"
+      />
     </div>
   </div>
   <Handle type="source" position={Position.Right} />

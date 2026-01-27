@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { DetectorCakeCard, DetectorInfoCard, DetectorSetupCard } from '$lib/detector/';
+  import {
+    DetectorCakeCard,
+    DetectorInfoCard,
+    DetectorSetupCard,
+  } from '$lib/detector/';
   import { useSimulationState } from '$lib/state.svelte';
 
   let {
@@ -9,7 +13,10 @@
 </script>
 
 <div class="flex flex-wrap gap-6">
-  <DetectorSetupCard bind:distance={detector.distance} bind:beamCenter={detector.beamCenter} />
+  <DetectorSetupCard
+    bind:distance={detector.distance}
+    bind:beamCenter={detector.beamCenter}
+  />
   <DetectorInfoCard
     modules={detector.modules}
     beamCenter={detector.beamCenter}

@@ -5,7 +5,8 @@
 
   import ProbeSetup from './ProbeSetup.svelte';
 
-  let { probe = $bindable(), short }: ComponentProps<typeof ProbeSetup> = $props();
+  let { probe = $bindable(), short }: ComponentProps<typeof ProbeSetup> =
+    $props();
 </script>
 
 <Card.Root>

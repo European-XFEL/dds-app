@@ -12,7 +12,9 @@
 
   let { pump = $bindable() }: Props = $props();
 
-  let photonEnergyInvalid = $derived(pump?.photonEnergyEv < pump?.excitedStateEnergyEv);
+  let photonEnergyInvalid = $derived(
+    pump?.photonEnergyEv < pump?.excitedStateEnergyEv,
+  );
 
   const fields = $derived([
     {
@@ -23,19 +25,30 @@
     {
       label: 'Photon Energy (eV)',
       key: 'photonEnergyEv',
-      input: { min: 1.0, max: 5.0, step: 0.1, 'aria-invalid': photonEnergyInvalid },
+      input: {
+        min: 1.0,
+        max: 5.0,
+        step: 0.1,
+        'aria-invalid': photonEnergyInvalid,
+      },
     },
     {
       label: 'Excited State Fraction',
       key: 'excitedStateFraction',
       input: { min: 0.0, max: 1.0, step: 0.01 },
     },
-  ]) satisfies Array<{ label: string; key: keyof Pump; input: ComponentProps<typeof Input> }>;
+  ]) satisfies Array<{
+    label: string;
+    key: keyof Pump;
+    input: ComponentProps<typeof Input>;
+  }>;
 </script>
 
 <Field.Set>
-  <Field.Legend>IR Optical Pump Configuration</Field.Legend>
-  <Field.Description>Configure the IR optical pump settings for the simulation.</Field.Description>
+  <Field.Legend>Optical Pump Configuration</Field.Legend>
+  <Field.Description
+    >Configure the optical pump settings for the simulation.</Field.Description
+  >
 
   <!-- TODO: Allow setting dE/dT directly instead of via energies -->
 
@@ -47,8 +60,18 @@
         </Field.Content>
         <div class="flex min-w-fit flex-2 items-center justify-between gap-x-2">
           {#if pump}
-            <Input type="number" {...input} bind:value={pump[key]} class="nodrag w-30" />
-            <Input type="range" {...input} bind:value={pump[key]} class="nodrag" />
+            <Input
+              type="number"
+              {...input}
+              bind:value={pump[key]}
+              class="nodrag w-30"
+            />
+            <Input
+              type="range"
+              {...input}
+              bind:value={pump[key]}
+              class="nodrag"
+            />
           {/if}
         </div>
       </Field.Field>

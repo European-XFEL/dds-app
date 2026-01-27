@@ -37,11 +37,18 @@
     radiusToTwoTheta(Math.max(radiusRange.min - 5, 0), distance),
     radiusToTwoTheta(radiusRange.max, distance),
   ]);
-  let twoThetaSpan = $derived(Math.max(twoThetaRange[1] - twoThetaRange[0], Number.EPSILON));
+  let twoThetaSpan = $derived(
+    Math.max(twoThetaRange[1] - twoThetaRange[0], Number.EPSILON),
+  );
 
   let transformedModules = $derived<TessellatedModule[]>(
     modules.map((module) =>
-      transformModuleTessellated(module, beamCenter, distance, tessellationGrid),
+      transformModuleTessellated(
+        module,
+        beamCenter,
+        distance,
+        tessellationGrid,
+      ),
     ),
   );
 
@@ -57,7 +64,12 @@
 
   let transformedPaths = $derived(
     transformedModules.flatMap((module) => {
-      const paths = tessellatedModuleToSvgPaths(module, panelShape, twoThetaRange, chiRange);
+      const paths = tessellatedModuleToSvgPaths(
+        module,
+        panelShape,
+        twoThetaRange,
+        chiRange,
+      );
       return paths.map((path, idx) => ({
         id: `${module.id}-quad-${idx}`,
         color: module.color,
@@ -67,7 +79,9 @@
   );
 
   const chiLabels = [-180, -135, -90, -45, 0, 45, 90, 135, 180];
-  let twoThetaLabels = $derived.by(() => genTwoThetaLabels(twoThetaRange, twoThetaStepDegrees));
+  let twoThetaLabels = $derived.by(() =>
+    genTwoThetaLabels(twoThetaRange, twoThetaStepDegrees),
+  );
 
   function genTwoThetaLabels(range: [number, number], step: number): number[] {
     const [min, max] = range;
@@ -82,7 +96,9 @@
 
   function formatTwoThetaLabel(value: number): string {
     const rounded = Math.round(value * 100) / 100;
-    return Number.isInteger(rounded) ? rounded.toString() : rounded.toFixed(1).replace(/\.0$/, '');
+    return Number.isInteger(rounded)
+      ? rounded.toString()
+      : rounded.toFixed(1).replace(/\.0$/, '');
   }
 
   // This was previously in a div wrapper:
@@ -142,8 +158,18 @@
   {/each}
   {#each chiLabels as chi (chi)}
     {@const chi_rad = (chi * Math.PI) / 180}
-    {@const y = ((chi_rad - chiRange[0]) / (chiRange[1] - chiRange[0])) * panelShape.height}
-    <text x="6" {y} dy="3" text-anchor="start" font-size="9" fill="currentColor" fill-opacity="0.6">
+    {@const y =
+      ((chi_rad - chiRange[0]) / (chiRange[1] - chiRange[0])) *
+      panelShape.height}
+    <text
+      x="6"
+      {y}
+      dy="3"
+      text-anchor="start"
+      font-size="9"
+      fill="currentColor"
+      fill-opacity="0.6"
+    >
       {chi}°
     </text>
   {/each}

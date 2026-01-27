@@ -30,13 +30,18 @@
       title: 'Solute Difference',
       body: `
         <p>Load ground and excited state structures (XYZ), compute intensities:</p>
-        ${katex.renderToString(String.raw`\Delta I(Q) = I_{\text{excited}}(Q) - I_{\text{ground}}(Q)`, { displayMode: true })}
+        ${katex.renderToString(
+          String.raw`\Delta I(Q) = I_{\text{excited}}(Q) - I_{\text{ground}}(Q)`,
+          { displayMode: true },
+        )}
       `,
     },
     {
       title: 'Solvent Response',
       body: `
-        <p>Load experimental ${katex.renderToString(String.raw`(\partial S/\partial T)`)} data and interpolate onto the Q grid.</p>
+        <p>Load experimental ${katex.renderToString(
+          String.raw`(\partial S/\partial T)`,
+        )} data and interpolate onto the Q grid.</p>
         <br>
         <p>Accounts for solvent heating from optical pump energy deposition.</p>
       `,
@@ -49,7 +54,9 @@
           String.raw`\Delta S(Q,t) \approx \alpha \cdot \Delta S_{\text{solute}} + \Delta S_{\text{solvent}}`,
           { displayMode: true },
         )}
-        where ${katex.renderToString(String.raw`\alpha`)} is the excited state fraction.
+        where ${katex.renderToString(
+          String.raw`\alpha`,
+        )} is the excited state fraction.
       `,
     },
   ] as const;
@@ -112,7 +119,9 @@
     {
       title: 'Configure Solvent',
       body: `
-        <p>Select a solvent with ${katex.renderToString(String.raw`(\partial S/\partial T)`)} differential
+        <p>Select a solvent with ${katex.renderToString(
+          String.raw`(\partial S/\partial T)`,
+        )} differential
         data. Set concentration to scale the solute contribution relative to the solvent background.</p>
       `,
     },
@@ -120,7 +129,9 @@
       title: 'Set Pump Parameters',
       body: `
         <p>Define photon energy (eV), excited-state energy, and excitation fraction
-        (${katex.renderToString(String.raw`\alpha`)}). These determine the solvent heating contribution
+        (${katex.renderToString(
+          String.raw`\alpha`,
+        )}). These determine the solvent heating contribution
         via energy deposition.</p>
       `,
     },
@@ -134,8 +145,12 @@
     {
       title: 'Compute & Analyze',
       body: `
-        <p>View ${katex.renderToString(String.raw`\Delta S(Q)`)} with separated contributions: total
-        signal, scaled solute difference (${katex.renderToString(String.raw`\alpha \cdot \Delta S`)}),
+        <p>View ${katex.renderToString(
+          String.raw`\Delta S(Q)`,
+        )} with separated contributions: total
+        signal, scaled solute difference (${katex.renderToString(
+          String.raw`\alpha \cdot \Delta S`,
+        )}),
         and solvent thermal response. Identify optimal Q-ranges for your experiment.</p>
       `,
     },
@@ -152,13 +167,17 @@
 <section>
   <h1 class="font-semibold">Technical Documentation</h1>
   <p>
-    Documentation of the physics, algorithms, and implementation details behind the SimEx-Debye
-    Scattering Simulator.
+    Documentation of the physics, algorithms, and implementation details behind
+    the SimEx-Debye Scattering Simulator.
   </p>
 
   <p>
     See the code repository at:
-    <a href="https://git.xfel.eu/simulation/simex-debye/" target="_blank" rel="noopener noreferrer">
+    <a
+      href="https://git.xfel.eu/simulation/simex-debye/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       https://git.xfel.eu/simulation/simex-debye/
     </a>.
   </p>
@@ -169,8 +188,8 @@
 
   <h3>The Debye Scattering Equation</h3>
   <p>
-    The simulator computes scattering intensity via the Debye scattering equation, which provides
-    the orientational average for isotropic samples.
+    The simulator computes scattering intensity via the Debye scattering
+    equation, which provides the orientational average for isotropic samples.
   </p>
 
   <div class="flex flex-wrap items-center">
@@ -196,7 +215,10 @@
         <Card.Title>Cromer-Mann (1968)</Card.Title>
       </Card.Header>
       <Card.Content>
-        <p>4-Gaussian + constant parameterization (coefficients stored locally for 98 elements).</p>
+        <p>
+          4-Gaussian + constant parameterization (coefficients stored locally
+          for 98 elements).
+        </p>
         <div class="mt-3 rounded-md bg-muted px-3 py-2">
           <Latex math={eqCromerMann} displayMode />
         </div>
@@ -218,7 +240,9 @@
 
     <Card.Root class="flex-1 gap-0 border-amber-500/50 bg-amber-500/5">
       <Card.Header>
-        <Card.Title class="text-sm text-amber-600">Physics Simplifications</Card.Title>
+        <Card.Title class="text-sm text-amber-600"
+          >Physics Simplifications</Card.Title
+        >
       </Card.Header>
       <Card.Content class="text-sm">
         <p>... list of things</p>
@@ -232,8 +256,8 @@
 
   <p>
     For pump-probe/time-resolved XSS experiments, the difference signal
-    <Latex math={String.raw`\Delta S(Q,t)`} /> combines solute structural change with solvent thermal
-    response.
+    <Latex math={String.raw`\Delta S(Q,t)`} /> combines solute structural change with
+    solvent thermal response.
   </p>
 
   <div class="not-prose grid gap-6 md:grid-cols-3">
@@ -254,8 +278,9 @@
   <h3>Image Reconstruction Pipeline</h3>
 
   <p>
-    The simulated difference signal can be used to reconstruct a more 'realistic' detector image by,
-    effectively, undoing each step required to perform 1D azimuthal integration.
+    The simulated difference signal can be used to reconstruct a more
+    'realistic' detector image by, effectively, undoing each step required to
+    perform 1D azimuthal integration.
   </p>
 
   <div class="not-prose grid gap-6 md:grid-cols-3">

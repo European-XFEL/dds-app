@@ -28,7 +28,7 @@
   tabindex="0"
   aria-label={`${moduleLabel} detector module`}
   class="cursor-grab transition-[transform] outline-none active:cursor-grabbing"
-  style="touch-action: none;"
+  style="touch-action: none"
   data-module-id={module.id}
   onmousedown={drag.handleMouseDown}
 >

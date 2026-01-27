@@ -13,7 +13,8 @@
     ref = $bindable(null),
     collapsible = 'icon',
     ...restProps
-  }: ComponentProps<typeof Sidebar.Root> & ComponentProps<typeof SidebarFooter> = $props();
+  }: ComponentProps<typeof Sidebar.Root> &
+    ComponentProps<typeof SidebarFooter> = $props();
 </script>
 
 <Sidebar.Root bind:ref {collapsible} {...restProps} variant="floating">

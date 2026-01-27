@@ -39,7 +39,11 @@
   <Card.Header>
     <Card.Title>
       Sample Parameters
-      {#if loading}<div transition:fade class="absolute ml-2 inline-block"><Spinner /></div>{/if}
+      {#if loading}
+        <div transition:fade class="absolute ml-2 inline-block">
+          <Spinner />
+        </div>
+      {/if}
     </Card.Title>
     <Card.Description hidden={short}>
       Parameters shared by both ground and excited states.

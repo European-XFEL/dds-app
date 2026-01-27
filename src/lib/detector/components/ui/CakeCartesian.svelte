@@ -29,7 +29,9 @@
 
   function handleModuleDrag(id: string, newPos: CartesianPoint) {
     modules = modules.map((module) =>
-      module.id === id ? { ...module, position: { x: newPos.x, y: newPos.y } } : module,
+      module.id === id
+        ? { ...module, position: { x: newPos.x, y: newPos.y } }
+        : module,
     );
   }
 
@@ -49,7 +51,12 @@
   class="mx-auto block rounded-lg bg-muted/30 text-muted-foreground/80"
 >
   <defs>
-    <pattern id="detectorGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <pattern
+      id="detectorGrid"
+      width="40"
+      height="40"
+      patternUnits="userSpaceOnUse"
+    >
       <path
         d="M 40 0 L 0 0 0 40"
         fill="none"
@@ -59,7 +66,11 @@
       />
     </pattern>
   </defs>
-  <rect width={panelShape.width} height={panelShape.height} fill="url(#detectorGrid)" />
+  <rect
+    width={panelShape.width}
+    height={panelShape.height}
+    fill="url(#detectorGrid)"
+  />
   {#each radius_rings as radius (radius)}
     <circle
       in:draw|global={{ duration: 3000, delay: 500 }}
@@ -74,7 +85,11 @@
     />
   {/each}
   {#each modules as module (module.id)}
-    <DraggableModule {module} onDrag={handleModuleDrag} svgElement={detectorSvgElement} />
+    <DraggableModule
+      {module}
+      onDrag={handleModuleDrag}
+      svgElement={detectorSvgElement}
+    />
   {/each}
   <Crosshair
     pos={{ x: beamCenter.x, y: beamCenter.y }}
@@ -91,5 +106,7 @@
   >
     x →
   </text>
-  <text x="5" y="15" font-size="10" fill="currentColor" fill-opacity="0.5">y ↓</text>
+  <text x="5" y="15" font-size="10" fill="currentColor" fill-opacity="0.5">
+    y ↓
+  </text>
 </svg>

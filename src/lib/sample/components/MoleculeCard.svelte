@@ -42,7 +42,11 @@
   <Card.Header>
     <Card.Title>
       {title}
-      {#if loading}<div class="absolute ml-2 inline-block"><Spinner /></div>{/if}
+      {#if loading}
+        <div class="absolute ml-2 inline-block">
+          <Spinner />
+        </div>
+      {/if}
     </Card.Title>
   </Card.Header>
 

@@ -25,7 +25,9 @@
 
 <Field.Set>
   <Field.Legend>Detector Configuration</Field.Legend>
-  <Field.Description>Select detector type and configure module positions.</Field.Description>
+  <Field.Description
+    >Select detector type and configure module positions.</Field.Description
+  >
 
   <Field.Field>
     <Field.Label>Detector</Field.Label>

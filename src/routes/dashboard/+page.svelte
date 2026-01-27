@@ -55,7 +55,12 @@
         simulation.sample.ground!.id,
         simulation.sample.excited!.id,
       ),
-    () => !!(simulation.sample.ground?.id && simulation.sample.excited?.id && simulation.qRange),
+    () =>
+      !!(
+        simulation.sample.ground?.id &&
+        simulation.sample.excited?.id &&
+        simulation.qRange
+      ),
   );
 
   const solventResource = createScatteringResource(
@@ -66,12 +71,20 @@
         calculations.deltaT!,
       ),
     () =>
-      !!(simulation.sample.solvent?.id && calculations.ratioSolventSolute && calculations.deltaT),
+      !!(
+        simulation.sample.solvent?.id &&
+        calculations.ratioSolventSolute &&
+        calculations.deltaT
+      ),
   );
 
   // Combined difference scattering signal
   const deltaS = $derived(
-    computeDeltaS(soluteResource.value, solventResource.value, calculations.excitedStateFraction),
+    computeDeltaS(
+      soluteResource.value,
+      solventResource.value,
+      calculations.excitedStateFraction,
+    ),
   );
 
   const hasGroundMolecule = $derived(!!simulation.sample.ground?.id);
@@ -80,12 +93,19 @@
   const hasDetector = $derived(!!simulation.detector);
   const hasPump = $derived(!!simulation.pump);
   const hasAll = $derived(
-    hasGroundMolecule && hasExcitedMolecule && hasSolvent && hasDetector && hasPump,
+    hasGroundMolecule &&
+      hasExcitedMolecule &&
+      hasSolvent &&
+      hasDetector &&
+      hasPump,
   );
 
   // Solute contribution scaled by excited fraction for display
   const deltaSSoluteScaled = $derived(
-    scaleSoluteByExcitedFraction(soluteResource.value, calculations.excitedStateFraction),
+    scaleSoluteByExcitedFraction(
+      soluteResource.value,
+      calculations.excitedStateFraction,
+    ),
   );
 
   const constant_options: ECOption = {
@@ -138,7 +158,8 @@
 
   let xAxis = $derived<ECOption['xAxis']>({
     id: 'q',
-    data: deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
+    data:
+      deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
   });
 
   const series_common: LineSeriesOption = {
@@ -173,7 +194,10 @@
 </script>
 
 <div class="h-lvh">
-  <Resizable.PaneGroup direction="horizontal" class="max-w-full gap-4 rounded-lg">
+  <Resizable.PaneGroup
+    direction="horizontal"
+    class="max-w-full gap-4 rounded-lg"
+  >
     <Resizable.Pane defaultSize={70}>
       <!-- <div class="flow-row w-max items-center gap-3">
           <Badge variant="outline"
@@ -210,7 +234,9 @@
       <ScrollArea class="mt-4 flex-1">
         <div class="grid h-72 gap-4">
           <SolventCard
-            bind:concentrationSoluteMolar={simulation.sample.concentrationSoluteMolar}
+            bind:concentrationSoluteMolar={
+              simulation.sample.concentrationSoluteMolar
+            }
             bind:solvent={simulation.sample.solvent}
             {short}
           />

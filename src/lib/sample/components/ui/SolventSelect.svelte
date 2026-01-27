@@ -14,7 +14,12 @@
     short?: boolean;
   };
 
-  let { solvent = $bindable(), solvents, loading, short = false }: Props = $props();
+  let {
+    solvent = $bindable(),
+    solvents,
+    loading,
+    short = false,
+  }: Props = $props();
 
   const triggerSolvent = $derived(solvent?.name ?? 'Select a solvent');
 </script>

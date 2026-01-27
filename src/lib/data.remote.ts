@@ -8,7 +8,11 @@ import { env } from '$env/dynamic/private';
 
 import { db } from '$lib/server/db/index';
 import * as schema from '$lib/server/db/schema';
-import { SimulationService, createClient, createConnectTransport } from '$lib/server/grpc/index';
+import {
+  SimulationService,
+  createClient,
+  createConnectTransport,
+} from '$lib/server/grpc/index';
 
 import { sha256HexFromText } from './server/db/util.ts';
 
@@ -179,7 +183,9 @@ export const getDebyeResult = query(
           intensity: result.i.map(String),
           q: result.q.map(String),
         })
-        .catch((error) => console.error('Failed to insert intensity result:', error));
+        .catch((error) =>
+          console.error('Failed to insert intensity result:', error),
+        );
 
       return result;
     } catch (error) {

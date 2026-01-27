@@ -17,7 +17,15 @@
     <SolventInfoCard solvent={sample.solvent} />
   </div>
   <div class="grid grid-cols-2 gap-6 @sm:grid-cols-1">
-    <MoleculeCard bind:molecule={ground} title="Ground Molecule" vizOpen={true} />
-    <MoleculeCard bind:molecule={excited} title="Excited Molecule" vizOpen={true} />
+    <MoleculeCard
+      bind:molecule={ground}
+      title="Ground Molecule"
+      vizOpen={true}
+    />
+    <MoleculeCard
+      bind:molecule={excited}
+      title="Excited Molecule"
+      vizOpen={true}
+    />
   </div>
 </div>
