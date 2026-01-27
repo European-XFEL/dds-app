@@ -1,6 +1,4 @@
 <script lang="ts">
-  import todos from '../../data/todos.json';
-
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
   let {
