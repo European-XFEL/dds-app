@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Structure } from 'matterviz';
-
+  // import { Structure } from 'matterviz';
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   import * as Field from '$shadcn/ui/field/index.js';
@@ -8,6 +8,7 @@
   import { getMoleculeFileContent } from '$lib/data.remote';
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
+  import { preloadMatterviz } from '$lib/utils/matterviz';
 
   interface Props {
     molecule: Sample['ground'] | Sample['excited'];
@@ -53,14 +54,25 @@
     });
   });
 
+  let Structure = $state<any>(null);
+
   let placeholder_title = $derived.by(() => {
+    if (!Structure) return 'Loading MatterViz...';
     if (!molecule?.id) return 'No molecule selected';
     if (molecule?.id && !loading_structure && !structure_string) return 'Molecule file not found';
   });
 
   let placeholder_description = $derived.by(() => {
+    if (!Structure) return '';
     if (!molecule?.id) return 'Select a molecule to view its structure.';
     if (loading_structure && !structure_string) return 'Loading molecule';
+  });
+
+  onMount(async () => {
+    // Get structure from preloaded MatterViz
+    let matterviz = await preloadMatterviz();
+    // @ts-ignore
+    Structure = matterviz.Structure;
   });
 </script>
 
