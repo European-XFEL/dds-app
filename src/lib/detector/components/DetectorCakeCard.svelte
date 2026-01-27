@@ -54,10 +54,11 @@
         <div class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
           {#await import('./ui/CakeCartesian.svelte')}
             <Skeleton
-              class="h-[{panelShape.height}px] w-[{panelShape.width}px] mx-auto block rounded-lg bg-muted/30"
+              class="mx-auto block rounded-lg bg-muted/30"
+              style="width: {panelShape.width}px; height: {panelShape.height}px;"
             />
           {:then { default: CakeViewCartesian }}
-            <div in:fade|global={{ duration: 200 }}>
+            <div in:fade>
               <CakeViewCartesian bind:beamCenter bind:modules {panelShape} />
             </div>
           {/await}
@@ -67,10 +68,11 @@
         <div class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
           {#await import('./ui/CakePolar.svelte')}
             <Skeleton
-              class="h-[{panelShape.height}px] w-[{panelShape.width}px] mx-auto block rounded-lg bg-muted/30"
+              class="mx-auto block rounded-lg bg-muted/30"
+              style="width: {panelShape.width}px; height: {panelShape.height}px;"
             />
           {:then { default: CakeViewPolar }}
-            <div in:fade|global={{ duration: 200 }}>
+            <div in:fade>
               <CakeViewPolar
                 {beamCenter}
                 {modules}
