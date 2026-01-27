@@ -52,8 +52,10 @@
           Combine solute structural changes with solvent thermal response
         </p>
       </div>
-      <div class="grid gap-6 md:grid-cols-2">
-        <Card.Root>
+      <div class="cards-grid grid gap-6 md:grid-cols-2">
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Action
               class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-500/10"
@@ -75,7 +77,9 @@
           </Card.Content>
         </Card.Root>
 
-        <Card.Root>
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Action
               class="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10"
@@ -97,7 +101,9 @@
           </Card.Content>
         </Card.Root>
 
-        <Card.Root>
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Action
               class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-500/10"
@@ -119,7 +125,9 @@
           </Card.Content>
         </Card.Root>
 
-        <Card.Root>
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Action
               class="flex h-12 w-12 items-center justify-center rounded-lg bg-red-500/10"
@@ -147,8 +155,10 @@
           Set up all parameters needed for accurate scattering predictions
         </p>
       </div>
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card.Root>
+      <div class="features-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Title class="text-base">Molecular Structures</Card.Title>
             <Card.Action>
@@ -161,7 +171,9 @@
           </Card.Header>
         </Card.Root>
 
-        <Card.Root>
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Title class="text-base">Solvent Library</Card.Title>
             <Card.Action>
@@ -174,7 +186,9 @@
           </Card.Header>
         </Card.Root>
 
-        <Card.Root>
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Title class="text-base">Pump Parameters</Card.Title>
             <Card.Action>
@@ -188,7 +202,9 @@
           </Card.Header>
         </Card.Root>
 
-        <Card.Root>
+        <Card.Root
+          class="rounded-none border-0 bg-white/25 shadow-none backdrop-blur-sm dark:bg-slate-900/40"
+        >
           <Card.Header>
             <Card.Title class="text-base">Detector Geometry</Card.Title>
             <Card.Action>
