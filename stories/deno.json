@@ -1,8 +1,0 @@
-{
-  "imports": {
-    "@std/assert": "jsr:@std/assert@1",
-    "@storybook/addon-svelte-csf": "npm:@storybook/addon-svelte-csf@^5.0.10",
-    "@storybook/sveltekit": "npm:@storybook/sveltekit@^10.2.0",
-    "storybook": "npm:storybook@^10.2.0"
-  }
-}
