@@ -30,7 +30,8 @@
           X-Ray Solution Scattering Simulator
         </h1>
         <p class="mx-auto max-w-2xl text-lg text-pretty text-muted-foreground">
-          Proof of concept web interface for X-ray solution scattering simulation
+          Proof of concept web interface for X-ray solution scattering
+          simulation
         </p>
       </div>
       <div class="flex flex-wrap justify-center gap-3">
@@ -64,7 +65,8 @@
             </Card.Action>
             <Card.Title>Solute Difference</Card.Title>
             <Card.Description>
-              Compute intensity difference between excited and ground state molecular structures
+              Compute intensity difference between excited and ground state
+              molecular structures
             </Card.Description>
           </Card.Header>
           <Card.Content>
@@ -112,7 +114,8 @@
             </Card.Action>
             <Card.Title>Combined Signal</Card.Title>
             <Card.Description>
-              Predict the total difference scattering as measured at the detector
+              Predict the total difference scattering as measured at the
+              detector
             </Card.Description>
           </Card.Header>
           <Card.Content>
@@ -136,8 +139,8 @@
             </Card.Action>
             <Card.Title>Image Recreation</Card.Title>
             <Card.Description>
-              Simulate detector images based on detector information (geometry, masks, etc...) and
-              combined scattering signal
+              Simulate detector images based on detector information (geometry,
+              masks, etc...) and combined scattering signal
             </Card.Description>
           </Card.Header>
           <Card.Content>
@@ -165,7 +168,8 @@
               <Atom class="h-5 w-5 text-primary" />
             </Card.Action>
             <Card.Description class="text-sm text-muted-foreground">
-              Upload XYZ for ground and excited states. Supports arbitrary molecular geometries.
+              Upload XYZ for ground and excited states. Supports arbitrary
+              molecular geometries.
               <!-- TODO: Limit upload file by no. of atoms -->
             </Card.Description>
           </Card.Header>
@@ -180,8 +184,8 @@
               <Beaker class="h-5 w-5 text-primary" />
             </Card.Action>
             <Card.Description class="text-sm text-muted-foreground">
-              Pre-loaded <Latex math={String.raw`\partial S/\partial T`} /> data for common solvents with
-              temperature-dependent response curves.
+              Pre-loaded <Latex math={String.raw`\partial S/\partial T`} /> data for
+              common solvents with temperature-dependent response curves.
             </Card.Description>
           </Card.Header>
         </Card.Root>
@@ -195,9 +199,9 @@
               <Radiation class="h-5 w-5 text-primary" />
             </Card.Action>
             <Card.Description class="text-sm text-muted-foreground">
-              Configure photon energy, excited state energy, and excitation fraction (<Latex
-                math={String.raw`\alpha`}
-              />) for your optical pump.
+              Configure photon energy, excited state energy, and excitation
+              fraction (<Latex math={String.raw`\alpha`} />) for your optical
+              pump.
             </Card.Description>
           </Card.Header>
         </Card.Root>
@@ -211,7 +215,8 @@
               <Microscope class="h-5 w-5 text-primary" />
             </Card.Action>
             <Card.Description class="text-sm text-muted-foreground">
-              Support for European XFEL detectors with configurable sample-detector distance.
+              Support for European XFEL detectors with configurable
+              sample-detector distance.
             </Card.Description>
           </Card.Header>
         </Card.Root>

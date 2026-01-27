@@ -1,9 +1,8 @@
 <script module>
   import { defineMeta } from '@storybook/addon-svelte-csf';
 
-  import { createSimulationSeed } from '$lib/state.svelte';
-
   import PumpSetupCard from '$lib/pump/components/PumpSetupCard.svelte';
+  import { createSimulationSeed } from '$lib/state.svelte';
 
   const defaultState = createSimulationSeed();
 

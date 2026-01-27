@@ -199,7 +199,10 @@
     for (const qRing of CONFIG.rings) {
       const distance = Math.abs(normalizedRadius - qRing);
       if (distance < CONFIG.ringWidth * 2) {
-        intensity += Math.exp(-(distance * distance) / twoSigmaSq) * 0.8 * (1 - qRing * 0.5);
+        intensity +=
+          Math.exp(-(distance * distance) / twoSigmaSq) *
+          0.8 *
+          (1 - qRing * 0.5);
       }
     }
     if (normalizedRadius < CONFIG.beamStopRadius) {
@@ -295,7 +298,13 @@
 
       const fb = gl!.createFramebuffer()!;
       gl!.bindFramebuffer(gl!.FRAMEBUFFER, fb);
-      gl!.framebufferTexture2D(gl!.FRAMEBUFFER, gl!.COLOR_ATTACHMENT0, gl!.TEXTURE_2D, tex, 0);
+      gl!.framebufferTexture2D(
+        gl!.FRAMEBUFFER,
+        gl!.COLOR_ATTACHMENT0,
+        gl!.TEXTURE_2D,
+        tex,
+        0,
+      );
       framebuffers.push(fb);
     }
 
@@ -332,7 +341,17 @@
     const lutData = buildColorLUT();
     colorLutTexture = gl!.createTexture()!;
     gl!.bindTexture(gl!.TEXTURE_2D, colorLutTexture);
-    gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, 256, 1, 0, gl!.RGBA, gl!.UNSIGNED_BYTE, lutData);
+    gl!.texImage2D(
+      gl!.TEXTURE_2D,
+      0,
+      gl!.RGBA,
+      256,
+      1,
+      0,
+      gl!.RGBA,
+      gl!.UNSIGNED_BYTE,
+      lutData,
+    );
     gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
     gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
     gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
@@ -407,12 +426,28 @@
     gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
     gl.uniform1i(gl.getUniformLocation(updateProgram, 'u_noise'), 2);
 
-    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_decayRate'), CONFIG.intensityDecay);
-    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_pulseFade'), 1 / CONFIG.pulseFadeDuration);
-    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_photonRate'), normalizedPhotonRate);
-    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_maxIntensity'), CONFIG.maxIntensity);
+    gl.uniform1f(
+      gl.getUniformLocation(updateProgram, 'u_decayRate'),
+      CONFIG.intensityDecay,
+    );
+    gl.uniform1f(
+      gl.getUniformLocation(updateProgram, 'u_pulseFade'),
+      1 / CONFIG.pulseFadeDuration,
+    );
+    gl.uniform1f(
+      gl.getUniformLocation(updateProgram, 'u_photonRate'),
+      normalizedPhotonRate,
+    );
+    gl.uniform1f(
+      gl.getUniformLocation(updateProgram, 'u_maxIntensity'),
+      CONFIG.maxIntensity,
+    );
     gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_time'), time * 0.001);
-    gl.uniform2f(gl.getUniformLocation(updateProgram, 'u_resolution'), pixelsX, pixelsY);
+    gl.uniform2f(
+      gl.getUniformLocation(updateProgram, 'u_resolution'),
+      pixelsX,
+      pixelsY,
+    );
 
     gl.bindVertexArray(quadVAO);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -432,11 +467,28 @@
     gl.bindTexture(gl.TEXTURE_2D, colorLutTexture);
     gl.uniform1i(gl.getUniformLocation(renderProgram, 'u_colorLut'), 1);
 
-    gl.uniform1f(gl.getUniformLocation(renderProgram, 'u_maxIntensity'), CONFIG.maxIntensity);
-    gl.uniform1f(gl.getUniformLocation(renderProgram, 'u_pulseBoost'), CONFIG.pulseBoost);
-    gl.uniform2f(gl.getUniformLocation(renderProgram, 'u_resolution'), width, height);
-    gl.uniform2f(gl.getUniformLocation(renderProgram, 'u_detectorSize'), pixelsX, pixelsY);
-    gl.uniform1f(gl.getUniformLocation(renderProgram, 'u_pixelSize'), CONFIG.pixelSize);
+    gl.uniform1f(
+      gl.getUniformLocation(renderProgram, 'u_maxIntensity'),
+      CONFIG.maxIntensity,
+    );
+    gl.uniform1f(
+      gl.getUniformLocation(renderProgram, 'u_pulseBoost'),
+      CONFIG.pulseBoost,
+    );
+    gl.uniform2f(
+      gl.getUniformLocation(renderProgram, 'u_resolution'),
+      width,
+      height,
+    );
+    gl.uniform2f(
+      gl.getUniformLocation(renderProgram, 'u_detectorSize'),
+      pixelsX,
+      pixelsY,
+    );
+    gl.uniform1f(
+      gl.getUniformLocation(renderProgram, 'u_pixelSize'),
+      CONFIG.pixelSize,
+    );
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 

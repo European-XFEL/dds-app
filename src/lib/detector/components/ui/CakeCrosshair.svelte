@@ -22,7 +22,7 @@
 
 <g
   class="cursor-move text-destructive"
-  style="touch-action: none;"
+  style="touch-action: none"
   role="button"
   tabindex="0"
   aria-label="Beam center crosshair"

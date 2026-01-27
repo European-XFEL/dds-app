@@ -1,4 +1,5 @@
 import { defineConfig } from 'drizzle-kit';
+
 import process from 'node:process';
 
 const env = process.env;
@@ -20,8 +21,7 @@ if (!DB_HOST || !DB_NAME) {
   );
 }
 
-const DATABASE_URL =
-  `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+const DATABASE_URL = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
 
 console.log('Using database URL:', DATABASE_URL);
 

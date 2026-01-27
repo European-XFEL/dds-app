@@ -42,7 +42,8 @@
     document.documentElement.classList.toggle(
       'dark',
       localStorage.theme === 'dark' ||
-        (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches),
+        (!('theme' in localStorage) &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches),
     );
   }
 
@@ -55,7 +56,7 @@
   const showSidebar = $derived(page.url.pathname !== heroPathname);
 </script>
 
-<Sidebar.Provider style="--sidebar-width: 19rem;">
+<Sidebar.Provider style="--sidebar-width: 19rem">
   {#if showSidebar}
     <AppSidebar {sample} />
   {/if}

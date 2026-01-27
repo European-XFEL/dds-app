@@ -18,11 +18,15 @@ function getDb(): DB {
   const DB_NAME = env['DB_NAME'];
 
   if (!DB_USER || !DB_PASSWORD) {
-    throw new Error('Missing DB credentials: set DB_USER and DB_PASSWORD environment variables');
+    throw new Error(
+      'Missing DB credentials: set DB_USER and DB_PASSWORD environment variables',
+    );
   }
 
   if (!DB_HOST || !DB_NAME) {
-    throw new Error('Missing DB host info: set DB_HOST and DB_NAME environment variables');
+    throw new Error(
+      'Missing DB host info: set DB_HOST and DB_NAME environment variables',
+    );
   }
 
   const DATABASE_URL = `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;

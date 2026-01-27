@@ -125,7 +125,9 @@
         {#each group.items as item (item.title)}
           <Sidebar.MenuItem>
             <Sidebar.MenuButton
-              {...item?.disabled ? { 'aria-disabled': 'true', tabindex: -1 } : {}}
+              {...item?.disabled
+                ? { 'aria-disabled': 'true', tabindex: -1 }
+                : {}}
             >
               {#snippet tooltipContent()}
                 {item.title}

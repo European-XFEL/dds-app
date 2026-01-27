@@ -45,7 +45,12 @@
         simulation.sample.ground!.id,
         simulation.sample.excited!.id,
       ),
-    () => !!(simulation.sample.ground?.id && simulation.sample.excited?.id && simulation.qRange),
+    () =>
+      !!(
+        simulation.sample.ground?.id &&
+        simulation.sample.excited?.id &&
+        simulation.qRange
+      ),
   );
 
   const solventResource = createScatteringResource(
@@ -56,17 +61,28 @@
         calculations.deltaT!,
       ),
     () =>
-      !!(simulation.sample.solvent?.id && calculations.ratioSolventSolute && calculations.deltaT),
+      !!(
+        simulation.sample.solvent?.id &&
+        calculations.ratioSolventSolute &&
+        calculations.deltaT
+      ),
   );
 
   // Combined difference scattering signal
   const deltaS = $derived(
-    computeDeltaS(soluteResource.value, solventResource.value, calculations.excitedStateFraction),
+    computeDeltaS(
+      soluteResource.value,
+      solventResource.value,
+      calculations.excitedStateFraction,
+    ),
   );
 
   // Solute contribution scaled by excited fraction for display
   const deltaSSoluteScaled = $derived(
-    scaleSoluteByExcitedFraction(soluteResource.value, calculations.excitedStateFraction),
+    scaleSoluteByExcitedFraction(
+      soluteResource.value,
+      calculations.excitedStateFraction,
+    ),
   );
 
   const constant_options: ECOption = {
@@ -119,7 +135,8 @@
 
   let xAxis = $derived<ECOption['xAxis']>({
     id: 'q',
-    data: deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
+    data:
+      deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
   });
 
   const series_common: LineSeriesOption = {

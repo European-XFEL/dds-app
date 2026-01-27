@@ -151,8 +151,8 @@ function quadToSvgPath(
 
   return (
     svgPoints
-      .map((p, i) =>
-        `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`
+      .map(
+        (p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`,
       )
       .join(' ') + ' Z'
   );
@@ -218,8 +218,8 @@ export function generateCakedGridLines(
   const thetaSpan = rangeSpan(twoThetaRange);
   const twoThetaLines: number[] = [];
   if (twoThetaStepDegrees > 0) {
-    const start = Math.ceil(twoThetaMin / twoThetaStepDegrees) *
-      twoThetaStepDegrees;
+    const start =
+      Math.ceil(twoThetaMin / twoThetaStepDegrees) * twoThetaStepDegrees;
     for (
       let theta = start;
       theta <= twoThetaMax + 1e-6;

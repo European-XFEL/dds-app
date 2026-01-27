@@ -17,7 +17,9 @@
 <Field.Set>
   {#if !short}
     <Field.Legend>X-Ray Probe Configuration</Field.Legend>
-    <Field.Description>Configure the X-ray probe wavelength settings.</Field.Description>
+    <Field.Description
+      >Configure the X-ray probe wavelength settings.</Field.Description
+    >
   {/if}
 
   <Field.Group>

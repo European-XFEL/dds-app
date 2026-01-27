@@ -30,7 +30,7 @@ export async function fetchDeltaSSolute(
   // Validate Q ranges match
   if (
     ground.q.map((v) => v.toFixed(6)).toString() !==
-      excited.q.map((v) => v.toFixed(6)).toString()
+    excited.q.map((v) => v.toFixed(6)).toString()
   ) {
     throw new Error('Q ranges of ground and excited states do not match.');
   }

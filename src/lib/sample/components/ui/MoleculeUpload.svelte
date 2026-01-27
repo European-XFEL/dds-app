@@ -50,7 +50,11 @@
 
     const contents = await file.text();
 
-    uploadMolecule({ name: name ?? name_placeholder, filename: file.name, contents })
+    uploadMolecule({
+      name: name ?? name_placeholder,
+      filename: file.name,
+      contents,
+    })
       .then(async (response) => {
         if (response?.error) {
           error = response.error;
@@ -71,11 +75,15 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>Upload</Dialog.Trigger>
+  <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
+    Upload
+  </Dialog.Trigger>
   <Dialog.Content class="sm:max-w-[425px]">
     <Dialog.Header>
       <Dialog.Title>Upload Molecule File</Dialog.Title>
-      <Dialog.Description>Choose a .xyz file and provide a name (optional).</Dialog.Description>
+      <Dialog.Description>
+        Choose a .xyz file and provide a name (optional).
+      </Dialog.Description>
     </Dialog.Header>
 
     <div class="grid gap-4">
@@ -93,7 +101,12 @@
       </div>
       <div class="grid gap-3">
         <Label for="name-1">Name</Label>
-        <Input id="name-1" name="name" placeholder={name_placeholder} bind:value={name} />
+        <Input
+          id="name-1"
+          name="name"
+          placeholder={name_placeholder}
+          bind:value={name}
+        />
       </div>
       {#if error}
         <div class="text-sm text-destructive">{error}</div>
@@ -101,7 +114,9 @@
     </div>
 
     <Dialog.Footer>
-      <Dialog.Close class={buttonVariants({ variant: 'outline' })}>Cancel</Dialog.Close>
+      <Dialog.Close class={buttonVariants({ variant: 'outline' })}>
+        Cancel
+      </Dialog.Close>
       <Button type="submit" onclick={upload} disabled={uploading || !!error}>
         Upload
         {#if uploading}

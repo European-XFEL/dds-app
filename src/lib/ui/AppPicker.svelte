@@ -65,7 +65,10 @@
       >
         {#if apps.length}
           {#each apps as app (app.title)}
-            <DropdownMenu.Item onSelect={() => handleSelect(app)} disabled={app.disabled}>
+            <DropdownMenu.Item
+              onSelect={() => handleSelect(app)}
+              disabled={app.disabled}
+            >
               <span>{app.title}</span>
               {#if app === displayApp}
                 <CheckIcon class="ml-auto size-4" />

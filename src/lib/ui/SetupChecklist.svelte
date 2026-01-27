@@ -28,14 +28,36 @@
     hasPump: boolean;
   }
 
-  let { hasGroundMolecule, hasExcitedMolecule, hasSolvent, hasDetector, hasPump }: Props = $props();
+  let {
+    hasGroundMolecule,
+    hasExcitedMolecule,
+    hasSolvent,
+    hasDetector,
+    hasPump,
+  }: Props = $props();
 
   const items = $derived<ChecklistItem[]>([
     { label: 'Select Solvent', completed: hasSolvent, icon: Beaker },
-    { label: 'Select Ground Molecule', completed: hasGroundMolecule, icon: Atom },
-    { label: 'Select Excited Molecule', completed: hasExcitedMolecule, icon: Atom },
-    { label: 'Configure IR Optical Pump and Probe', completed: hasPump, icon: Projector },
-    { label: 'Configure Detector', completed: hasDetector, icon: Fullscreen },
+    {
+      label: 'Select Ground Molecule',
+      completed: hasGroundMolecule,
+      icon: Atom,
+    },
+    {
+      label: 'Select Excited Molecule',
+      completed: hasExcitedMolecule,
+      icon: Atom,
+    },
+    {
+      label: 'Configure IR Optical Pump and Probe',
+      completed: hasPump,
+      icon: Projector,
+    },
+    {
+      label: 'Configure Detector',
+      completed: hasDetector,
+      icon: Fullscreen,
+    },
   ]);
 
   const completedCount = $derived(items.filter((i) => i.completed).length);
@@ -43,7 +65,9 @@
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center p-8">
-  <div class="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-sm">
+  <div
+    class="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-sm"
+  >
     <div class="mb-6 flex items-center gap-3">
       <div class="rounded-full bg-primary/10 p-2">
         <FlaskConical class="h-5 w-5 text-primary" />
@@ -57,6 +81,7 @@
     </div>
 
     <div class="mb-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+      <!-- deno-fmt-ignore -->
       <div
         class="h-full bg-primary transition-all duration-300 ease-out"
         style="width: {(completedCount / items.length) * 100}%"
@@ -87,7 +112,9 @@
           <span
             class={cn(
               'text-sm transition-colors',
-              item.completed ? 'text-muted-foreground line-through' : 'text-foreground',
+              item.completed
+                ? 'text-muted-foreground line-through'
+                : 'text-foreground',
             )}
           >
             {item.label}
@@ -97,7 +124,9 @@
     </ul>
 
     {#if allComplete}
-      <div class="mt-6 rounded-md bg-primary/10 p-3 text-center text-sm text-primary">
+      <div
+        class="mt-6 rounded-md bg-primary/10 p-3 text-center text-sm text-primary"
+      >
         All set! Your scattering signals should now be displayed.
       </div>
     {:else}

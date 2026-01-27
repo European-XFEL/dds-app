@@ -39,8 +39,11 @@
         <Tooltip.Root>
           <Tooltip.Trigger><BadgeInfo size={16} /></Tooltip.Trigger>
           <Tooltip.Content class="w-fit max-w-xs">
-            Drag the <span class="font-medium text-destructive">red crosshair</span> to move the
-            beam center or drag the <span class="font-medium text-blue-600">colored modules</span>
+            Drag the <span class="font-medium text-destructive">
+              red crosshair</span
+            >
+            to move the beam center or drag the
+            <span class="font-medium text-blue-600">colored modules</span>
             to reposition them. The caked projection updates in real time.
           </Tooltip.Content>
         </Tooltip.Root>
@@ -51,8 +54,11 @@
   <Card.Content class="flex min-w-fit flex-col gap-6">
     <div class="flex grow flex-wrap justify-center-safe gap-6">
       <div class="min-w-fit">
-        <div class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
+        <div
+          class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner"
+        >
           {#await import('./ui/CakeCartesian.svelte')}
+            <!-- deno-fmt-ignore -->
             <Skeleton
               class="mx-auto block rounded-lg bg-muted/30"
               style="width: {panelShape.width}px; height: {panelShape.height}px;"
@@ -65,8 +71,11 @@
         </div>
       </div>
       <div class="min-w-fit">
-        <div class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner">
+        <div
+          class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner"
+        >
           {#await import('./ui/CakePolar.svelte')}
+            <!-- deno-fmt-ignore -->
             <Skeleton
               class="mx-auto block rounded-lg bg-muted/30"
               style="width: {panelShape.width}px; height: {panelShape.height}px;"

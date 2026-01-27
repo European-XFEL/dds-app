@@ -13,8 +13,8 @@ const timestamps = {
   createdAt: timestamp({ mode: 'date', precision: 3 })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(() =>
-    new Date()
+  updatedAt: timestamp({ mode: 'date', precision: 3 }).$onUpdate(
+    () => new Date(),
   ),
 };
 
