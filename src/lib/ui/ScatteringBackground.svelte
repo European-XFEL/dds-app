@@ -1,36 +1,218 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
 
   import { browser } from '$app/environment';
 
   const CONFIG = {
     pixelSize: 8,
-    maxIntensity: 100,
-    beamCenter: { x: 0.5, y: 0.45 },
-    // Scattering pattern
+    maxIntensity: 30,
+    beamCenter: { x: 0.5, y: 0.55 },
     rings: [0.12, 0.28, 0.48, 0.72] as const,
     ringWidth: 0.04,
     backgroundDecay: 3.0,
     beamStopRadius: 0.04,
-    // Pulse timing (FEL structure)
     pulseFrames: 15,
     gapFrames: 60,
     photonRateHigh: 20_000,
-    photonRateLow: 1_000,
-    // Visual
+    photonRateLow: 1,
     intensityDecay: 0.92,
     pulseFadeDuration: 8,
     pulseBoost: 0.6,
   } as const;
 
-  // === Precomputed color LUT (256 entries) ===
-  const COLOR_LUT = new Uint8Array(256 * 4); // RGBA for each intensity level
-  (function buildColorLUT() {
+  let canvas: HTMLCanvasElement;
+  let gl: WebGL2RenderingContext | null = null;
+  let animationId: number;
+  let frameCounter = 0;
+
+  // WebGL resources
+  let updateProgram: WebGLProgram;
+  let renderProgram: WebGLProgram;
+  let stateTextures: WebGLTexture[] = [];
+  let framebuffers: WebGLFramebuffer[] = [];
+  let probabilityTexture: WebGLTexture;
+  let colorLutTexture: WebGLTexture;
+  let noiseTexture: WebGLTexture;
+  let quadVAO: WebGLVertexArrayObject;
+  let currentState = 0;
+  let pixelsX = 0;
+  let pixelsY = 0;
+
+  // === Shader sources ===
+  const VERTEX_SHADER = `#version 300 es
+    in vec2 a_position;
+    out vec2 v_uv;
+    void main() {
+      v_uv = a_position * 0.5 + 0.5;
+      gl_Position = vec4(a_position, 0.0, 1.0);
+    }
+  `;
+
+  // Update shader: decay intensities, add photons
+  const UPDATE_SHADER = `#version 300 es
+    precision highp float;
+
+    uniform sampler2D u_state;
+    uniform sampler2D u_probability;
+    uniform sampler2D u_noise;
+    uniform float u_decayRate;
+    uniform float u_pulseFade;
+    uniform float u_photonRate;
+    uniform float u_maxIntensity;
+    uniform float u_time;
+    uniform vec2 u_resolution;
+
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    // Hash function for additional randomness
+    float hash(vec2 p) {
+      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+      p3 += dot(p3, p3.yzx + 33.33);
+      return fract((p3.x + p3.y) * p3.z);
+    }
+
+    void main() {
+      vec4 state = texture(u_state, v_uv);
+      float intensity = state.r;
+      float pulseTimer = state.g;
+
+      // Decay
+      intensity = intensity > 0.1 ? intensity * u_decayRate : 0.0;
+      pulseTimer = max(0.0, pulseTimer - u_pulseFade);
+
+      // Sample noise texture with time offset for randomness
+      vec2 noiseUV = fract(v_uv + vec2(u_time * 0.1, u_time * 0.07));
+      float noise = texture(u_noise, noiseUV).r;
+
+      // Additional hash-based randomness
+      float rand = hash(v_uv * u_resolution + u_time);
+
+      // Probability of this pixel receiving a photon
+      float prob = texture(u_probability, v_uv).r;
+
+      // Scale probability by photon rate (normalized)
+      float threshold = prob * u_photonRate * 0.5;
+
+      // Add photons stochastically
+      if (noise * rand < threshold) {
+        intensity = min(intensity + 2.0, u_maxIntensity);
+        pulseTimer = 1.0;
+      }
+
+      fragColor = vec4(intensity, pulseTimer, 0.0, 1.0);
+    }
+  `;
+
+  // Render shader: convert state to visual output with color LUT
+  const RENDER_SHADER = `#version 300 es
+    precision highp float;
+
+    uniform sampler2D u_state;
+    uniform sampler2D u_colorLut;
+    uniform float u_maxIntensity;
+    uniform float u_pulseBoost;
+    uniform vec2 u_resolution;
+    uniform vec2 u_detectorSize;
+    uniform float u_pixelSize;
+
+    in vec2 v_uv;
+    out vec4 fragColor;
+
+    void main() {
+      // Background color
+      vec3 bgColor = vec3(250.0, 250.0, 252.0) / 255.0;
+
+      // Calculate detector pixel coordinates
+      vec2 pixelCoord = v_uv * u_resolution;
+      vec2 detectorPixel = floor(pixelCoord / u_pixelSize);
+      vec2 withinPixel = mod(pixelCoord, u_pixelSize);
+
+      // Grid gap effect (1px border)
+      if (withinPixel.x >= u_pixelSize - 1.0 || withinPixel.y >= u_pixelSize - 1.0) {
+        fragColor = vec4(bgColor, 1.0);
+        return;
+      }
+
+      // Sample state at detector pixel center
+      vec2 stateUV = (detectorPixel + 0.5) / u_detectorSize;
+
+      // Clamp to valid range
+      if (stateUV.x < 0.0 || stateUV.x > 1.0 || stateUV.y < 0.0 || stateUV.y > 1.0) {
+        fragColor = vec4(bgColor, 1.0);
+        return;
+      }
+
+      vec4 state = texture(u_state, stateUV);
+      float intensity = state.r;
+      float pulseTimer = state.g;
+
+      if (intensity < 0.1) {
+        fragColor = vec4(bgColor, 1.0);
+        return;
+      }
+
+      // Look up color from LUT
+      float lutCoord = min(1.0, intensity / u_maxIntensity);
+      vec4 color = texture(u_colorLut, vec2(lutCoord, 0.5));
+
+      // Apply pulse boost
+      if (pulseTimer > 0.0) {
+        float boost = pulseTimer * u_pulseBoost;
+        color.r = min(1.0, color.r + boost * (1.0 - color.r));
+        color.g = min(1.0, color.g + boost * (1.0 - color.g));
+        color.b = min(1.0, color.b + boost * (100.0 / 255.0));
+        color.a = min(1.0, color.a + boost * (76.0 / 255.0));
+      }
+
+      // Alpha blend with background
+      vec3 blended = color.rgb * color.a + bgColor * (1.0 - color.a);
+      fragColor = vec4(blended, 1.0);
+    }
+  `;
+
+  function createShader(type: number, source: string): WebGLShader {
+    const shader = gl!.createShader(type)!;
+    gl!.shaderSource(shader, source);
+    gl!.compileShader(shader);
+    if (!gl!.getShaderParameter(shader, gl!.COMPILE_STATUS)) {
+      console.error('Shader compile error:', gl!.getShaderInfoLog(shader));
+    }
+    return shader;
+  }
+
+  function createProgram(vertSrc: string, fragSrc: string): WebGLProgram {
+    const program = gl!.createProgram()!;
+    gl!.attachShader(program, createShader(gl!.VERTEX_SHADER, vertSrc));
+    gl!.attachShader(program, createShader(gl!.FRAGMENT_SHADER, fragSrc));
+    gl!.linkProgram(program);
+    if (!gl!.getProgramParameter(program, gl!.LINK_STATUS)) {
+      console.error('Program link error:', gl!.getProgramInfoLog(program));
+    }
+    return program;
+  }
+
+  function computeScatteringIntensity(normalizedRadius: number): number {
+    let intensity = Math.exp(-normalizedRadius * CONFIG.backgroundDecay);
+    const sigma = CONFIG.ringWidth * 0.3;
+    const twoSigmaSq = 2 * sigma * sigma;
+    for (const qRing of CONFIG.rings) {
+      const distance = Math.abs(normalizedRadius - qRing);
+      if (distance < CONFIG.ringWidth * 2) {
+        intensity += Math.exp(-(distance * distance) / twoSigmaSq) * 0.8 * (1 - qRing * 0.5);
+      }
+    }
+    if (normalizedRadius < CONFIG.beamStopRadius) {
+      intensity *= normalizedRadius / CONFIG.beamStopRadius;
+    }
+    return Math.min(intensity, 1);
+  }
+
+  function buildColorLUT(): Uint8Array {
+    const lut = new Uint8Array(256 * 4);
     for (let i = 0; i < 256; i++) {
       const t = i / 255;
       let r: number, g: number, b: number, a: number;
-
       if (t < 0.3) {
         const s = t / 0.3;
         r = 245 - s * 45;
@@ -50,228 +232,213 @@
         b = 200 + s * 30;
         a = (0.8 + s * 0.2) * 255;
       }
-
       const idx = i * 4;
-      COLOR_LUT[idx] = r;
-      COLOR_LUT[idx + 1] = g;
-      COLOR_LUT[idx + 2] = b;
-      COLOR_LUT[idx + 3] = a;
+      lut[idx] = r;
+      lut[idx + 1] = g;
+      lut[idx + 2] = b;
+      lut[idx + 3] = a;
     }
-  })();
-
-  // === State ===
-  let canvas: HTMLCanvasElement = $state()!;
-  let ctx: CanvasRenderingContext2D | null = null;
-  let imageData: ImageData;
-  let animationId: number;
-
-  let width = 0;
-  let height = 0;
-  let pixelsX = 0;
-  let pixelsY = 0;
-  let beamCenterX = 0;
-  let beamCenterY = 0;
-  let maxRadius = 0;
-  let frameCounter = 0;
-
-  // Typed arrays for detector state
-  let intensities: Float32Array;
-  let pulseTimers: Float32Array;
-  let probabilityMap: Float32Array; // Precomputed scattering probabilities
-  let cumulativeProb: Float32Array; // For weighted random sampling
-
-  // === Scattering intensity function (called once per pixel on init) ===
-  function computeScatteringIntensity(normalizedRadius: number): number {
-    let intensity = Math.exp(-normalizedRadius * CONFIG.backgroundDecay);
-
-    // Ring features
-    const sigma = CONFIG.ringWidth * 0.3;
-    const twoSigmaSq = 2 * sigma * sigma;
-    for (const qRing of CONFIG.rings) {
-      const distance = Math.abs(normalizedRadius - qRing);
-      if (distance < CONFIG.ringWidth * 2) {
-        intensity += Math.exp(-(distance * distance) / twoSigmaSq) * 0.8 * (1 - qRing * 0.5);
-      }
-    }
-
-    // Beam stop
-    if (normalizedRadius < CONFIG.beamStopRadius) {
-      intensity *= normalizedRadius / CONFIG.beamStopRadius;
-    }
-
-    return Math.min(intensity, 1);
+    return lut;
   }
 
-  // === Initialize detector and precompute probability map ===
-  function initDetector() {
+  function initWebGL() {
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetHeight;
+    canvas.width = width;
+    canvas.height = height;
+
     pixelsX = Math.ceil(width / CONFIG.pixelSize);
     pixelsY = Math.ceil(height / CONFIG.pixelSize);
-    beamCenterX = pixelsX * CONFIG.beamCenter.x;
-    beamCenterY = pixelsY * CONFIG.beamCenter.y;
-    maxRadius = Math.sqrt(pixelsX * pixelsX + pixelsY * pixelsY) / 2;
+    const beamCenterX = pixelsX * CONFIG.beamCenter.x;
+    const beamCenterY = pixelsY * CONFIG.beamCenter.y;
+    const maxRadius = Math.sqrt(pixelsX * pixelsX + pixelsY * pixelsY) / 2;
 
-    const numPixels = pixelsX * pixelsY;
-    intensities = new Float32Array(numPixels);
-    pulseTimers = new Float32Array(numPixels);
-    probabilityMap = new Float32Array(numPixels);
-    cumulativeProb = new Float32Array(numPixels);
+    // Create programs
+    updateProgram = createProgram(VERTEX_SHADER, UPDATE_SHADER);
+    renderProgram = createProgram(VERTEX_SHADER, RENDER_SHADER);
 
-    // Precompute scattering probability for each pixel
-    let cumulative = 0;
+    // Create quad VAO
+    quadVAO = gl!.createVertexArray()!;
+    gl!.bindVertexArray(quadVAO);
+    const quadBuffer = gl!.createBuffer()!;
+    gl!.bindBuffer(gl!.ARRAY_BUFFER, quadBuffer);
+    gl!.bufferData(
+      gl!.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+      gl!.STATIC_DRAW,
+    );
+    const posLoc = gl!.getAttribLocation(updateProgram, 'a_position');
+    gl!.enableVertexAttribArray(posLoc);
+    gl!.vertexAttribPointer(posLoc, 2, gl!.FLOAT, false, 0, 0);
+
+    // Create state textures (ping-pong) - initialize with zeros to avoid lazy init warning
+    const initialStateData = new Float32Array(pixelsX * pixelsY * 4);
+    for (let i = 0; i < 2; i++) {
+      const tex = gl!.createTexture()!;
+      gl!.bindTexture(gl!.TEXTURE_2D, tex);
+      gl!.texImage2D(
+        gl!.TEXTURE_2D,
+        0,
+        gl!.RGBA32F,
+        pixelsX,
+        pixelsY,
+        0,
+        gl!.RGBA,
+        gl!.FLOAT,
+        initialStateData,
+      );
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.NEAREST);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.NEAREST);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
+      gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
+      stateTextures.push(tex);
+
+      const fb = gl!.createFramebuffer()!;
+      gl!.bindFramebuffer(gl!.FRAMEBUFFER, fb);
+      gl!.framebufferTexture2D(gl!.FRAMEBUFFER, gl!.COLOR_ATTACHMENT0, gl!.TEXTURE_2D, tex, 0);
+      framebuffers.push(fb);
+    }
+
+    // Create probability texture
+    const probData = new Float32Array(pixelsX * pixelsY * 4);
     for (let py = 0; py < pixelsY; py++) {
       for (let px = 0; px < pixelsX; px++) {
-        const idx = py * pixelsX + px;
+        const idx = (py * pixelsX + px) * 4;
         const dx = px - beamCenterX;
         const dy = py - beamCenterY;
         const normalizedRadius = Math.sqrt(dx * dx + dy * dy) / maxRadius;
-        const prob = computeScatteringIntensity(normalizedRadius);
-        probabilityMap[idx] = prob;
-        cumulative += prob;
-        cumulativeProb[idx] = cumulative;
+        probData[idx] = computeScatteringIntensity(normalizedRadius);
       }
     }
+    probabilityTexture = gl!.createTexture()!;
+    gl!.bindTexture(gl!.TEXTURE_2D, probabilityTexture);
+    gl!.texImage2D(
+      gl!.TEXTURE_2D,
+      0,
+      gl!.RGBA32F,
+      pixelsX,
+      pixelsY,
+      0,
+      gl!.RGBA,
+      gl!.FLOAT,
+      probData,
+    );
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.NEAREST);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.NEAREST);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
 
-    // Normalize cumulative distribution
-    if (cumulative > 0) {
-      for (let i = 0; i < numPixels; i++) {
-        cumulativeProb[i] /= cumulative;
-      }
-    }
+    // Create color LUT texture
+    const lutData = buildColorLUT();
+    colorLutTexture = gl!.createTexture()!;
+    gl!.bindTexture(gl!.TEXTURE_2D, colorLutTexture);
+    gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, 256, 1, 0, gl!.RGBA, gl!.UNSIGNED_BYTE, lutData);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.CLAMP_TO_EDGE);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
 
-    // Create ImageData for direct pixel manipulation
-    imageData = ctx!.createImageData(width, height);
-    // Fill with background color (off-white)
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] = 250;
-      data[i + 1] = 250;
-      data[i + 2] = 252;
-      data[i + 3] = 255;
+    // Create noise texture for randomness
+    const noiseSize = 512;
+    const noiseData = new Uint8Array(noiseSize * noiseSize * 4);
+    for (let i = 0; i < noiseData.length; i++) {
+      noiseData[i] = Math.random() * 255;
     }
+    noiseTexture = gl!.createTexture()!;
+    gl!.bindTexture(gl!.TEXTURE_2D, noiseTexture);
+    gl!.texImage2D(
+      gl!.TEXTURE_2D,
+      0,
+      gl!.RGBA,
+      noiseSize,
+      noiseSize,
+      0,
+      gl!.RGBA,
+      gl!.UNSIGNED_BYTE,
+      noiseData,
+    );
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MIN_FILTER, gl!.LINEAR);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_MAG_FILTER, gl!.LINEAR);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_S, gl!.REPEAT);
+    gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.REPEAT);
+
+    gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
   }
 
   function resize() {
-    if (!canvas || !ctx) return;
-    width = canvas.offsetWidth;
-    height = canvas.offsetHeight;
-    canvas.width = width;
-    canvas.height = height;
-    initDetector();
+    if (!canvas || !gl) return;
+
+    // Cleanup old resources
+    stateTextures.forEach((t) => gl!.deleteTexture(t));
+    framebuffers.forEach((f) => gl!.deleteFramebuffer(f));
+    if (probabilityTexture) gl!.deleteTexture(probabilityTexture);
+    if (colorLutTexture) gl!.deleteTexture(colorLutTexture);
+    if (noiseTexture) gl!.deleteTexture(noiseTexture);
+    stateTextures = [];
+    framebuffers = [];
+    currentState = 0;
+
+    initWebGL();
   }
 
-  // === Binary search for weighted random pixel selection ===
-  function samplePhotonPixel(): number {
-    const r = Math.random();
-    let lo = 0;
-    let hi = cumulativeProb.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >>> 1;
-      if (cumulativeProb[mid] < r) {
-        lo = mid + 1;
-      } else {
-        hi = mid;
-      }
-    }
-    return lo;
-  }
+  function animate(time: number) {
+    if (!gl) return;
 
-  // === Main update loop ===
-  function update() {
-    const decayRate = CONFIG.intensityDecay;
-    const pulseFade = 1 / CONFIG.pulseFadeDuration;
-    const numPixels = intensities.length;
-
-    // Decay intensities and pulse timers (single pass)
-    for (let i = 0; i < numPixels; i++) {
-      if (intensities[i] > 0.1) {
-        intensities[i] *= decayRate;
-      } else {
-        intensities[i] = 0;
-      }
-      if (pulseTimers[i] > 0) {
-        pulseTimers[i] = Math.max(0, pulseTimers[i] - pulseFade);
-      }
-    }
-
-    // Add photons based on current pulse phase
+    const width = canvas.width;
+    const height = canvas.height;
     const isInPulse = frameCounter < CONFIG.pulseFrames;
-    const photonCount = isInPulse ? CONFIG.photonRateHigh : CONFIG.photonRateLow;
+    const photonRate = isInPulse ? CONFIG.photonRateHigh : CONFIG.photonRateLow;
+    const normalizedPhotonRate = photonRate / (pixelsX * pixelsY);
 
-    for (let i = 0; i < photonCount; i++) {
-      const idx = samplePhotonPixel();
-      intensities[idx] = Math.min(intensities[idx] + 2, CONFIG.maxIntensity);
-      pulseTimers[idx] = 1;
-    }
-  }
+    // Update pass
+    gl.useProgram(updateProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[1 - currentState]);
+    gl.viewport(0, 0, pixelsX, pixelsY);
 
-  // === Render to ImageData (much faster than fillRect calls) ===
-  function render() {
-    if (!ctx || !imageData) return;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, stateTextures[currentState]);
+    gl.uniform1i(gl.getUniformLocation(updateProgram, 'u_state'), 0);
 
-    const data = imageData.data;
-    const ps = CONFIG.pixelSize;
-    const maxInt = CONFIG.maxIntensity;
-    const pulseBoost = CONFIG.pulseBoost;
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, probabilityTexture);
+    gl.uniform1i(gl.getUniformLocation(updateProgram, 'u_probability'), 1);
 
-    // Reset to background
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] = 250;
-      data[i + 1] = 250;
-      data[i + 2] = 252;
-      data[i + 3] = 255;
-    }
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, noiseTexture);
+    gl.uniform1i(gl.getUniformLocation(updateProgram, 'u_noise'), 2);
 
-    // Render detector pixels
-    for (let py = 0; py < pixelsY; py++) {
-      for (let px = 0; px < pixelsX; px++) {
-        const idx = py * pixelsX + px;
-        const intensity = intensities[idx];
+    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_decayRate'), CONFIG.intensityDecay);
+    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_pulseFade'), 1 / CONFIG.pulseFadeDuration);
+    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_photonRate'), normalizedPhotonRate);
+    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_maxIntensity'), CONFIG.maxIntensity);
+    gl.uniform1f(gl.getUniformLocation(updateProgram, 'u_time'), time * 0.001);
+    gl.uniform2f(gl.getUniformLocation(updateProgram, 'u_resolution'), pixelsX, pixelsY);
 
-        if (intensity < 0.1) continue;
+    gl.bindVertexArray(quadVAO);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-        // Look up base color from LUT
-        const lutIdx = Math.min(255, Math.floor((intensity / maxInt) * 255)) * 4;
-        let r = COLOR_LUT[lutIdx];
-        let g = COLOR_LUT[lutIdx + 1];
-        let b = COLOR_LUT[lutIdx + 2];
-        let a = COLOR_LUT[lutIdx + 3];
+    currentState = 1 - currentState;
 
-        // Apply pulse boost
-        const pulse = pulseTimers[idx];
-        if (pulse > 0) {
-          const boost = pulse * pulseBoost;
-          r = Math.min(255, r + boost * (255 - r));
-          g = Math.min(255, g + boost * (255 - g));
-          b = Math.min(255, b + boost * 100);
-          a = Math.min(255, a + boost * 76);
-        }
+    // Render pass
+    gl.useProgram(renderProgram);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, width, height);
 
-        // Fill pixel block (leaving 1px gap for grid effect)
-        const startX = px * ps;
-        const startY = py * ps;
-        const endX = Math.min(startX + ps - 1, width);
-        const endY = Math.min(startY + ps - 1, height);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, stateTextures[currentState]);
+    gl.uniform1i(gl.getUniformLocation(renderProgram, 'u_state'), 0);
 
-        for (let y = startY; y < endY; y++) {
-          for (let x = startX; x < endX; x++) {
-            const i = (y * width + x) * 4;
-            // Alpha blend with background
-            const alpha = a / 255;
-            data[i] = Math.floor(r * alpha + 250 * (1 - alpha));
-            data[i + 1] = Math.floor(g * alpha + 250 * (1 - alpha));
-            data[i + 2] = Math.floor(b * alpha + 252 * (1 - alpha));
-            data[i + 3] = 255;
-          }
-        }
-      }
-    }
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, colorLutTexture);
+    gl.uniform1i(gl.getUniformLocation(renderProgram, 'u_colorLut'), 1);
 
-    ctx.putImageData(imageData, 0, 0);
-  }
+    gl.uniform1f(gl.getUniformLocation(renderProgram, 'u_maxIntensity'), CONFIG.maxIntensity);
+    gl.uniform1f(gl.getUniformLocation(renderProgram, 'u_pulseBoost'), CONFIG.pulseBoost);
+    gl.uniform2f(gl.getUniformLocation(renderProgram, 'u_resolution'), width, height);
+    gl.uniform2f(gl.getUniformLocation(renderProgram, 'u_detectorSize'), pixelsX, pixelsY);
+    gl.uniform1f(gl.getUniformLocation(renderProgram, 'u_pixelSize'), CONFIG.pixelSize);
 
-  function animate() {
-    update();
-    render();
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     frameCounter = (frameCounter + 1) % (CONFIG.pulseFrames + CONFIG.gapFrames);
     animationId = requestAnimationFrame(animate);
@@ -280,9 +447,21 @@
   onMount(() => {
     if (!browser) return;
 
-    ctx = canvas.getContext('2d', { alpha: false });
-    resize();
-    animate();
+    gl = canvas.getContext('webgl2', { alpha: false, antialias: false });
+    if (!gl) {
+      console.error('WebGL2 not supported');
+      return;
+    }
+
+    // Enable float textures
+    const ext = gl.getExtension('EXT_color_buffer_float');
+    if (!ext) {
+      console.error('EXT_color_buffer_float not supported');
+      return;
+    }
+
+    initWebGL();
+    animationId = requestAnimationFrame(animate);
 
     window.addEventListener('resize', resize);
 
