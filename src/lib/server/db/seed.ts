@@ -65,16 +65,16 @@ async function seedMolecules(directory: string) {
       const contents = await Deno.readTextFile(filePath);
       const name = path.basename(filename, '.xyz');
 
-      const id = await sha256HexFromText(contents);
+      const sha = await sha256HexFromText(contents);
 
       console.log(
-        `Seeding molecule: ${name} from file: ${filename} (id=${id})`,
+        `Seeding molecule: ${name} from file: ${filename} (sha=${sha})`,
       );
 
       await db
         .insert(molecules)
-        .values({ id, name, filename, contents })
-        .onConflictDoNothing({ target: molecules.id });
+        .values({ sha, name, filename, contents })
+        .onConflictDoNothing({ target: molecules.sha });
     }),
   );
 }
@@ -119,6 +119,7 @@ async function seedSolvents(directory: string) {
     const contents = await Deno.readTextFile(filePath);
     const fileName = path.parse(filename).name;
     const name = solvent_name_map[fileName] || fileName;
+    const sha = await sha256HexFromText(contents);
 
     let rhom = undefined;
     let cpm = undefined;
@@ -160,6 +161,7 @@ async function seedSolvents(directory: string) {
       name,
       filename,
       contents,
+      sha,
       rhom,
       cpm,
       qMin,

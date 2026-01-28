@@ -1,13 +1,18 @@
-import { createId } from '@paralleldrive/cuid2';
+import { init } from '@paralleldrive/cuid2';
 import { getTableColumns } from 'drizzle-orm';
 import {
   char,
+  integer,
   numeric,
   pgTable,
   text,
   timestamp,
   unique,
 } from 'drizzle-orm/pg-core';
+
+const uIdLength = 24;
+
+const createId = init({ length: uIdLength });
 
 const timestamps = {
   createdAt: timestamp({ mode: 'date', precision: 3 })
@@ -21,6 +26,7 @@ const timestamps = {
 const fileData = {
   filename: text('filename').notNull(),
   contents: text('contents').notNull(),
+  sha: char({ length: 64 }).unique().notNull(),
 };
 
 const qRange = {
@@ -30,7 +36,10 @@ const qRange = {
 };
 
 export const molecules = pgTable('molecules', {
-  id: char({ length: 64 }).primaryKey().notNull(),
+  id: char({ length: uIdLength })
+    .primaryKey()
+    .unique()
+    .$defaultFn(() => createId()),
   name: text().unique().notNull(),
   ...fileData,
   ...timestamps,
@@ -43,7 +52,7 @@ export { moleculesInfo };
 export const intensities = pgTable(
   'intensities',
   {
-    moleculeId: char({ length: 64 })
+    moleculeId: char({ length: uIdLength })
       .references(() => molecules.id)
       .notNull(),
     ...qRange,
@@ -59,8 +68,9 @@ export const intensities = pgTable(
 export const solvents = pgTable(
   'solvents',
   {
-    id: char({ length: 32 })
+    id: char({ length: uIdLength })
       .primaryKey()
+      .unique()
       .$defaultFn(() => createId()),
     name: text().unique().notNull(),
     rhom: numeric({ mode: 'number' }).notNull(),
@@ -70,7 +80,7 @@ export const solvents = pgTable(
     ...qRange,
   },
   (table) => ({
-    filenameUnique: unique().on(table.filename),
+    shaUnique: unique().on(table.sha),
   }),
 );
 
