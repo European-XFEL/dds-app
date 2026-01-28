@@ -4,7 +4,7 @@ import z from 'zod';
 
 import { command, prerender } from '$app/server';
 
-import { db } from '$lib/server/db';
+import { db, schema } from '$lib/server/db';
 
 import {
   getDebyeResultImpl,
@@ -22,7 +22,6 @@ export const listMolecules = prerender(
   },
   {
     inputs: () => [],
-    dynamic: true,
   },
 );
 
@@ -42,7 +41,6 @@ export const listSolvents = prerender(
   },
   {
     inputs: () => [],
-    dynamic: true,
   },
 );
 
@@ -52,12 +50,15 @@ export const getMoleculeFileContent = prerender(
     return await getMoleculeFileContentImpl(id);
   },
   {
-    inputs: () => {
-      return db.query.molecules
-        .findMany()
-        .then((molecules) => molecules.map((m) => m.id));
+    inputs: async () => {
+      const res = await db
+        .select({ id: schema.moleculesInfo.id })
+        .from(schema.molecules);
+
+      const ids = res.map((r) => r.id);
+
+      return ids;
     },
-    dynamic: true,
   },
 );
 
@@ -67,12 +68,15 @@ export const getSolventIQ = prerender(
     return await getSolventIQImpl(id);
   },
   {
-    inputs: () => {
-      return db.query.solvents
-        .findMany()
-        .then((solvents) => solvents.map((s) => s.id));
+    inputs: async () => {
+      const res = await db
+        .select({ id: schema.solventsInfo.id })
+        .from(schema.solvents);
+
+      const ids = res.map((r) => r.id);
+
+      return ids;
     },
-    dynamic: true,
   },
 );
 
@@ -82,20 +86,20 @@ export const getDebyeResult = prerender(
     return await getDebyeResultImpl(request);
   },
   {
-    inputs: () => {
+    inputs: async () => {
       const qRange = {
         min: 0.005253,
         max: 8.498164,
         step: 0.006044,
       };
 
-      return db.query.molecules.findMany().then((molecules) => {
-        return molecules.map((m) => ({
-          fileId: m.id,
-          qRange: qRange,
-        }));
-      });
+      const res = await db
+        .select({ id: schema.moleculesInfo.id })
+        .from(schema.molecules);
+
+      const ids = res.map((r) => r.id);
+
+      return ids.map((id) => ({ fileId: id, qRange: qRange }));
     },
-    dynamic: true,
   },
 );
