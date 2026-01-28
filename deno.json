@@ -16,7 +16,7 @@
   "imports": {
     "$data/": "./src/data/",
     "$lib/": "./src/lib/",
-    "$remote": "./src/lib/remote/dynamic.ts",
+    "$remote": "./src/lib/remote/dynamic.remote.ts",
     "@std/crypto": "jsr:@std/crypto@^1.0.5",
     "@std/dotenv": "jsr:@std/dotenv@^0.225.6",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",

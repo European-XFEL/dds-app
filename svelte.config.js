@@ -32,7 +32,7 @@ const config_deno = {
     adapter: adapter_deno(),
     alias: {
       ...config.kit?.alias,
-      $remote: './src/lib/remote/dynamic.ts',
+      $remote: './src/lib/remote/dynamic.remote.ts',
     }
   },
 };
@@ -47,7 +47,7 @@ const config_static = {
     },
     alias: {
       ...config.kit?.alias,
-      $remote: './src/lib/remote/static.ts',
+      $remote: './src/lib/remote/static.remote.ts',
     }
   },
 };

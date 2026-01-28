@@ -160,13 +160,13 @@ export async function uploadMoleculeImpl({
   filename,
   contents,
 }: z.infer<typeof uploadSchema>) {
-  const id = await sha256HexFromText(contents);
+  const sha = await sha256HexFromText(contents);
 
   try {
     const result = await db
       .insert(schema.molecules)
       .values({
-        id,
+        sha,
         name,
         filename,
         contents,
