@@ -2,7 +2,7 @@
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
 
-  import { listMolecules } from '$lib/data.remote';
+  import { listMolecules } from '$remote';
   import type { Sample } from '$lib/types';
 
   import MoleculeUpload from './MoleculeUpload.svelte';

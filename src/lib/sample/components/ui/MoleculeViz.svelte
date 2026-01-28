@@ -5,7 +5,7 @@
 
   import * as Field from '$shadcn/ui/field/index.js';
 
-  import { getMoleculeFileContent } from '$lib/data.remote';
+  import { getMoleculeFileContent } from '$remote';
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
   import { preloadMatterviz } from '$lib/utils/matterviz';

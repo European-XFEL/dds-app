@@ -2,7 +2,7 @@
   import { Label } from '$shadcn/ui/label/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
 
-  import { listSolvents } from '$lib/data.remote';
+  import { listSolvents } from '$remote';
   import type { Sample } from '$lib/types';
 
   type Solvents = Awaited<ReturnType<typeof listSolvents>>;

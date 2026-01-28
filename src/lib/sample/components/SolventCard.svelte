@@ -4,7 +4,7 @@
   import * as Card from '$shadcn/ui/card/index.js';
   import { Spinner } from '$shadcn/ui/spinner/index.js';
 
-  import { listSolvents } from '$lib/data.remote';
+  import { listSolvents } from '$remote';
   import type { Sample, Solvents } from '$lib/types';
 
   import SoluteConcentration from './ui/SoluteConcentration.svelte';

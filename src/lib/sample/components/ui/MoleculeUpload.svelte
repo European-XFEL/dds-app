@@ -5,7 +5,7 @@
   import { Label } from '$shadcn/ui/label/index.js';
   import Spinner from '$shadcn/ui/spinner/spinner.svelte';
 
-  import { listMolecules, uploadMolecule } from '$lib/data.remote';
+  import { listMolecules, uploadMolecule } from '$remote';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 

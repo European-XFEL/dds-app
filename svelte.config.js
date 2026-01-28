@@ -30,6 +30,10 @@ const config_deno = {
   kit: {
     ...config.kit,
     adapter: adapter_deno(),
+    alias: {
+      ...config.kit?.alias,
+      $remote: './src/lib/remote/dynamic.ts',
+    }
   },
 };
 
@@ -41,6 +45,10 @@ const config_static = {
     paths: {
       base: process.argv.includes('dev') ? '' : process.env.BASE_PATH,
     },
+    alias: {
+      ...config.kit?.alias,
+      $remote: './src/lib/remote/static.ts',
+    }
   },
 };
 
