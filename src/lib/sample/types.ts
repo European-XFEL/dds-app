@@ -1,4 +1,4 @@
-import { listMolecules, listSolvents } from '$lib/data.remote';
+import { listMolecules, listSolvents } from '$remote';
 
 export type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 

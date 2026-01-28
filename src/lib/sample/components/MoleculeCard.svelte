@@ -3,7 +3,7 @@
   import * as Collapsible from '$shadcn/ui/collapsible/index.js';
   import { Spinner } from '$shadcn/ui/spinner';
 
-  import { listMolecules } from '$lib/data.remote';
+  import { listMolecules } from '$remote';
   import type { Sample } from '$lib/types';
 
   import MoleculeSelect from './ui/MoleculeSelect.svelte';

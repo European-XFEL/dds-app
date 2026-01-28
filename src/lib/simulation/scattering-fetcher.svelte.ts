@@ -1,4 +1,5 @@
-import { getDebyeResult, getSolventIQ } from '$lib/data.remote';
+import { getDebyeResult, getSolventIQ } from '$remote';
+
 import type { QRange } from '$lib/types';
 
 export type ScatteringData = {
