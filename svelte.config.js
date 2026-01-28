@@ -1,13 +1,12 @@
-import adapter from '@deno/svelte-adapter';
+import adapter_deno from '@deno/svelte-adapter';
+import adapter_static from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import process from "node:process";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  // Consult https://svelte.dev/docs/kit/integrations
-  // for more information about preprocessors
   preprocess: [vitePreprocess()],
   kit: {
-    adapter: adapter(),
     alias: {
       $css: './src/app.css',
       $components: './src/components',
@@ -26,4 +25,34 @@ const config = {
   extensions: ['.svelte', '.svx'],
 };
 
-export default config;
+const config_deno = {
+  ...config,
+  kit: {
+    ...config.kit,
+    adapter: adapter_deno(),
+  },
+};
+
+const config_static = {
+  ...config,
+  kit: {
+    ...config.kit,
+    adapter: adapter_static({ fallback: '404.html' }),
+    paths: {
+      base: process.argv.includes('dev') ? '' : process.env.BASE_PATH,
+    },
+  },
+};
+
+// Pick configuration: env var TARGET or CLI arg --target=*
+const cliArg = process.argv.find((a) => a.startsWith('--target='));
+const target = process.env.TARGET || (cliArg && cliArg.split('=')[1]) || 'deno';
+
+/**
+ * Export the selected config. Defaults to `config_deno` when nothing is set.
+ */
+const selectedConfig = target === 'static' ? config_static : config_deno;
+
+console.log(`Using SvelteKit config for target: ${target}`);
+
+export default selectedConfig;
