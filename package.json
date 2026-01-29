@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "db:start": "docker compose up",
     "db:push": "drizzle-kit push",
-    "db:seed": "deno run -A src/lib/server/db/seed.ts",
+    "db:seed": "deno run -A ./scripts/seed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

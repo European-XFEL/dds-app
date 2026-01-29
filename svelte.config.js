@@ -11,7 +11,6 @@ const config = {
       $css: './src/app.css',
       $components: './src/components',
       $shadcn: './src/lib/shadcn/components',
-      $data: './src/data',
     },
     experimental: {
       remoteFunctions: true,

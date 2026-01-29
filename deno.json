@@ -14,7 +14,6 @@
   },
   "unstable": ["fmt-component", "sloppy-imports"],
   "imports": {
-    "$data/": "./src/data/",
     "$lib/": "./src/lib/",
     "$remote": "./src/lib/remote/dynamic.remote.ts",
     "@std/crypto": "jsr:@std/crypto@^1.0.5",
