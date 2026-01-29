@@ -2,7 +2,8 @@
   import type { XRayProbe } from '../types';
 
   import * as Field from '$shadcn/ui/field';
-  import { Input } from '$shadcn/ui/input';
+
+  import NumSlider from '$lib/ui/NumSlider.svelte';
 
   type Props = {
     probe: XRayProbe;
@@ -24,13 +25,13 @@
 
   <Field.Group>
     <Field.Field orientation="responsive">
-      <Field.Content>
-        <Field.Label>X-Ray Wavelength (Å)</Field.Label>
-      </Field.Content>
-      <div class="flex min-w-fit flex-2 items-center justify-between gap-x-2">
-        <Input type="number" bind:value={wavelength} class="nodrag w-30" />
-        <Input type="range" bind:value={wavelength} class="nodrag w-full" />
-      </div>
+      <NumSlider
+        label="X-Ray Wavelength (Å)"
+        bind:value={wavelength}
+        min="0.1"
+        max="2.0"
+        step="0.01"
+      />
     </Field.Field>
   </Field.Group>
 </Field.Set>

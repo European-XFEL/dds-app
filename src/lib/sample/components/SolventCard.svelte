@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { listSolvents } from '$remote';
+
   import { fade } from 'svelte/transition';
 
   import * as Card from '$shadcn/ui/card/index.js';
   import { Spinner } from '$shadcn/ui/spinner/index.js';
 
-  import { listSolvents } from '$remote';
   import type { Sample, Solvents } from '$lib/types';
+  import NumSlider from '$lib/ui/NumSlider.svelte';
 
-  import SoluteConcentration from './ui/SoluteConcentration.svelte';
   import SolventSelect from './ui/SolventSelect.svelte';
 
   interface Props {
@@ -54,7 +55,13 @@
   <Card.Content>
     <div class="flex flex-col gap-6">
       <SolventSelect bind:solvent {solvents} {loading} />
-      <SoluteConcentration bind:concentrationSoluteMolar />
+      <NumSlider
+        label="Solute Concentration (M)"
+        min="0.001"
+        max="5"
+        step="0.001"
+        bind:value={concentrationSoluteMolar}
+      />
     </div>
   </Card.Content>
 </Card.Root>

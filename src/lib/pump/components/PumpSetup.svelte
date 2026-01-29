@@ -6,6 +6,8 @@
   import * as Field from '$shadcn/ui/field';
   import { Input } from '$shadcn/ui/input';
 
+  import NumSlider from '$lib/ui/NumSlider.svelte';
+
   type Props = {
     pump: Pump;
   };
@@ -55,25 +57,13 @@
   <Field.Group>
     {#each fields as { label, key, input } (key)}
       <Field.Field orientation="responsive">
-        <Field.Content>
-          <Field.Label>{label}</Field.Label>
-        </Field.Content>
-        <div class="flex min-w-fit flex-2 items-center justify-between gap-x-2">
-          {#if pump}
-            <Input
-              type="number"
-              {...input}
-              bind:value={pump[key]}
-              class="nodrag w-30"
-            />
-            <Input
-              type="range"
-              {...input}
-              bind:value={pump[key]}
-              class="nodrag"
-            />
-          {/if}
-        </div>
+        <NumSlider
+          {label}
+          bind:value={pump[key]}
+          min={input.min}
+          max={input.max}
+          step={input.step}
+        />
       </Field.Field>
     {/each}
   </Field.Group>

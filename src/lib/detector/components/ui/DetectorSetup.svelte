@@ -4,6 +4,7 @@
   import * as Select from '$shadcn/ui/select';
 
   import type { CartesianPoint } from '$lib/types';
+  import NumSlider from '$lib/ui/NumSlider.svelte';
 
   type Props = {
     distance: number;
@@ -46,15 +47,12 @@
   </Field.Field>
 
   <Field.Field>
-    <Field.Label>Sample Detector Distance (mm)</Field.Label>
-    <div class="flex min-w-fit items-center justify-between gap-x-2">
-      <Input
-        type="number"
-        bind:value={distance}
-        class="nodrag w-30 text-sm text-muted-foreground"
-      />
-      <Input type="range" bind:value={distance} class="nodrag" />
-    </div>
+    <NumSlider
+      label="Sample Detector Distance(mm)"
+      bind:value={distance}
+      min="15"
+      max="150"
+    />
   </Field.Field>
 
   <Field.Group class="flex flex-wrap">
