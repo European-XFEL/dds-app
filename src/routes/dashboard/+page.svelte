@@ -14,6 +14,7 @@
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
+  import { SetupChecklist } from '$lib/dashboard';
   import { DetectorSetupCard } from '$lib/detector';
   import { PumpSetupCard } from '$lib/pump';
   import { MoleculeCard, SolventCard } from '$lib/sample';
@@ -28,7 +29,7 @@
     scaleSoluteByExcitedFraction,
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
-  import { LineChart, SetupChecklist } from '$lib/ui';
+  import { LineChart } from '$lib/ui';
 
   // Compose type for type-safe options
   type ECOption = ComposeOption<
