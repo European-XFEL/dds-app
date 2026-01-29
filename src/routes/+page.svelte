@@ -16,7 +16,8 @@
   import { Button } from '$shadcn/ui/button';
   import * as Card from '$shadcn/ui/card';
 
-  import { Latex, ScatteringBackground } from '$lib/ui';
+  import { ScatteringBackground } from '$lib/dashboard';
+  import { Latex } from '$lib/ui';
 </script>
 
 <ScatteringBackground />

@@ -8,12 +8,12 @@
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
+  import { Sidebar as AppSidebar } from '$lib/nav';
   import {
     type SimulationState,
     createSimulationSeed,
     setSimulationState,
   } from '$lib/state.svelte';
-  import { Sidebar as AppSidebar } from '$lib/ui';
   import { preloadMatterviz } from '$lib/utils/matterviz';
 
   let { children } = $props();
