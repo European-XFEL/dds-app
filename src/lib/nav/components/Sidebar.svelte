@@ -3,10 +3,9 @@
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
-  import { AppPicker } from '$lib/ui';
-
-  import SidebarContent from './SidebarContent.svelte';
-  import SidebarFooter from './SidebarFooter.svelte';
+  import AppPicker from './ui/AppPicker.svelte';
+  import SidebarContent from './ui/SidebarContent.svelte';
+  import SidebarFooter from './ui/SidebarFooter.svelte';
 
   let {
     sample,
