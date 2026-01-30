@@ -9,7 +9,6 @@ import process from 'node:process';
 
 import { relations } from '$lib/server/db/relations.ts';
 import * as schema from '$lib/server/db/schema.ts';
-import { molecules, solvents } from '$lib/server/db/schema.ts';
 import { sha256HexFromText } from '$lib/server/db/util.ts';
 
 const env = Deno.env.toObject();
@@ -42,40 +41,97 @@ const db = drizzle(DATABASE_URL, { schema, relations });
  * Uses onConflictDoNothing to safely handle duplicate entries.
  */
 export async function bootstrap(
-  molecules_dir = './src/data/molecules',
-  solvents_dir = './src/data/solvents',
+  molecules_dir = './data/molecules',
+  solvents_dir = './data/solvents',
 ) {
   await Promise.all([seedMolecules(molecules_dir), seedSolvents(solvents_dir)]);
 }
+
+const moleculeFilenameRegex = /^(.*)-(\d+)\.xyz$/;
+
+const urlRegex = /(https?:\/\/[^\s]+)/g;
 
 /**
  * Seed molecules from .xyz files in the specified directory.
  * Each file is stored in the molecules table with its id as the sha256 hash of its contents.
  */
 async function seedMolecules(directory: string) {
-  const xyzFiles: string[] = [];
+  const moleculeDirs: { [key: string]: string[] } = {};
 
   for await (const entry of Deno.readDir(directory)) {
-    if (entry.isFile && entry.name.endsWith('.xyz')) xyzFiles.push(entry.name);
+    if (entry.isDirectory) {
+      const subdir = path.join(directory, entry.name);
+      moleculeDirs[entry.name] = [];
+
+      for await (const subentry of Deno.readDir(subdir)) {
+        if (subentry.isFile && subentry.name.endsWith('.xyz')) {
+          moleculeDirs[entry.name].push(path.join(entry.name, subentry.name));
+        }
+      }
+    }
   }
 
   await Promise.all(
-    xyzFiles.map(async (filename) => {
-      const filePath = path.join(directory, filename);
-      const contents = await Deno.readTextFile(filePath);
-      const name = path.basename(filename, '.xyz');
+    Object.values(moleculeDirs)
+      .flat()
+      .map(async (fileSubPath) => {
+        const filePath = path.join(directory, fileSubPath);
+        const moleculeName = path.dirname(fileSubPath);
 
-      const sha = await sha256HexFromText(contents);
+        // get state and original filename from `${filename}-${state}.xyz` w/ regex
+        const { filename, state } = (() => {
+          const baseName = path.basename(fileSubPath);
+          const match = baseName.match(moleculeFilenameRegex);
+          if (match) {
+            return {
+              filename: match[1] + '.xyz',
+              state: parseInt(match[2], 10),
+            };
+          } else {
+            return { filename: baseName, state: 0 };
+          }
+        })();
 
-      console.log(
-        `Seeding molecule: ${name} from file: ${filename} (sha=${sha})`,
-      );
+        const contents = await Deno.readTextFile(filePath);
+        const contentsLines = contents.split('\n');
 
-      await db
-        .insert(molecules)
-        .values({ sha, name, filename, contents })
-        .onConflictDoNothing({ target: molecules.sha });
-    }),
+        const sha = await sha256HexFromText(contents);
+
+        const atomCount = Number(contentsLines[0]);
+        const description = (contentsLines[1] || '').replace(/^#\s*/, '');
+
+        // References are urls in the description, extract if present
+        const reference = (() => {
+          const urls = description.match(urlRegex);
+          return urls ? urls[0] : null;
+        })();
+
+        console.log(`${moleculeName} - ${filename} (state: ${state})`);
+
+        await db
+          .insert(schema.moleculeFiles)
+          .values({
+            moleculeName,
+            atomCount,
+            description,
+            reference,
+            state,
+            filename,
+            contents,
+            sha,
+          })
+          .onConflictDoUpdate({
+            target: schema.moleculeFiles.sha,
+            set: {
+              moleculeName,
+              atomCount,
+              description,
+              reference,
+              state,
+              filename,
+            },
+          });
+      }),
   );
 }
 
@@ -150,10 +206,9 @@ async function seedSolvents(directory: string) {
       rhom = parseFloat(saved_solvent_data.rhom);
       cpm = parseFloat(saved_solvent_data.cpm);
     } else {
-      const queryChemicalPyodide =
-        await import('../src/lib/server/thermo.ts').then(
-          (mod) => mod.queryChemicalPyodide,
-        );
+      const queryChemicalPyodide = await import('$lib/server/thermo.ts').then(
+        (mod) => mod.queryChemicalPyodide,
+      );
       const chemPromise = queryChemicalPyodide(name);
       [rhom, cpm] = await chemPromise;
     }
@@ -182,9 +237,9 @@ async function seedSolvents(directory: string) {
       );
 
       await db
-        .insert(solvents)
+        .insert(schema.solvents)
         .values(values)
-        .onConflictDoUpdate({ target: solvents.name, set: values });
+        .onConflictDoUpdate({ target: schema.solvents.name, set: values });
     }),
   );
 }

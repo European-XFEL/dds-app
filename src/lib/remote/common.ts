@@ -164,7 +164,7 @@ export async function uploadMoleculeImpl({
 
   try {
     const result = await db
-      .insert(schema.molecules)
+      .insert(schema.moleculeFiles)
       .values({
         sha,
         name,
