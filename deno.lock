@@ -20,6 +20,7 @@
     "npm:@sveltejs/vite-plugin-svelte@^6.2.1": "6.2.4_svelte@5.46.1__acorn@8.15.0_vite@7.3.1__@types+node@24.10.9__picomatch@4.0.3_@types+node@24.10.9",
     "npm:@tailwindcss/typography@~0.5.19": "0.5.19_tailwindcss@4.1.18",
     "npm:@tailwindcss/vite@^4.1.17": "4.1.18_vite@7.3.1__@types+node@24.10.9__picomatch@4.0.3_@types+node@24.10.9",
+    "npm:@tanstack/table-core@^8.21.3": "8.21.3",
     "npm:@trivago/prettier-plugin-sort-imports@^6.0.2": "6.0.2_prettier@3.8.1_prettier-plugin-svelte@3.4.1__prettier@3.8.1__svelte@5.46.1___acorn@8.15.0_svelte@5.46.1__acorn@8.15.0",
     "npm:@types/node@24": "24.10.9",
     "npm:@types/papaparse@^5.5.2": "5.5.2",
@@ -1053,6 +1054,9 @@
         "tailwindcss",
         "vite"
       ]
+    },
+    "@tanstack/table-core@8.21.3": {
+      "integrity": "sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg=="
     },
     "@tediousjs/connection-string@0.5.0": {
       "integrity": "sha512-7qSgZbincDDDFyRweCIEvZULFAw5iz/DeunhvuxpL31nfntX3P4Yd4HkHBRg9H8CdqY1e5WFN1PZIz/REL9MVQ=="
@@ -3139,6 +3143,16 @@
       ]
     }
   },
+  "redirects": {
+    "https://deno.land/x/python/mod.ts": "https://deno.land/x/python@0.4.6/mod.ts"
+  },
+  "remote": {
+    "https://deno.land/x/python@0.4.6/mod.ts": "36292020f3a7e8c9774d5de7fe32e261b3b5ddfbb6689a78bb499014d40baa82",
+    "https://deno.land/x/python@0.4.6/src/ffi.ts": "cb1b0f1666315d32b6088ec7f08bfada9dd04279ecd080086d9a46359648c025",
+    "https://deno.land/x/python@0.4.6/src/python.ts": "4e418700e81ccb96144dcda411b16bb89d9d55e70e3576c6fa96b8863e477925",
+    "https://deno.land/x/python@0.4.6/src/symbols.ts": "c710f541be44237161d445b2a7fa7d260be31e37fe255ef186fb93efaaaeae72",
+    "https://deno.land/x/python@0.4.6/src/util.ts": "e30a5f33235f4ae31ed34cee6b6dd06e0fc9336da119096866a0b5cc707932ec"
+  },
   "workspace": {
     "dependencies": [
       "jsr:@std/crypto@^1.0.5",
@@ -3162,6 +3176,7 @@
         "npm:@sveltejs/vite-plugin-svelte@^6.2.1",
         "npm:@tailwindcss/typography@~0.5.19",
         "npm:@tailwindcss/vite@^4.1.17",
+        "npm:@tanstack/table-core@^8.21.3",
         "npm:@trivago/prettier-plugin-sort-imports@^6.0.2",
         "npm:@types/node@24",
         "npm:@types/papaparse@^5.5.2",
