@@ -36,7 +36,7 @@
   }
 </script>
 
-<Card.Root class="flex-auto">
+<Card.Root>
   <Card.Header>
     <Card.Title>
       Sample Parameters

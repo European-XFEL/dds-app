@@ -1,12 +1,10 @@
-import { listMolecules, listSolvents } from '$remote';
+import { listSolvents } from '$remote';
+
+import { Molecule } from '$lib/types';
 
 export type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 
 export type Solvent = Solvents[number];
-
-export type Molecules = Awaited<ReturnType<typeof listMolecules>>;
-
-export type Molecule = Molecules[number];
 
 export interface Sample {
   concentrationSoluteMolar: number | undefined;

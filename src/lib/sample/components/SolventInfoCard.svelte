@@ -22,7 +22,7 @@
   });
 </script>
 
-<Card.Root class="flex-auto gap-3">
+<Card.Root>
   <Card.Header>
     <Card.Title>Solvent Information</Card.Title>
     <Card.Description>Summary of solvent information.</Card.Description>
