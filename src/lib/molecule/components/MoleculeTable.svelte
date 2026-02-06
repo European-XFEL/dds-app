@@ -10,7 +10,11 @@
     getSortedRowModel,
   } from '@tanstack/table-core';
 
+  import { flip } from 'svelte/animate';
+  import { slide } from 'svelte/transition';
+
   import { FlexRender, createSvelteTable } from '$shadcn/ui/data-table';
+  import { Spinner } from '$shadcn/ui/spinner';
   import * as Table from '$shadcn/ui/table';
 
   import {
@@ -42,6 +46,7 @@
   let columnVisibility = $state<VisibilityState>({
     sha: false,
     atomCount: false,
+    state: false,
     createdAt: false,
     updatedAt: false,
     id: false,
@@ -226,18 +231,19 @@
       </Table.Header>
       <Table.Body>
         {#each table.getRowModel().rows as row (row.id)}
-          {@const isSelected =
-            row.depth > 0 &&
-            (selectedGroundId === (row.original as MoleculeRow).id ||
-              selectedExcitedId === (row.original as MoleculeRow).id)}
-          {@const isGroupRow = row.depth === 0}
-          {$inspect(row.id, isGroupRow)}
-          <Table.Row
-            class={isGroupRow
+          <!-- Note: table row extracted from Table.Row to apply slide/flip -->
+          <tr
+            data-slot="table-row"
+            transition:slide={{ duration: 300 }}
+            animate:flip={{ duration: 300 }}
+            class="border-b transition-colors data-[state=selected]:bg-muted hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-muted/50 {row.depth ===
+            0
               ? 'bg-muted/30 hover:bg-muted/50'
-              : isSelected
+              : row.depth > 0 &&
+                  (selectedGroundId === (row.original as MoleculeRow).id ||
+                    selectedExcitedId === (row.original as MoleculeRow).id)
                 ? 'bg-primary/5 hover:bg-primary/10'
-                : ''}
+                : ''}"
           >
             {#each row.getVisibleCells() as cell (cell.id)}
               <Table.Cell>
@@ -247,7 +253,7 @@
                 />
               </Table.Cell>
             {/each}
-          </Table.Row>
+          </tr>
         {/each}
         {#if table.getRowModel().rows.length === 0}
           <Table.Row>
@@ -255,7 +261,14 @@
               colspan={table.getVisibleLeafColumns().length}
               class="h-24 text-center text-muted-foreground"
             >
-              No molecules found.
+              {#if loading}
+                Loading Molecules
+                <div class="absolute ml-2 inline-block">
+                  <Spinner />
+                </div>
+              {:else}
+                No molecules found.
+              {/if}
             </Table.Cell>
           </Table.Row>
         {/if}
@@ -263,8 +276,5 @@
     </Table.Root>
   </div>
 
-  <TableFooter
-    rowCount={molecules.length}
-    groupCount={groupedData.length}
-  />
+  <TableFooter rowCount={molecules.length} groupCount={groupedData.length} />
 </div>
