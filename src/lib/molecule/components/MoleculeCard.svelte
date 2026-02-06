@@ -43,6 +43,25 @@
   );
 
   let moleculeName = $state<string>();
+
+  let moleculeStates = $derived.by(() => {
+    if (!molecules) return [];
+    return molecules.filter((m) => m.moleculeName === moleculeName);
+  });
+
+  $effect(() => {
+    if (!moleculeStates) return;
+
+    for (const state of moleculeStates) {
+      if (state.state === 0) {
+        ground = state;
+      } else if (state.state === 1) {
+        excited = state;
+      }
+    }
+  });
+
+  $inspect(moleculeStates);
 </script>
 
 <Card.Root>
@@ -61,7 +80,7 @@
     <form>
       <Field.Group>
         <Field.Set>
-          <Field.Description>...</Field.Description>
+          <!-- <Field.Description>...</Field.Description> -->
           <Field.Group>
             <Field.Field>
               <Field.Label>Molecule</Field.Label>
@@ -86,24 +105,34 @@
           </Field.Group>
         </Field.Set>
 
-        <Field.Separator />
-
         <Field.Set class="flex flex-row gap-4">
           <Field.Field>
             <Field.Label>Ground State</Field.Label>
             <Select.Root type="single">
-              <Select.Trigger>0</Select.Trigger>
+              <Select.Trigger>
+                {ground ? `${ground.filename}` : 'Select ground state'}
+              </Select.Trigger>
               <Select.Content>
-                <Select.Item value="0">0</Select.Item>
+                {#each moleculeStates as state (state.id)}
+                  <Select.Item value={state.id} label={`${state.moleculeName}`}>
+                    {state.filename}
+                  </Select.Item>
+                {/each}
               </Select.Content>
             </Select.Root>
           </Field.Field>
           <Field.Field>
             <Field.Label>Excited State</Field.Label>
             <Select.Root type="single">
-              <Select.Trigger>0</Select.Trigger>
+              <Select.Trigger>
+                {excited ? `${excited.filename}` : 'Select excited state'}
+              </Select.Trigger>
               <Select.Content>
-                <Select.Item value="0">0</Select.Item>
+                {#each moleculeStates as state (state.id)}
+                  <Select.Item value={state.id} label={`${state.moleculeName}`}>
+                    {state.filename}
+                  </Select.Item>
+                {/each}
               </Select.Content>
             </Select.Root>
           </Field.Field>

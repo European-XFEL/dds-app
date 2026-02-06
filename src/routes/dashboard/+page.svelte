@@ -16,8 +16,9 @@
 
   import { SetupChecklist } from '$lib/dashboard';
   import { DetectorSetupCard } from '$lib/detector';
+  import { MoleculeCard } from '$lib/molecule';
   import { PumpSetupCard } from '$lib/pump';
-  import { MoleculeCard, SolventCard } from '$lib/sample';
+  import { SolventCard } from '$lib/sample';
   import {
     createScatteringResource,
     fetchDeltaSSolute,
@@ -242,14 +243,8 @@
             {short}
           />
           <MoleculeCard
-            bind:molecule={simulation.sample.ground}
-            title="Ground Molecule"
-            vizOpen={false}
-            vizCollapseShow={false}
-          />
-          <MoleculeCard
-            bind:molecule={simulation.sample.excited}
-            title="Excited Molecule"
+            bind:ground={simulation.sample.ground}
+            bind:excited={simulation.sample.excited}
             vizOpen={false}
             vizCollapseShow={false}
           />
