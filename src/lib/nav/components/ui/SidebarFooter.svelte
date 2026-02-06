@@ -20,6 +20,6 @@
     <div>Ground: {sample.groundName ?? ''}</div>
     <div>Excited: {sample.excitedName ?? ''}</div>
     <div>Solvent: {sample.solventName ?? ''}</div>
-    <div>Solute Concentration: {sample.concentrationSoluteMolar ?? ''}%</div>
+    <div>Solute Concentration: {sample.concentrationSoluteMolar ?? ''} mol/L</div>
   </section>
 </Sidebar.Footer>

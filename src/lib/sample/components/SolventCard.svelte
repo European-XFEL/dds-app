@@ -56,7 +56,7 @@
     <div class="flex flex-col gap-6">
       <SolventSelect bind:solvent {solvents} {loading} />
       <NumSlider
-        label="Solute Concentration (M)"
+        label="Solute Concentration (mol/L)"
         min="0.001"
         max="5"
         step="0.001"
