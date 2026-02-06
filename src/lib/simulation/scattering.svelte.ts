@@ -37,6 +37,8 @@ export function createScatteringCalculations(simulation: SimulationState) {
 
   /**
    * Concentration of solvent in mol/L.
+   * rhom is molar density (from thermo.chemical.Chemical.rhom) in mol/m3.
+   * To convert to mol/L divide by 1_000 (1 m3 = 1000 L).
    */
   const concentrationSolvent = $derived.by(() => {
     const rhom = simulation.sample.solvent?.rhom;

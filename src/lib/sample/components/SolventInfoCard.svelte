@@ -13,7 +13,7 @@
   const tooltip = $derived.by(() => {
     // if (!solvent) return;
     return [
-      ['ρ', 'm<sup>3</sup>/mol', solvent?.rhom.toPrecision(5)],
+      ['ρ<sub>m</sub>', 'mol/m<sup>3</sup>', solvent?.rhom.toPrecision(5)],
       ['Cpm', 'J/mol/K', solvent?.cpm.toPrecision(3)],
       ['Q Min', 'Å<sup>-1</sup>', solvent?.qMin.toPrecision(3)],
       ['Q Max', 'Å<sup>-1</sup>', solvent?.qMax.toPrecision(3)],
@@ -35,7 +35,7 @@
       <Table.Body>
         {#each tooltip as [key, unit, value], i (key)}
           <Table.Row>
-            <Table.Cell class="font-medium">{key}</Table.Cell>
+            <Table.Cell class="font-medium">{@html key}</Table.Cell>
             <Table.Cell>{value}</Table.Cell>
             <Table.Cell class="text-end">{@html unit}</Table.Cell>
           </Table.Row>
