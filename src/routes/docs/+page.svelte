@@ -1,29 +1,33 @@
 <script lang="ts">
+  import { CircleAlert } from '@lucide/svelte';
   import katex from 'katex';
 
+  import * as Alert from '$shadcn/ui/alert';
   import * as Card from '$shadcn/ui/card';
 
   import { Latex } from '$lib/ui';
 
-  const eqDebye = String.raw`I(Q) = \sum_i \sum_j f_i(Q) f_j(Q) \frac{\sin(Q r_{ij})}{Q r_{ij}}`;
+  const eqDebye = String.raw`I(Q) = \sum_{i=1}^{N} \sum_{j=1}^{N} f_i(Q) f_j(Q) \frac{\sin(Q r_{ij})}{Q r_{ij}}`;
 
   const defsLeft = String.raw`
     \begin{aligned}
       f_i(Q) &\coloneqq \text{atomic form factor for atom } i \\
-      r_{ij} &\coloneqq \text{interatomic distance} \left(\AA\right) \\
-      Q = 4\pi \sin(\theta)/\lambda &\coloneqq \text{momentum transfer} \left(\AA^{-1}\right)
+      r_{ij} &\coloneqq \lVert \mathbf{r}_i - \mathbf{r}_j \rVert \text{ (interatomic distance in } \AA\text{)} \\
+      2\theta &\coloneqq \text{scattering angle}; \quad \theta = \text{half-angle} \\
+      Q &\coloneqq \frac{4\pi}{\lambda} \sin(\theta) \text{ (momentum transfer in } \AA^{-1}\text{)}
     \end{aligned}
   `;
 
   const defsRight = String.raw`
     \begin{aligned}
-      S(Q) = \sum_{i<j} f_i f_j \frac{\sin(Qr)}{Qr} &\colon \text{pairs accumulated as} \\
-      I = 2S + \sum_i f_i^2 &\colon \text{final intensity} \\
-      \mathcal{O}(N^2 \times |Q|) &\colon \text{complexity for } N \text{ atoms}
+      I_{\text{pairs}}(Q) = \sum_{i<j} f_i(Q) f_j(Q) \frac{\sin(Qr_{ij})}{Qr_{ij}} &\colon \text{pair contributions} \\
+      I_{\text{self}}(Q) = \sum_{i=1}^{N} f_i^2(Q) &\colon \text{self-terms (diagonal)} \\
+      I(Q) = 2 I_{\text{pairs}}(Q) + I_{\text{self}}(Q) &\colon \text{total intensity} \\
+      \mathcal{O}(N^2, N_Q) &\colon \text{complexity for } N \text{ atoms, } N_Q \text{ Q-points}
     \end{aligned}
   `;
 
-  const eqCromerMann = String.raw`f_0(Q) = \sum_k a_k \exp\left(-b_k \left(\frac{Q}{4\pi}\right)^2\right) + c`;
+  const eqCromerMann = String.raw`f_0(Q) = \sum_{k=1}^{4} a_k \exp\left(-b_k \left(\frac{Q}{4\pi}\right)^2\right) + c`;
 
   const pipeline = [
     {
@@ -43,7 +47,7 @@
           String.raw`(\partial S/\partial T)`,
         )} data and interpolate onto the Q grid.</p>
         <br>
-        <p>Accounts for solvent heating from optical pump energy deposition.</p>
+        <p>This is multiplied by a scalar temperature rise (or fitted amplitude) to estimate the solvent contribution to the signal.</p>
       `,
     },
     {
@@ -51,47 +55,49 @@
       body: `
         <p>The measured difference signal combines both contributions:</p>
         ${katex.renderToString(
-          String.raw`\Delta S(Q,t) \approx \alpha \cdot \Delta S_{\text{solute}} + \Delta S_{\text{solvent}}`,
+          String.raw`\Delta I(Q,t) \approx \alpha(t) \cdot \Delta I_{\text{solute}}(Q) + \beta(t) \cdot \Delta I_{\text{solvent,unit}}(Q)`,
           { displayMode: true },
         )}
         where ${katex.renderToString(
-          String.raw`\alpha`,
-        )} is the excited state fraction.
+          String.raw`\alpha(t)`,
+        )} is the time-dependent excited state fraction, and ${katex.renderToString(
+          String.raw`\beta(t)`,
+        )} is the solvent-heating amplitude (e.g., proportional to temperature jump).
       `,
     },
   ] as const;
 
   const imagePipeline = [
     {
-      title: 'Undo integration',
+      title: 'Forward project 1D signal onto detector coordinates',
       body: `
-        <p>Simulated 1D difference signal is extended to cover the detector as much as possible.</p>
+        <p>Simulated 1D difference signal is projected onto detector geometry.</p>
         <br>
-        <p>The 1D line is copied to create a 2D image (axis of radius vs angle).</p>
+        <p>The 1D curve is mapped to a 2D image (radius vs azimuthal angle).</p>
       `,
     },
     {
-      title: 'Transform from radial to pixel coordinates',
+      title: 'Map radial coordinate → pixel geometry',
       body: `...`,
     },
     {
-      title: 'Undo absorption',
+      title: 'Apply absorption',
       body: `...`,
     },
     {
-      title: 'Undo solid angle corrections',
+      title: 'Apply solid-angle correction',
       body: `...`,
     },
     {
-      title: 'Undo polarization corrections',
+      title: 'Apply polarization correction',
       body: `...`,
     },
     {
-      title: 'Undo flat field',
+      title: 'Apply flat-field',
       body: `...`,
     },
     {
-      title: 'Undo dark subtraction',
+      title: 'Add dark/background',
       body: `...`,
     },
     {
@@ -103,7 +109,7 @@
       body: `...`,
     },
     {
-      title: 'Perform azimuthal integration on image',
+      title: 'Azimuthally integrate to validate closure',
       body: `...`,
     },
   ] as const;
@@ -128,11 +134,10 @@
     {
       title: 'Set Pump Parameters',
       body: `
-        <p>Define photon energy (eV), excited-state energy, and excitation fraction
+        <p>Define photon energy (eV), excess energy deposited as heat per absorption, and excitation fraction
         (${katex.renderToString(
-          String.raw`\alpha`,
-        )}). These determine the solvent heating contribution
-        via energy deposition.</p>
+          String.raw`\alpha(t)`,
+        )}). The heat deposition is used to estimate temperature jump and solvent response amplitude.</p>
       `,
     },
     {
@@ -146,10 +151,10 @@
       title: 'Compute & Analyze',
       body: `
         <p>View ${katex.renderToString(
-          String.raw`\Delta S(Q)`,
+          String.raw`\Delta I(Q)`,
         )} with separated contributions: total
         signal, scaled solute difference (${katex.renderToString(
-          String.raw`\alpha \cdot \Delta S`,
+          String.raw`\alpha \cdot \Delta I_{\text{solute}}`,
         )}),
         and solvent thermal response. Identify optimal Q-ranges for your experiment.</p>
       `,
@@ -186,10 +191,34 @@
 <section>
   <h2 class="font-semibold">Simulation Details</h2>
 
+  <Card.Root class="flex-1 gap-0 border-amber-500/50 bg-amber-500/5">
+    <Card.Header>
+      <Card.Title class="text-sm text-amber-600"
+        >Physics Simplifications</Card.Title
+      >
+    </Card.Header>
+    <Card.Content class="text-sm">
+      <ul class="list-inside list-disc space-y-1">
+        <li>
+          Gas-phase / isolated-solute scattering (no cage or intermolecular
+          interference)
+        </li>
+        <li>Independent atom approximation (tabulated atomic form factors)</li>
+        <li>No Debye-Waller factors or thermal motion</li>
+        <li>Tabulated solvent thermal response</li>
+        <li>No explicit solute-solvent structural correlation</li>
+      </ul>
+    </Card.Content>
+  </Card.Root>
+
   <h3>The Debye Scattering Equation</h3>
   <p>
     The simulator computes scattering intensity via the Debye scattering
-    equation, which provides the orientational average for isotropic samples.
+    equation, which provides the orientational average for isotropic samples. We
+    compute <strong
+      >relative orientationally averaged molecular scattering</strong
+    > (up to an overall scale factor); detector and beamline prefactors are handled
+    separately or not modeled.
   </p>
 
   <div class="flex flex-wrap items-center">
@@ -227,25 +256,16 @@
 
     <Card.Root class="flex-2 gap-2">
       <Card.Header>
-        <Card.Title>Waasmaier-Kirfel (1995)</Card.Title>
+        <Card.Title>Waasmaier–Kirfel (1995)</Card.Title>
       </Card.Header>
       <Card.Content>
         Alternative parameterization via <code>periodictable</code> using
         <code>cromermann.fxrayatq()</code>.
         <br /><br />
         Computes <Latex math={String.raw`f_0(Q)`} /> only (no anomalous
-        <Latex math={String.raw`f', f''`} /> corrections).
-      </Card.Content>
-    </Card.Root>
-
-    <Card.Root class="flex-1 gap-0 border-amber-500/50 bg-amber-500/5">
-      <Card.Header>
-        <Card.Title class="text-sm text-amber-600"
-          >Physics Simplifications</Card.Title
-        >
-      </Card.Header>
-      <Card.Content class="text-sm">
-        <p>... list of things</p>
+        <Latex math={String.raw`f'(E), f''(E)`} /> corrections). This ignores dispersion
+        corrections and may be inaccurate near absorption edges or when resonant scattering
+        effects are significant.
       </Card.Content>
     </Card.Root>
   </div>
@@ -255,9 +275,11 @@
   <h3>Difference Scattering Pipeline</h3>
 
   <p>
-    For pump-probe/time-resolved XSS experiments, the difference signal
-    <Latex math={String.raw`\Delta S(Q,t)`} /> combines solute structural change with
-    solvent thermal response.
+    For pump–probe time-resolved XSS experiments, the difference signal
+    <Latex math={String.raw`\Delta I(Q)`} /> combines solute structural change with
+    solvent thermal response. Time dependence arises through the excitation fraction
+    <Latex math={String.raw`\alpha(t)`} /> and solvent heating parameters, not structural
+    evolution.
   </p>
 
   <div class="not-prose grid gap-6 md:grid-cols-3">
@@ -278,9 +300,8 @@
   <h3>Image Reconstruction Pipeline</h3>
 
   <p>
-    The simulated difference signal can be used to reconstruct a more
-    'realistic' detector image by, effectively, undoing each step required to
-    perform 1D azimuthal integration.
+    We forward-simulate a 2D detector image by applying the same effects that
+    are corrected during 1D reduction, then re-integrate as a consistency check.
   </p>
 
   <div class="not-prose grid gap-6 md:grid-cols-3">
