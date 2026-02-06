@@ -12,7 +12,7 @@
   } = useSimulationState();
 </script>
 
-<div class="flex flex-wrap gap-6">
+<div class="mt-8 flex flex-wrap gap-6">
   <DetectorSetupCard
     bind:distance={detector.distance}
     bind:beamCenter={detector.beamCenter}
