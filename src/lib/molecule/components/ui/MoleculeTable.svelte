@@ -231,11 +231,11 @@
         {/each}
       </Table.Header>
       <Table.Body>
-        {#each table.getRowModel().rows as row (row.id)}
+        {#each table.getRowModel().rows as row, index (row.id)}
           <!-- Note: table row extracted from Table.Row to apply slide/flip -->
           <tr
             data-slot="table-row"
-            transition:slide={{ duration: 300 }}
+            transition:slide|global={{ duration: 300, delay: index * 60 }}
             animate:flip={{ duration: 300 }}
             class="border-b transition-colors data-[state=selected]:bg-muted hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-muted/50 {row.depth ===
             0
@@ -248,10 +248,14 @@
           >
             {#each row.getVisibleCells() as cell (cell.id)}
               <Table.Cell>
-                <FlexRender
-                  content={cell.column.columnDef.cell}
-                  context={cell.getContext()}
-                />
+                <div
+                  transition:slide|global={{ duration: 300, delay: index * 60 }}
+                >
+                  <FlexRender
+                    content={cell.column.columnDef.cell}
+                    context={cell.getContext()}
+                  />
+                </div>
               </Table.Cell>
             {/each}
           </tr>
