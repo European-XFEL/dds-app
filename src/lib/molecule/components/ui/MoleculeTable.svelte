@@ -1,5 +1,10 @@
 <script lang="ts">
-  import type { Molecule, MoleculeSelection, Molecules } from '../types';
+  import {
+    type GroupRow,
+    type MoleculeRow,
+    type TableRow,
+    createMoleculeColumns,
+  } from '../columns';
   import {
     type ColumnFiltersState,
     type SortingState,
@@ -17,14 +22,10 @@
   import { Spinner } from '$shadcn/ui/spinner';
   import * as Table from '$shadcn/ui/table';
 
-  import {
-    type GroupRow,
-    type MoleculeRow,
-    type TableRow,
-    createMoleculeColumns,
-  } from './columns';
-  import TableFooter from './ui/TableFooter.svelte';
-  import TableToolbar from './ui/TableToolbar.svelte';
+  import type { Molecule, MoleculeSelection, Molecules } from '$lib/types';
+
+  import TableFooter from './TableFooter.svelte';
+  import TableToolbar from './TableToolbar.svelte';
 
   interface Props {
     molecules: Molecules;

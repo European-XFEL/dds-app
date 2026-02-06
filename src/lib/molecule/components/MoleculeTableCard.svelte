@@ -7,10 +7,10 @@
   import * as Card from '$shadcn/ui/card';
   import { Spinner } from '$shadcn/ui/spinner';
 
-  import MoleculeDataTable from './MoleculeTable.svelte';
+  import MoleculeDataTable from './ui/MoleculeTable.svelte';
 
   interface Props {
-    molecules: Molecules;
+    molecules?: Molecules;
     ground?: Molecule;
     excited?: Molecule;
     loading?: boolean;
