@@ -14,7 +14,7 @@
     pulseFrames: 15,
     gapFrames: 60,
     photonRateHigh: 20_000,
-    photonRateLow: 1,
+    photonRateLowMax: 1,
     intensityDecay: 0.92,
     pulseFadeDuration: 8,
     pulseBoost: 0.6,
@@ -24,6 +24,8 @@
   let gl: WebGL2RenderingContext | null = null;
   let animationId: number;
   let frameCounter = 0;
+  let isDarkMode = $state(false);
+  let photonRateLow = $derived(isDarkMode ? 0 : CONFIG.photonRateLowMax);
 
   // WebGL resources
   let updateProgram: WebGLProgram;
@@ -115,13 +117,14 @@
     uniform vec2 u_resolution;
     uniform vec2 u_detectorSize;
     uniform float u_pixelSize;
+    uniform vec3 u_bgColor;
 
     in vec2 v_uv;
     out vec4 fragColor;
 
     void main() {
-      // Background color
-      vec3 bgColor = vec3(250.0, 250.0, 252.0) / 255.0;
+      // Background color from uniform
+      vec3 bgColor = u_bgColor;
 
       // Calculate detector pixel coordinates
       vec2 pixelCoord = v_uv * u_resolution;
@@ -211,29 +214,54 @@
     return Math.min(intensity, 1);
   }
 
-  function buildColorLUT(): Uint8Array {
+  function buildColorLUT(darkMode: boolean): Uint8Array {
     const lut = new Uint8Array(256 * 4);
     for (let i = 0; i < 256; i++) {
       const t = i / 255;
       let r: number, g: number, b: number, a: number;
-      if (t < 0.3) {
-        const s = t / 0.3;
-        r = 245 - s * 45;
-        g = 240 - s * 80;
-        b = 255 - s * 30;
-        a = (0.3 + s * 0.3) * 255;
-      } else if (t < 0.6) {
-        const s = (t - 0.3) / 0.3;
-        r = 200 - s * 70;
-        g = 160 - s * 80;
-        b = 225 - s * 25;
-        a = (0.6 + s * 0.2) * 255;
+
+      if (darkMode) {
+        // Dark mode: lighter colors on dark background
+        if (t < 0.3) {
+          const s = t / 0.3;
+          r = 100 + s * 100;
+          g = 150 + s * 50;
+          b = 255;
+          a = (0 + s * 0.3) * 255;
+        } else if (t < 0.6) {
+          const s = (t - 0.3) / 0.3;
+          r = 200 - s * 50;
+          g = 200 - s * 50;
+          b = 255;
+          a = (0.5 + s * 0.25) * 255;
+        } else {
+          const s = (t - 0.6) / 0.4;
+          r = 255 - s * 50;
+          g = 100 - s * 50;
+          b = 200 + s * 30;
+          a = (0.75 + s * 0.25) * 255;
+        }
       } else {
-        const s = (t - 0.6) / 0.4;
-        r = 130 - s * 50;
-        g = 80 - s * 50;
-        b = 200 + s * 30;
-        a = (0.8 + s * 0.2) * 255;
+        // Light mode: original colors
+        if (t < 0.3) {
+          const s = t / 0.3;
+          r = 245 - s * 45;
+          g = 240 - s * 80;
+          b = 255 - s * 30;
+          a = (0.3 + s * 0.3) * 255;
+        } else if (t < 0.6) {
+          const s = (t - 0.3) / 0.3;
+          r = 200 - s * 70;
+          g = 160 - s * 80;
+          b = 225 - s * 25;
+          a = (0.6 + s * 0.2) * 255;
+        } else {
+          const s = (t - 0.6) / 0.4;
+          r = 130 - s * 50;
+          g = 80 - s * 50;
+          b = 200 + s * 30;
+          a = (0.8 + s * 0.2) * 255;
+        }
       }
       const idx = i * 4;
       lut[idx] = r;
@@ -338,7 +366,7 @@
     gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
 
     // Create color LUT texture
-    const lutData = buildColorLUT();
+    const lutData = buildColorLUT(isDarkMode);
     colorLutTexture = gl!.createTexture()!;
     gl!.bindTexture(gl!.TEXTURE_2D, colorLutTexture);
     gl!.texImage2D(
@@ -406,8 +434,15 @@
     const width = canvas.width;
     const height = canvas.height;
     const isInPulse = frameCounter < CONFIG.pulseFrames;
-    const photonRate = isInPulse ? CONFIG.photonRateHigh : CONFIG.photonRateLow;
+    const photonRate = isInPulse ? CONFIG.photonRateHigh : photonRateLow;
     const normalizedPhotonRate = photonRate / (pixelsX * pixelsY);
+
+    // Get background color based on dark mode
+    let bgColor = { r: 250 / 255, g: 250 / 255, b: 252 / 255 };
+    if (isDarkMode) {
+      // Dark mode background - using a dark gray/blue
+      bgColor = { r: 20 / 255, g: 20 / 255, b: 30 / 255 };
+    }
 
     // Update pass
     gl.useProgram(updateProgram);
@@ -489,6 +524,12 @@
       gl.getUniformLocation(renderProgram, 'u_pixelSize'),
       CONFIG.pixelSize,
     );
+    gl.uniform3f(
+      gl.getUniformLocation(renderProgram, 'u_bgColor'),
+      bgColor.r,
+      bgColor.g,
+      bgColor.b,
+    );
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -498,6 +539,43 @@
 
   onMount(() => {
     if (!browser) return;
+
+    // Detect dark mode
+    isDarkMode = document.documentElement.classList.contains('dark');
+
+    // Listen for dark mode changes
+    const observer = new MutationObserver(() => {
+      const wasDarkMode = isDarkMode;
+      isDarkMode = document.documentElement.classList.contains('dark');
+
+      // Rebuild color LUT if dark mode changed
+      if (isDarkMode !== wasDarkMode && gl) {
+        gl.deleteTexture(colorLutTexture);
+        const lutData = buildColorLUT(isDarkMode);
+        colorLutTexture = gl.createTexture()!;
+        gl.bindTexture(gl.TEXTURE_2D, colorLutTexture);
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGBA,
+          256,
+          1,
+          0,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          lutData,
+        );
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
 
     gl = canvas.getContext('webgl2', { alpha: false, antialias: false });
     if (!gl) {
@@ -520,6 +598,7 @@
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationId);
+      observer.disconnect();
     };
   });
 </script>
