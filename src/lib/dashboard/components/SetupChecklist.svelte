@@ -61,14 +61,14 @@
   const allComplete = $derived(completedCount === items.length);
 </script>
 
-<Card.Root class="w-full max-w-md">
-  <Card.Header class="flex items-center gap-3">
-    <Card.Title class="text-lg">Setup Required</Card.Title>
+<Card.Root class="w-full max-w-xl">
+  <Card.Header class="flex items-center gap-6">
+    <Card.Title class="min-w-fit">Setup Required</Card.Title>
     <Card.Description>
       Complete the following steps to generate scattering signals
     </Card.Description>
-    <Card.Action>
-      <FlaskConical class="h-5 w-5 text-primary" />
+    <Card.Action class="self-center">
+      <FlaskConical class="h-8 w-8 text-primary" />
     </Card.Action>
   </Card.Header>
 
