@@ -209,7 +209,7 @@
             >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
           >
         </div> -->
-      <div transition:fade class="relative flex flex-col gap-6 pt-4">
+      <div transition:fade class="relative mt-8 flex flex-col gap-6">
         <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
         <!-- TODO: Re-enable temperature result badges -->
         <!-- TODO: Improve plot axis/zooming -->
@@ -219,7 +219,7 @@
             <LineChart {constant_options} {xAxis} {series} />
           </div>
         {:else}
-          <div class="absolute" transition:fade>
+          <div class="absolute inset-0" transition:fade>
             <SetupChecklist
               {hasGroundMolecule}
               {hasExcitedMolecule}
@@ -231,9 +231,11 @@
         {/if}
       </div>
     </Resizable.Pane>
+
     <Resizable.Handle />
+
     <Resizable.Pane defaultSize={20} class="flex min-w-110 flex-col">
-      <ScrollArea class="mt-4 flex-1">
+      <ScrollArea class="mt-8 flex-1">
         <div class="grid h-72 gap-4">
           <SolventCard
             bind:concentrationSoluteMolar={
