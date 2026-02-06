@@ -3,15 +3,12 @@
     Atom,
     Beaker,
     Check,
-    Circle,
-    Droplets,
     FlaskConical,
     Fullscreen,
     Projector,
-    Radio,
-    Zap,
   } from '@lucide/svelte';
 
+  import * as Card from '$lib/shadcn/components/ui/card';
   import { cn } from '$lib/shadcn/utils';
 
   interface ChecklistItem {
@@ -64,31 +61,26 @@
   const allComplete = $derived(completedCount === items.length);
 </script>
 
-<div class="flex h-full w-full flex-col items-center justify-center p-8">
-  <div
-    class="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-sm"
-  >
-    <div class="mb-6 flex items-center gap-3">
-      <div class="rounded-full bg-primary/10 p-2">
-        <FlaskConical class="h-5 w-5 text-primary" />
-      </div>
-      <div>
-        <h3 class="text-lg font-semibold text-foreground">Setup Required</h3>
-        <p class="text-sm text-muted-foreground">
-          Complete the following steps to generate scattering signals
-        </p>
-      </div>
-    </div>
+<Card.Root class="w-full max-w-md">
+  <Card.Header class="flex items-center gap-3">
+    <Card.Title class="text-lg">Setup Required</Card.Title>
+    <Card.Description>
+      Complete the following steps to generate scattering signals
+    </Card.Description>
+    <Card.Action>
+      <FlaskConical class="h-5 w-5 text-primary" />
+    </Card.Action>
+  </Card.Header>
 
-    <div class="mb-4 h-2 w-full overflow-hidden rounded-full bg-muted">
-      <!-- deno-fmt-ignore -->
+  <Card.Content class="space-y-4">
+    <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
       <div
         class="h-full bg-primary transition-all duration-300 ease-out"
         style="width: {(completedCount / items.length) * 100}%"
       ></div>
     </div>
 
-    <p class="mb-4 text-right text-xs text-muted-foreground">
+    <p class="text-right text-xs text-muted-foreground">
       {completedCount} of {items.length} completed
     </p>
 
@@ -125,14 +117,14 @@
 
     {#if allComplete}
       <div
-        class="mt-6 rounded-md bg-primary/10 p-3 text-center text-sm text-primary"
+        class="rounded-md bg-primary/10 p-3 text-center text-sm text-primary"
       >
         All set! Your scattering signals should now be displayed.
       </div>
     {:else}
-      <p class="mt-6 text-center text-xs text-muted-foreground">
+      <p class="text-center text-xs text-muted-foreground">
         Use the configuration panels on the right to complete setup
       </p>
     {/if}
-  </div>
-</div>
+  </Card.Content>
+</Card.Root>
