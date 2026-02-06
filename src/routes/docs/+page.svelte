@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CircleAlert } from '@lucide/svelte';
+  import { CircleAlert, TriangleAlert } from '@lucide/svelte';
   import katex from 'katex';
 
   import * as Alert from '$shadcn/ui/alert';
@@ -170,7 +170,24 @@
 </script>
 
 <section>
+  <Alert.Root variant="destructive" class="float-right mb-4 ml-4 max-w-md">
+    <CircleAlert />
+    <Alert.Title>Unreviewed content</Alert.Title>
+    <Alert.Description class="[&_p]:my-1 [&_p]:leading-snug">
+      <p>This page has not been reviewed.</p>
+      <p>
+        As it was written by Robert (me), a software developer with a degree in
+        space physics, it's probably wrong.
+      </p>
+      <p>
+        Treat this page as a placeholder/example text to show something on the
+        interface.
+      </p>
+    </Alert.Description>
+  </Alert.Root>
+
   <h1 class="font-semibold">Technical Documentation</h1>
+
   <p>
     Documentation of the physics, algorithms, and implementation details behind
     the SimEx-Debye Scattering Simulator.
@@ -189,27 +206,28 @@
 </section>
 
 <section>
-  <h2 class="font-semibold">Simulation Details</h2>
-
-  <Card.Root class="flex-1 gap-0 border-amber-500/50 bg-amber-500/5">
-    <Card.Header>
-      <Card.Title class="text-sm text-amber-600"
-        >Physics Simplifications</Card.Title
-      >
-    </Card.Header>
-    <Card.Content class="text-sm">
-      <ul class="list-inside list-disc space-y-1">
+  <Alert.Root
+    class="float-right mb-4 ml-4 max-w-md border-amber-500/50 bg-amber-500/5"
+  >
+    <TriangleAlert class="text-amber-600" />
+    <Alert.Title class="text-amber-600">Physics Simplifications</Alert.Title>
+    <Alert.Description
+      class="text-sm [&_li]:my-0 [&_li]:leading-snug [&_ul]:pl-4"
+    >
+      <ul class="list-disc">
         <li>
           Gas-phase / isolated-solute scattering (no cage or intermolecular
           interference)
         </li>
-        <li>Independent atom approximation (tabulated atomic form factors)</li>
+        <li>Independent atoms (tabulated form factors)</li>
         <li>No Debye-Waller factors or thermal motion</li>
         <li>Tabulated solvent thermal response</li>
         <li>No explicit solute-solvent structural correlation</li>
       </ul>
-    </Card.Content>
-  </Card.Root>
+    </Alert.Description>
+  </Alert.Root>
+
+  <h2 class="font-semibold">Simulation Details</h2>
 
   <h3>The Debye Scattering Equation</h3>
   <p>
