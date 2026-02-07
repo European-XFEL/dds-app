@@ -1,17 +1,17 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import { includeIgnoreFile } from '@eslint/compat';
-import js from '@eslint/js';
-import prettier from 'eslint-config-prettier';
-import svelte from 'eslint-plugin-svelte';
-import { defineConfig } from 'eslint/config';
-import globals from 'globals';
-import ts from 'typescript-eslint';
+import { includeIgnoreFile } from "@eslint/compat";
+import js from "@eslint/js";
+import prettier from "eslint-config-prettier";
+import svelte from "eslint-plugin-svelte";
+import { defineConfig } from "eslint/config";
+import globals from "globals";
+import ts from "typescript-eslint";
 
-import { URL, fileURLToPath } from 'node:url';
+import { URL, fileURLToPath } from "node:url";
 
-import svelteConfig from './svelte.config.js';
+import svelteConfig from "./svelte.config.js";
 
-const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
+const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url));
 
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
@@ -27,25 +27,25 @@ export default defineConfig(
     rules: {
       // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
       // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-      'no-undef': 'off',
+      "no-undef": "off",
       // Override no-unused-vars to ignore variables that start with _
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'warn', // or "error"
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn", // or "error"
         {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          caughtErrorsIgnorePattern: '^_',
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
         },
       ],
     },
   },
   {
-    files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
+    files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
     languageOptions: {
       parserOptions: {
         projectService: true,
-        extraFileExtensions: ['.svelte'],
+        extraFileExtensions: [".svelte"],
         parser: ts.parser,
         svelteConfig,
       },

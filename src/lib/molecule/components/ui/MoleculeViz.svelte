@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { getMoleculeFileContent } from '$remote';
-
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   import * as Field from '$shadcn/ui/field/index.js';
+
+  import { getMoleculeFileContent } from '$remote';
 
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';

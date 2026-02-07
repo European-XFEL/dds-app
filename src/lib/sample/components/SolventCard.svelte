@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { listSolvents } from '$remote';
-
   import { fade } from 'svelte/transition';
 
   import * as Card from '$shadcn/ui/card/index.js';
   import { Spinner } from '$shadcn/ui/spinner/index.js';
+
+  import { listSolvents } from '$remote';
 
   import type { Sample, Solvents } from '$lib/types';
   import NumSlider from '$lib/ui/NumSlider.svelte';

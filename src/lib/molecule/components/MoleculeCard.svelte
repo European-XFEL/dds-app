@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { listMolecules } from '$remote';
-
   import * as Card from '$shadcn/ui/card/index.js';
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Select from '$shadcn/ui/select/index.js';
   import { Spinner } from '$shadcn/ui/spinner';
+
+  import { listMolecules } from '$remote';
 
   import type { Sample } from '$lib/types';
 
@@ -60,8 +60,6 @@
       }
     }
   });
-
-  $inspect(moleculeStates);
 </script>
 
 <Card.Root>

@@ -20,17 +20,17 @@ services:
     build:
       context: .
       target: dev
-    profiles: ['dev']
+    profiles: ["dev"]
     ports:
-      - '5173:5173'
+      - "5173:5173"
     environment:
-      HOST: '0.0.0.0'
-      PORT: '5173'
-      DB_HOST: 'db:5432'
-      DB_USER: '${DB_USER:?error}'
-      DB_PASSWORD: '${DB_PASSWORD:?error}'
-      DB_NAME: '${DB_NAME:?error}'
-      BACKEND_URL: 'http://backend:50051'
+      HOST: "0.0.0.0"
+      PORT: "5173"
+      DB_HOST: "db:5432"
+      DB_USER: "${DB_USER:?error}"
+      DB_PASSWORD: "${DB_PASSWORD:?error}"
+      DB_NAME: "${DB_NAME:?error}"
+      BACKEND_URL: "http://backend:50051"
     depends_on:
       - db
       - backend
@@ -50,20 +50,27 @@ services:
     build:
       context: .
       target: preview
-    profiles: ['preview']
+    environment:
+      DB_HOST: "db:5432"
+      DB_USER: "${DB_USER:?error}"
+      DB_PASSWORD: "${DB_PASSWORD:?error}"
+      DB_NAME: "${DB_NAME:?error}"
+      BACKEND_URL: "http://backend:50051"
+    command: ["deno", "task", "preview", "--host", "0.0.0.0"]
+    profiles: ["preview"]
     ports:
-      - '4173:4173'
+      - "4173:4173"
 
   web:
     build:
       context: .
       target: prod
-    profiles: ['prod']
+    profiles: ["prod"]
     ports:
-      - '3000:3000'
+      - "3000:3000"
     environment:
-      HOST: '0.0.0.0'
-      PORT: '3000'
+      HOST: "0.0.0.0"
+      PORT: "3000"
 
 volumes:
   pgdata:
