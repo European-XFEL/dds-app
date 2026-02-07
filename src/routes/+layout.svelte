@@ -32,8 +32,9 @@
   });
 
   const sample = $derived({
-    groundName: simulation.sample.ground?.name,
-    excitedName: simulation.sample.excited?.name,
+    moleculeName: simulation.sample.ground?.moleculeName,
+    groundName: simulation.sample.ground?.filename,
+    excitedName: simulation.sample.excited?.filename,
     solventName: simulation.sample.solvent?.name,
     concentrationSoluteMolar: simulation.sample.concentrationSoluteMolar,
   });
