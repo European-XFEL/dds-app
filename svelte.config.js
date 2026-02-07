@@ -47,6 +47,11 @@ const config_static = {
     alias: {
       ...config.kit?.alias,
       $remote: './src/lib/remote/static.remote.ts',
+    },
+    prerender: {
+      entries: [
+        '*'
+      ]
     }
   },
 };
