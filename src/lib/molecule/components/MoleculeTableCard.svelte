@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { listMolecules } from '$remote';
   import type { Molecule, Molecules } from '../types';
 
   import { fade } from 'svelte/transition';
 
   import * as Card from '$shadcn/ui/card';
   import { Spinner } from '$shadcn/ui/spinner';
+
+  import { listMolecules } from '$remote';
 
   import MoleculeDataTable from './ui/MoleculeTable.svelte';
 

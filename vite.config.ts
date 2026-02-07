@@ -1,9 +1,9 @@
-import deno from '@deno/vite-plugin';
-import { sveltekit } from '@sveltejs/kit/vite';
-import tailwindcss from '@tailwindcss/vite';
-import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig } from 'vite';
-import lucidePreprocess from 'vite-plugin-lucide-preprocess';
+import deno from "@deno/vite-plugin";
+import { sveltekit } from "@sveltejs/kit/vite";
+import tailwindcss from "@tailwindcss/vite";
+import { visualizer } from "rollup-plugin-visualizer";
+import { defineConfig } from "vite";
+import lucidePreprocess from "vite-plugin-lucide-preprocess";
 
 export default defineConfig({
   plugins: [
@@ -13,7 +13,7 @@ export default defineConfig({
     deno(),
     visualizer({
       emitFile: true,
-      filename: 'stats.html',
+      filename: "stats.html",
     }),
   ],
 });

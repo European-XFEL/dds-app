@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { getMoleculeFileContent } from '$remote';
-
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   import * as Field from '$shadcn/ui/field/index.js';
+
+  import { getMoleculeFileContent } from '$remote';
 
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
@@ -72,7 +72,7 @@
     <div
       class="relative aspect-square max-h-[50vh] w-full max-w-3xl border border-muted/50"
     >
-    <!-- TODO: improve messy branches and catches -->
+      <!-- TODO: improve messy branches and catches -->
       {#if !Trajectory || !ground?.id || !excited?.id}
         {#key `${placeholder_title}? + ${placeholder_description}`}
           <div class="absolute inset-0" transition:fade>

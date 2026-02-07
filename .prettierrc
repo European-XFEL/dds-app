@@ -9,6 +9,7 @@
     "^\\$app(/.*)?$",
     "^\\$env/(static|dynamic)/(private|public)$",
     "^\\$shadcn(/.*)?$",
+    "^\\$remote(/.*)?$",
     "^\\$lib(/.*)?$",
     "^\\$components(/.*)?$",
     "^\\./(.*)?$"

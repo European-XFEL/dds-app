@@ -248,9 +248,7 @@
           >
             {#each row.getVisibleCells() as cell (cell.id)}
               <Table.Cell>
-                <div
-                  in:slide|global={{ duration: 300, delay: index * 60 }}
-                >
+                <div in:slide|global={{ duration: 300, delay: index * 60 }}>
                   <FlexRender
                     content={cell.column.columnDef.cell}
                     context={cell.getContext()}
