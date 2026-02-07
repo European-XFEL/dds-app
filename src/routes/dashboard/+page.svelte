@@ -11,12 +11,17 @@
 
   import { fade } from 'svelte/transition';
 
+  import * as Collapsible from '$shadcn/ui/collapsible/index.js';
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
   import { SetupChecklist } from '$lib/dashboard';
   import { DetectorSetupCard } from '$lib/detector';
-  import { MoleculeCard } from '$lib/molecule';
+  import {
+    MoleculeCard,
+    MoleculeTrajectoryViz,
+    MoleculeViz,
+  } from '$lib/molecule';
   import { PumpSetupCard } from '$lib/pump';
   import { SolventCard } from '$lib/sample';
   import {
@@ -45,6 +50,9 @@
   const simulation = useSimulationState();
 
   let short = $state(true);
+  let vizOpen = $state(false);
+  let vizCollapseShow = $state(true);
+  let vizMode = $state<'trajectory' | 'individual'>('trajectory');
 
   // Use extracted calculations module
   const calculations = createScatteringCalculations(simulation);
@@ -209,25 +217,129 @@
             >Deposited Energy (J): {result?.depositedEnergyJoule ?? 'N/A'}</Badge
           >
         </div> -->
-      <div transition:fade class="relative mt-8 flex flex-col gap-6">
+      <div transition:fade class="mt-8 flex flex-col gap-6">
         <!-- TODO: Add warning based on the expected temperature range that the dSdT data can apply to? -->
         <!-- TODO: Re-enable temperature result badges -->
         <!-- TODO: Improve plot axis/zooming -->
         <!-- Conditionally show checklist or chart -->
+        <div class="h-96">
+          {#if hasAll}
+            <div class="h-full" transition:fade>
+              <LineChart {constant_options} {xAxis} {series} />
+            </div>
+          {:else}
+            <div class="h-full" transition:fade>
+              <SetupChecklist
+                {hasGroundMolecule}
+                {hasExcitedMolecule}
+                {hasSolvent}
+                {hasDetector}
+                {hasPump}
+              />
+            </div>
+          {/if}
+        </div>
+
+        <!-- Molecule Visualizations -->
         {#if hasAll}
-          <div class="absolute inset-0" transition:fade>
-            <LineChart {constant_options} {xAxis} {series} />
-          </div>
-        {:else}
-          <div class="absolute inset-0" transition:fade>
-            <SetupChecklist
-              {hasGroundMolecule}
-              {hasExcitedMolecule}
-              {hasSolvent}
-              {hasDetector}
-              {hasPump}
-            />
-          </div>
+          {#if vizCollapseShow}
+            <Collapsible.Root bind:open={vizOpen} class="w-full">
+              <Collapsible.Trigger
+                class="mb-2 w-full rounded-md bg-secondary/10 px-3 py-2 text-sm font-medium hover:bg-secondary/20"
+              >
+                {#if vizOpen}
+                  Hide Molecule Visualizations
+                {:else}
+                  Show Molecule Visualizations
+                {/if}
+              </Collapsible.Trigger>
+              <Collapsible.Content class="w-full">
+                <div class="mb-3 flex items-center gap-2 text-sm">
+                  <span class="font-semibold">View:</span>
+                  <button
+                    class={`rounded-md border px-2 py-1 text-xs font-medium transition hover:bg-secondary/10 ${
+                      vizMode === 'trajectory' ? 'bg-secondary/20' : ''
+                    }`}
+                    onclick={() => (vizMode = 'trajectory')}
+                  >
+                    Trajectory
+                  </button>
+                  <button
+                    class={`rounded-md border px-2 py-1 text-xs font-medium transition hover:bg-secondary/10 ${
+                      vizMode === 'individual' ? 'bg-secondary/20' : ''
+                    }`}
+                    onclick={() => (vizMode = 'individual')}
+                  >
+                    Individual
+                  </button>
+                </div>
+                {#if vizMode === 'trajectory'}
+                  <MoleculeTrajectoryViz
+                    ground={simulation.sample.ground}
+                    excited={simulation.sample.excited}
+                  />
+                {:else}
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-2">
+                      <h3 class="text-sm font-semibold">Ground State</h3>
+                      {#if simulation.sample.ground}
+                        <MoleculeViz molecule={simulation.sample.ground} />
+                      {/if}
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <h3 class="text-sm font-semibold">Excited State</h3>
+                      {#if simulation.sample.excited}
+                        <MoleculeViz molecule={simulation.sample.excited} />
+                      {/if}
+                    </div>
+                  </div>
+                {/if}
+              </Collapsible.Content>
+            </Collapsible.Root>
+          {:else if vizOpen}
+            <div>
+              <div class="mb-3 flex items-center gap-2 text-sm">
+                <span class="font-semibold">View:</span>
+                <button
+                  class={`rounded-md border px-2 py-1 text-xs font-medium transition hover:bg-secondary/10 ${
+                    vizMode === 'trajectory' ? 'bg-secondary/20' : ''
+                  }`}
+                  onclick={() => (vizMode = 'trajectory')}
+                >
+                  Trajectory
+                </button>
+                <button
+                  class={`rounded-md border px-2 py-1 text-xs font-medium transition hover:bg-secondary/10 ${
+                    vizMode === 'individual' ? 'bg-secondary/20' : ''
+                  }`}
+                  onclick={() => (vizMode = 'individual')}
+                >
+                  Individual
+                </button>
+              </div>
+              {#if vizMode === 'trajectory'}
+                <MoleculeTrajectoryViz
+                  ground={simulation.sample.ground}
+                  excited={simulation.sample.excited}
+                />
+              {:else}
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="flex flex-col gap-2">
+                    <h3 class="text-sm font-semibold">Ground State</h3>
+                    {#if simulation.sample.ground}
+                      <MoleculeViz molecule={simulation.sample.ground} />
+                    {/if}
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <h3 class="text-sm font-semibold">Excited State</h3>
+                    {#if simulation.sample.excited}
+                      <MoleculeViz molecule={simulation.sample.excited} />
+                    {/if}
+                  </div>
+                </div>
+              {/if}
+            </div>
+          {/if}
         {/if}
       </div>
     </Resizable.Pane>
