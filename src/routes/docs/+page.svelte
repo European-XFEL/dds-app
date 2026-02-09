@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CircleAlert, TriangleAlert } from '@lucide/svelte';
+  import { TriangleAlert } from '@lucide/svelte';
   import katex from 'katex';
 
   import * as Alert from '$shadcn/ui/alert';
@@ -170,22 +170,6 @@
 </script>
 
 <section>
-  <Alert.Root variant="destructive" class="float-right mb-4 ml-4 max-w-md">
-    <CircleAlert />
-    <Alert.Title>Unreviewed content</Alert.Title>
-    <Alert.Description class="[&_p]:my-1 [&_p]:leading-snug">
-      <p>This page has not been reviewed.</p>
-      <p>
-        As it was written by Robert (me), a software developer with a degree in
-        space physics, it's probably wrong.
-      </p>
-      <p>
-        Treat this page as a placeholder/example text to show something on the
-        interface.
-      </p>
-    </Alert.Description>
-  </Alert.Root>
-
   <h1 class="font-semibold">Technical Documentation</h1>
 
   <p>
