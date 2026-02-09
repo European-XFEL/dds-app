@@ -12,9 +12,9 @@ export type SimulationSeed = {
 
 const DEFAULT_SEED: SimulationSeed = {
   qRange: {
-    min: 0.01,
-    max: 9.0,
-    step: 0.01,
+    min: 0.005253,
+    max: 8.498164,
+    step: 0.006044,
   },
   pump: {
     photonEnergyEv: 4.0,
