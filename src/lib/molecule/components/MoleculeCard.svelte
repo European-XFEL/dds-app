@@ -8,35 +8,23 @@
 
   import type { Sample } from '$lib/types';
 
-  import MoleculeViz from './ui/MoleculeViz.svelte';
-
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
   type Props = {
+    molecules: Molecules;
     ground?: Sample['ground'];
     excited?: Sample['excited'];
-    molecules?: Molecules;
     vizOpen?: boolean;
     vizCollapseShow?: boolean;
     loading?: boolean;
   };
 
   let {
+    molecules,
     ground = $bindable(),
     excited = $bindable(),
-    molecules,
-    loading = true,
-    vizOpen = false,
-    vizCollapseShow = false,
+    loading = false,
   }: Props = $props();
-
-  // svelte-ignore state_referenced_locally
-  if (!molecules) {
-    listMolecules().then((data) => {
-      molecules = data;
-      loading = false;
-    });
-  }
 
   let moleculesNames = $derived(
     new Set(molecules?.map((m) => m.moleculeName)) ?? [],

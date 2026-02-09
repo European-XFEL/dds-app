@@ -6,31 +6,16 @@
   import * as Card from '$shadcn/ui/card';
   import { Spinner } from '$shadcn/ui/spinner';
 
-  import { listMolecules } from '$remote';
-
   import MoleculeDataTable from './ui/MoleculeTable.svelte';
 
   interface Props {
-    molecules?: Molecules;
-    ground?: Molecule;
-    excited?: Molecule;
+    molecules: Molecules;
+    ground?: Molecule | null;
+    excited?: Molecule | null;
     loading?: boolean;
   }
 
-  let {
-    ground = $bindable(),
-    excited = $bindable(),
-    molecules,
-    loading = true,
-  }: Props = $props();
-
-  // svelte-ignore state_referenced_locally
-  if (!molecules) {
-    listMolecules().then((data) => {
-      molecules = data;
-      loading = false;
-    });
-  }
+  let { ground, excited, molecules, loading = false }: Props = $props();
 </script>
 
 <Card.Root>
@@ -49,11 +34,6 @@
     </Card.Description>
   </Card.Header>
   <Card.Content>
-    <MoleculeDataTable
-      bind:ground
-      bind:excited
-      molecules={molecules || []}
-      {loading}
-    />
+    <MoleculeDataTable {ground} {excited} {molecules} />
   </Card.Content>
 </Card.Root>
