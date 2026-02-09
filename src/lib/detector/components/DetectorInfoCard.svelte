@@ -10,7 +10,7 @@
   let { ...restProps }: Props = $props();
 </script>
 
-<Card.Root class="min-w-sm flex-1">
+<Card.Root>
   <Card.Content>
     <DetectorInfo {...restProps} />
   </Card.Content>

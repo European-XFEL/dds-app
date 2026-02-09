@@ -13,8 +13,8 @@
   const simulation = useSimulationState();
 </script>
 
-<div class="mt-8 flex flex-col gap-6 @sm:flex-wrap">
-  <div class="grid grid-cols-3 gap-6 @sm:grid-cols-1">
+<div class="flex flex-col gap-6">
+  <div class="flex flex-wrap gap-6 [&>div]:min-w-sm [&>div]:flex-1">
     <SolventCard
       {solvents}
       bind:solvent={simulation.sample.solvent}

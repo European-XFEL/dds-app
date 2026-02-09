@@ -6,7 +6,7 @@
   const simulation = useSimulationState();
 </script>
 
-<div class="mt-8 flex flex-wrap gap-6 *:min-w-sm *:flex-1">
+<div class="flex flex-wrap gap-6 *:min-w-sm *:flex-1">
   <PumpSetupCard bind:pump={simulation.pump} />
   <ProbeSetupCard bind:probe={simulation.probe} />
 </div>

@@ -63,8 +63,8 @@
   {/if}
 
   <Sidebar.Inset class="overflow-y-auto">
-    <main class="m-0 mr-8 ml-8 flex justify-center-safe">
-      <div class="max-w-[1920px] grow">
+    <main class="m-4 flex justify-center-safe">
+      <div class="max-w-480 grow">
         {@render children?.()}
       </div>
     </main>
