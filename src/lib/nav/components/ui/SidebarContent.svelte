@@ -119,6 +119,7 @@
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
   import AlphaAlert from '$lib/ui/AlphaAlert.svelte';
+  import BugsFeatures from '$lib/ui/BugsFeatures.svelte';
   import FeedbackDialog from '$lib/ui/FeedbackDialog.svelte';
 
   // Resolve the urls in `data`
@@ -169,6 +170,7 @@
   <Sidebar.GroupContent>
     <Sidebar.Menu>
       <FeedbackDialog />
+      <BugsFeatures />
     </Sidebar.Menu>
   </Sidebar.GroupContent>
 </Sidebar.Group>
