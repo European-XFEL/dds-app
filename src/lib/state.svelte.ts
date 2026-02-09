@@ -2,9 +2,15 @@ import { getContext, hasContext, setContext } from 'svelte';
 
 import { DetectorState } from '$lib/detector/state.svelte';
 import { SampleState } from '$lib/sample/state.svelte';
-import type { SimulationDetails } from '$lib/types';
+import type { Pump, QRange, XRayProbe } from '$lib/types';
 
-const initialSeed = {
+export type SimulationSeed = {
+  qRange: QRange;
+  pump: Pump;
+  probe: XRayProbe;
+};
+
+const DEFAULT_SEED: SimulationSeed = {
   qRange: {
     min: 0.01,
     max: 9.0,
@@ -22,18 +28,51 @@ const initialSeed = {
 
 const APP_STATE_KEY = Symbol('simulation-state');
 
-export type SimulationState = SimulationDetails;
+function mergeSeed(seed?: Partial<SimulationSeed>): SimulationSeed {
+  return {
+    qRange: { ...DEFAULT_SEED.qRange, ...seed?.qRange },
+    pump: { ...DEFAULT_SEED.pump, ...seed?.pump },
+    probe: { ...DEFAULT_SEED.probe, ...seed?.probe },
+  };
+}
 
-export function createSimulationSeed(_seed = initialSeed): SimulationState {
-  const seed = structuredClone(_seed);
+export class SimulationState {
+  qRange = $state(structuredClone(DEFAULT_SEED.qRange));
+  pump = $state(structuredClone(DEFAULT_SEED.pump));
+  probe = $state(structuredClone(DEFAULT_SEED.probe));
 
-  // Wrap with $state() to make it deeply reactive for bindings
-  const state: SimulationState = $state({
-    ...seed,
-    detector: new DetectorState('LPD'),
-    sample: new SampleState(),
-  });
+  detector = new DetectorState('LPD');
+  sample = new SampleState();
 
+  reset(seed: SimulationSeed) {
+    this.qRange.min = seed.qRange.min;
+    this.qRange.max = seed.qRange.max;
+    this.qRange.step = seed.qRange.step;
+
+    this.pump.photonEnergyEv = seed.pump.photonEnergyEv;
+    this.pump.excitedStateEnergyEv = seed.pump.excitedStateEnergyEv;
+    this.pump.excitedStateFraction = seed.pump.excitedStateFraction;
+
+    this.probe.wavelength = seed.probe.wavelength;
+  }
+
+  syncQRangeFromSample() {
+    const solvent = this.sample.solvent;
+    if (!solvent) return;
+
+    this.qRange.min = solvent.qMin ?? this.qRange.min;
+    this.qRange.max = solvent.qMax ?? this.qRange.max;
+    this.qRange.step = solvent.qStep ?? this.qRange.step;
+  }
+}
+
+export function createSimulationSeed(seed?: Partial<SimulationSeed>): SimulationSeed {
+  return structuredClone(mergeSeed(seed));
+}
+
+export function createSimulationState(seed = createSimulationSeed()): SimulationState {
+  const state = new SimulationState();
+  state.reset(seed);
   return state;
 }
 

@@ -10,25 +10,41 @@
 
   import { Sidebar as AppSidebar } from '$lib/nav';
   import {
-    type SimulationState,
-    createSimulationSeed,
+        createSimulationSeed,
+createSimulationState,
     setSimulationState,
   } from '$lib/state.svelte';
   import { preloadMatterviz } from '$lib/utils/matterviz';
 
-  let { children } = $props();
+  let { data, children } = $props();
 
-  const simulationSeed = createSimulationSeed();
+  const simulation = createSimulationState(createSimulationSeed());
 
-  setSimulationState(simulationSeed);
+  setSimulationState(simulation);
 
-  const simulation: SimulationState = $state(simulationSeed);
+  $effect(() => {
+    const seed = (
+      data as { simulationSeed: import('$lib/state.svelte').SimulationSeed }
+    ).simulationSeed;
+    simulation.qRange.min = seed.qRange.min;
+    simulation.qRange.max = seed.qRange.max;
+    simulation.qRange.step = seed.qRange.step;
+
+    simulation.pump.photonEnergyEv = seed.pump.photonEnergyEv;
+    simulation.pump.excitedStateEnergyEv = seed.pump.excitedStateEnergyEv;
+    simulation.pump.excitedStateFraction = seed.pump.excitedStateFraction;
+
+    simulation.probe.wavelength = seed.probe.wavelength;
+  });
 
   // TODO: make this consistent - sample sets the maximum q values, user can set values lower than those, which then bins the data via frontend js
   $effect(() => {
-    simulation.qRange.min = simulation.sample.solvent?.qMin ?? 0;
-    simulation.qRange.max = simulation.sample.solvent?.qMax ?? 0;
-    simulation.qRange.step = simulation.sample.solvent?.qStep ?? 0;
+    const solvent = simulation.sample.solvent;
+    if (!solvent) return;
+
+    simulation.qRange.min = solvent.qMin ?? simulation.qRange.min;
+    simulation.qRange.max = solvent.qMax ?? simulation.qRange.max;
+    simulation.qRange.step = solvent.qStep ?? simulation.qRange.step;
   });
 
   const sample = $derived({
