@@ -51,10 +51,11 @@
 
   const heroPathname = resolve('/').replace('./', '/');
   const showSidebar = $derived(page.url.pathname !== heroPathname);
+  const favicon = resolve('/favicon.png');
 </script>
 
 <svelte:head>
-  <link rel="icon" href="/favicon.png" />
+  <link rel="icon" href={favicon} />
 </svelte:head>
 
 <Sidebar.Provider style="--sidebar-width: 19rem">
