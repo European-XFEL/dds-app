@@ -40,7 +40,7 @@ const config_static = {
   ...config,
   kit: {
     ...config.kit,
-    adapter: adapter_static({ fallback: "404.html" }),
+    adapter: adapter_static(),
     paths: {
       base: process.argv.includes("dev") ? "" : process.env.BASE_PATH,
     },

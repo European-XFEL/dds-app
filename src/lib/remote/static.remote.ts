@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// deno-lint-ignore-file no-unused-vars
 import z from 'zod';
 
 import { form, prerender } from '$app/server';
@@ -7,12 +5,12 @@ import { form, prerender } from '$app/server';
 import { db, schema } from '$lib/server/db';
 
 import {
+  feedbackSchema,
   getDebyeResultImpl,
   getMoleculeFileContentImpl,
   getSolventIQImpl,
   listMoleculesImpl,
   listSolventsImpl,
-  feedbackSchema,
   simRequest,
   uploadSchema,
 } from './common';
@@ -102,7 +100,7 @@ export const getDebyeResult = prerender(
   },
 );
 
-export const submitFeedback = form(feedbackSchema, async () => {
+export const submitFeedback = form(feedbackSchema, () => {
   return {
     success: false,
     error: 'Feedback submission is not supported in the static build.',
