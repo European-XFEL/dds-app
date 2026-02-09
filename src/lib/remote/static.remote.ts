@@ -12,7 +12,7 @@ import {
   getSolventIQImpl,
   listMoleculesImpl,
   listSolventsImpl,
-  simulation_request,
+  simRequest,
   uploadSchema,
 } from './common';
 
@@ -81,7 +81,7 @@ export const getSolventIQ = prerender(
 );
 
 export const getDebyeResult = prerender(
-  simulation_request,
+  simRequest,
   async (request) => {
     return await getDebyeResultImpl(request);
   },

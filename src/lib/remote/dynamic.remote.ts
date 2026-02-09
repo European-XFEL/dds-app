@@ -8,7 +8,7 @@ import {
   getSolventIQImpl,
   listMoleculesImpl,
   listSolventsImpl,
-  simulation_request,
+  simRequest,
   uploadMoleculeImpl,
   uploadSchema,
 } from './common';
@@ -33,6 +33,6 @@ export const getSolventIQ = query(z.string(), async (id: string) => {
   return await getSolventIQImpl(id);
 });
 
-export const getDebyeResult = query(simulation_request, async (request) => {
+export const getDebyeResult = query(simRequest, async (request) => {
   return await getDebyeResultImpl(request);
 });
