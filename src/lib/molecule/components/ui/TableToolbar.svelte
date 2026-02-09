@@ -1,4 +1,5 @@
 <script lang="ts">
+  import MoleculeUpload from '../MoleculeUpload.svelte';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import Settings2 from '@lucide/svelte/icons/settings-2';
   import type { Table } from '@tanstack/table-core';
@@ -27,8 +28,9 @@
       placeholder="Search molecules..."
       value={globalFilter}
       oninput={handleInputChange}
-      class="h-9 w-[250px]"
+      class="h-9 w-64"
     />
+    <MoleculeUpload />
   </div>
   <div class="flex items-center gap-2">
     <DropdownMenu.Root>
@@ -41,7 +43,7 @@
           </Button>
         {/snippet}
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content align="end" class="w-[180px]">
+      <DropdownMenu.Content align="end" class="w-45">
         {#each table
           .getAllColumns()
           .filter((col) => col.getCanHide()) as column}

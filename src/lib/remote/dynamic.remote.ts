@@ -1,6 +1,8 @@
 import z from 'zod';
 
-import { command, form, query } from '$app/server';
+import { invalid } from '@sveltejs/kit';
+
+import { form, query } from '$app/server';
 
 import {
   getDebyeResultImpl,
@@ -19,8 +21,14 @@ export const listMolecules = query(async () => {
   return await listMoleculesImpl();
 });
 
-export const uploadMolecule = command(uploadSchema, async (input) => {
-  return await uploadMoleculeImpl(input);
+export const uploadMolecule = form(uploadSchema, async (input, issue) => {
+  const response = await uploadMoleculeImpl(input);
+
+  if (!response.success) {
+    invalid(issue.moleculeName(response.error ?? 'Unable to upload molecule.'));
+  }
+
+  return response;
 });
 
 export const listSolvents = query(async () => {
