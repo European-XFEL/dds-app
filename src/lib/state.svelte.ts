@@ -66,11 +66,15 @@ export class SimulationState {
   }
 }
 
-export function createSimulationSeed(seed?: Partial<SimulationSeed>): SimulationSeed {
+export function createSimulationSeed(
+  seed?: Partial<SimulationSeed>,
+): SimulationSeed {
   return structuredClone(mergeSeed(seed));
 }
 
-export function createSimulationState(seed = createSimulationSeed()): SimulationState {
+export function createSimulationState(
+  seed = createSimulationSeed(),
+): SimulationState {
   const state = new SimulationState();
   state.reset(seed);
   return state;
