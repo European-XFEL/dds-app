@@ -22,7 +22,7 @@
   import { Spinner } from '$shadcn/ui/spinner';
   import * as Table from '$shadcn/ui/table';
 
-  import type { Molecule, MoleculeSelection, Molecules } from '$lib/types';
+  import type { Molecule, Molecules } from '$lib/types';
 
   import TableFooter from './TableFooter.svelte';
   import TableToolbar from './TableToolbar.svelte';
@@ -34,12 +34,9 @@
     loading?: boolean;
   }
 
-  let {
-    molecules = $bindable(),
-    ground = $bindable(),
-    excited = $bindable(),
-    loading,
-  }: Props = $props();
+  let { molecules, ground, excited, loading }: Props = $props();
+  // NOTE: ground and excited are not bindable here, their state is instead
+  // loaded and modified directly in cell components
 
   // Table state
   let sorting = $state<SortingState>([{ id: 'moleculeName', desc: false }]);
@@ -54,24 +51,9 @@
   });
   let globalFilter = $state('');
 
-  // Selection state
-  let selectedGroundId = $state<string | null>(null);
-  let selectedExcitedId = $state<string | null>(null);
-
   // Editable cell state
   let editingCell = $state<{ id: string; field: string } | null>(null);
   let editValue = $state('');
-
-  // Selection handlers
-  function selectGround(molecule: Molecule) {
-    selectedGroundId = selectedGroundId === molecule.id ? null : molecule.id;
-    ground = molecule;
-  }
-
-  function selectExcited(molecule: Molecule) {
-    selectedExcitedId = selectedExcitedId === molecule.id ? null : molecule.id;
-    excited = molecule;
-  }
 
   // Editing handlers
   function startEditing(
@@ -129,12 +111,8 @@
   // Create columns with handlers
   const columns = $derived(
     createMoleculeColumns({
-      selectedGroundId,
-      selectedExcitedId,
       editingCell,
       editValue,
-      onSelectGround: selectGround,
-      onSelectExcited: selectExcited,
       onStartEdit: startEditing,
       onSaveEdit: saveEdit,
       onCancelEdit: cancelEdit,
@@ -178,27 +156,6 @@
       },
     }),
   );
-
-  // Report selection changes
-  $effect(() => {
-    ground = selectedGroundId
-      ? (molecules.find((m) => m.id === selectedGroundId) ?? null)
-      : null;
-
-    excited = selectedExcitedId
-      ? (molecules.find((m) => m.id === selectedExcitedId) ?? null)
-      : null;
-  });
-
-  // Current selection for toolbar display
-  let selection = $derived<MoleculeSelection>({
-    ground: selectedGroundId
-      ? (molecules.find((m) => m.id === selectedGroundId) ?? null)
-      : null,
-    excited: selectedExcitedId
-      ? (molecules.find((m) => m.id === selectedExcitedId) ?? null)
-      : null,
-  });
 </script>
 
 <div class="space-y-4">
@@ -206,8 +163,6 @@
     {table}
     {globalFilter}
     onGlobalFilterChange={(value) => (globalFilter = value)}
-    {selection}
-    {molecules}
   />
 
   <div class="rounded-md border">
@@ -235,14 +190,13 @@
           <!-- Note: table row extracted from Table.Row to apply slide/flip -->
           <tr
             data-slot="table-row"
-            in:slide|global={{ duration: 300, delay: index * 60 }}
             animate:flip={{ duration: 300 }}
             class="border-b transition-colors data-[state=selected]:bg-muted hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-muted/50 {row.depth ===
             0
               ? 'bg-muted/30 hover:bg-muted/50'
               : row.depth > 0 &&
-                  (selectedGroundId === (row.original as MoleculeRow).id ||
-                    selectedExcitedId === (row.original as MoleculeRow).id)
+                  (ground?.id === (row.original as MoleculeRow).id ||
+                    excited?.id === (row.original as MoleculeRow).id)
                 ? 'bg-primary/5 hover:bg-primary/10'
                 : ''}"
           >
