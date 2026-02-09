@@ -12,7 +12,9 @@
     "semiColons": true,
     "singleQuote": true
   },
-  "unstable": ["fmt-component", "sloppy-imports"],
+  "unstable": [
+    "sloppy-imports"
+  ],
   "imports": {
     "$lib/": "./src/lib/",
     "$remote": "./src/lib/remote/dynamic.remote.ts",
@@ -24,12 +26,21 @@
   "compilerOptions": {
     "checkJs": true,
     "strict": true,
-    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
-    "types": ["./.svelte-kit/ambient.d.ts"]
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable",
+      "deno.ns"
+    ],
+    "types": [
+      "./.svelte-kit/ambient.d.ts"
+    ]
   },
   "lint": {
     "rules": {
-      "exclude": ["no-sloppy-imports"]
+      "exclude": [
+        "no-sloppy-imports"
+      ]
     }
   }
 }
