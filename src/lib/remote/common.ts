@@ -13,6 +13,8 @@ import {
   createConnectTransport,
 } from '$lib/server/grpc';
 
+import { uploadSchema } from './schema';
+
 const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:50051';
 
 const transport = createConnectTransport({
@@ -165,17 +167,31 @@ export async function getDebyeResultImpl(request: z.infer<typeof simRequest>) {
   }
 }
 
-export const uploadSchema = z.object({
-  name: z.string(),
-  filename: z.string(),
-  contents: z.string(),
-});
+const atomCountLine = /^(\s*\d+)/;
+
+function extractAtomCount(contents: string) {
+  const firstLine = contents.split(/\r?\n/, 1)[0]?.trim();
+  if (!firstLine) return null;
+  const match = atomCountLine.exec(firstLine);
+  if (!match) return null;
+  const parsed = Number.parseInt(match[1], 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export { uploadSchema };
 
 export async function uploadMoleculeImpl({
-  name,
-  filename,
-  contents,
+  moleculeName,
+  description,
+  state,
+  reference,
+  atomCount,
+  file,
 }: z.infer<typeof uploadSchema>) {
+  const filename = file.name;
+  const contents = await file.text();
+  const derivedAtomCount = extractAtomCount(contents);
+  const resolvedAtomCount = derivedAtomCount ?? atomCount;
   const sha = await sha256HexFromText(contents);
 
   try {
@@ -183,7 +199,11 @@ export async function uploadMoleculeImpl({
       .insert(schema.moleculeFiles)
       .values({
         sha,
-        name,
+        moleculeName,
+        description,
+        state,
+        reference: reference ?? null,
+        atomCount: resolvedAtomCount,
         filename,
         contents,
       })

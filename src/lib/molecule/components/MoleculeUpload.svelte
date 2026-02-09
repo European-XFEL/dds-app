@@ -1,11 +1,15 @@
 <script lang="ts">
-  import { Button, buttonVariants } from '$shadcn/ui/button/index.js';
+  import * as Button from '$shadcn/ui/button/index.js';
+  import { buttonVariants } from '$shadcn/ui/button/index.js';
   import * as Dialog from '$shadcn/ui/dialog/index.js';
+  import * as Field from '$shadcn/ui/field/index.js';
   import { Input } from '$shadcn/ui/input/index.js';
-  import { Label } from '$shadcn/ui/label/index.js';
   import Spinner from '$shadcn/ui/spinner/spinner.svelte';
+  import * as Textarea from '$shadcn/ui/textarea/index.js';
 
   import { listMolecules, uploadMolecule } from '$remote';
+
+  import { uploadSchema } from '$lib/remote/schema';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
@@ -15,61 +19,109 @@
 
   let { molecules = $bindable() }: Props = $props();
 
-  let name: string | null = $state(null);
-  let error: string | null = $state(null);
-  let files: FileList | null = $state(null);
-  let uploading: boolean = $state(false);
   let open = $state(false);
+  let lastUploadedId = $state<string | null>(null);
+  let fileError = $state<string | null>(null);
+  let fileReadToken = 0;
+  let file = $state<File | null>(null);
 
-  let file = $derived.by<File | null>(() => files?.[0] ?? null);
-  let name_placeholder = $derived.by<string>(() => {
+  const uploadForm = uploadMolecule.preflight(uploadSchema);
+
+  let filenameStem = $derived.by<string>(() => {
     if (!file) return '';
     return file.name.replace(/\.[^/.]+$/, '');
   });
 
-  $effect(() => {
-    let current_name = name ?? name_placeholder;
-    if (molecules && molecules.find((m) => m.name === current_name)) {
-      error = 'A molecule with this name already exists.';
-      if (!name) {
-        name = name_placeholder;
+  let moleculeNameValue = $derived.by<string>(
+    () => uploadForm.fields.moleculeName.value() ?? '',
+  );
+
+  let nameConflict = $derived.by(
+    () =>
+      !!moleculeNameValue &&
+      !!molecules?.some((m) => m.moleculeName === moleculeNameValue),
+  );
+
+  let fileIssues = $derived(uploadForm.fields.file?.issues() ?? []);
+  let moleculeNameIssues = $derived(
+    uploadForm.fields.moleculeName?.issues() ?? [],
+  );
+  let descriptionIssues = $derived(
+    uploadForm.fields.description?.issues() ?? [],
+  );
+  let stateIssues = $derived(uploadForm.fields.state?.issues() ?? []);
+  let atomCountIssues = $derived(uploadForm.fields.atomCount?.issues() ?? []);
+  let referenceIssues = $derived(uploadForm.fields.reference?.issues() ?? []);
+
+  let fileInvalid = $derived.by(() => !!fileError || fileIssues.length > 0);
+  let moleculeNameInvalid = $derived.by(
+    () => nameConflict || moleculeNameIssues.length > 0,
+  );
+  let descriptionInvalid = $derived.by(() => descriptionIssues.length > 0);
+  let stateInvalid = $derived.by(() => stateIssues.length > 0);
+  let atomCountInvalid = $derived.by(() => atomCountIssues.length > 0);
+  let referenceInvalid = $derived.by(() => referenceIssues.length > 0);
+
+  function parseAtomCount(contents: string) {
+    const firstLine = contents.split(/\r?\n/, 1)[0]?.trim();
+    if (!firstLine) return null;
+    const match = /^(\d+)/.exec(firstLine);
+    if (!match) return null;
+    const parsed = Number.parseInt(match[1], 10);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  function parseComment(contents: string) {
+    return contents.split(/\r?\n/, 2)[1]?.trim();
+  }
+
+  if (uploadForm.fields.state.value() === undefined) {
+    uploadForm.fields.state.set(0);
+  }
+
+  const uploadEnhance = uploadForm.enhance(async ({ form, submit }) => {
+    await submit();
+    const result = uploadForm.result;
+
+    if (result?.success && result.result) {
+      if (result.result.id !== lastUploadedId && molecules) {
+        molecules.push(result.result);
       }
-    } else {
-      error = null;
+      lastUploadedId = result.result.id;
+      open = false;
+      form.reset();
+      file = null;
     }
   });
 
-  async function upload() {
-    error = null;
-    if (!file) {
-      error = 'Please select a file to upload.';
-      return;
+  function handleFileChange(event: Event) {
+    const target = event.currentTarget as HTMLInputElement | null;
+    const selected = target?.files?.[0] ?? null;
+    file = selected;
+    fileError = null;
+
+    if (!selected) return;
+
+    if (!uploadForm.fields.moleculeName.value()) {
+      const stem = selected.name.replace(/\.[^/.]+$/, '');
+      uploadForm.fields.moleculeName.set(stem);
     }
 
-    uploading = true;
-
-    const contents = await file.text();
-
-    uploadMolecule({
-      name: name ?? name_placeholder,
-      filename: file.name,
-      contents,
-    })
-      .then(async (response) => {
-        if (response?.error) {
-          error = response.error;
+    const token = ++fileReadToken;
+    selected
+      .text()
+      .then((contents) => {
+        if (token !== fileReadToken) return;
+        const count = parseAtomCount(contents);
+        if (count === null) {
+          fileError = 'Unable to read the atom count from this file.';
           return;
         }
-        if (molecules && response.result) {
-          molecules.push(response.result);
-        }
-        open = false;
+        uploadForm.fields.atomCount.set(count);
       })
-      .catch((e) => {
-        error = e.message || 'An error occurred during upload.';
-      })
-      .finally(() => {
-        uploading = false;
+      .catch(() => {
+        if (token !== fileReadToken) return;
+        fileError = 'Unable to read the selected file.';
       });
   }
 </script>
@@ -78,51 +130,131 @@
   <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
     Upload
   </Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-[425px]">
+  <Dialog.Content class="sm:max-w-130">
     <Dialog.Header>
       <Dialog.Title>Upload Molecule File</Dialog.Title>
       <Dialog.Description>
-        Choose a .xyz file and provide a name (optional).
+        Upload an XYZ file containing molecular structure data.
       </Dialog.Description>
     </Dialog.Header>
 
-    <div class="grid gap-4">
-      <div class="grid gap-3">
-        <Label for="file">Select File</Label>
-        <input
-          id="file"
-          name="file"
-          accept=".xyz"
-          class="file-input"
-          type="file"
-          max="1"
-          bind:files
-        />
-      </div>
-      <div class="grid gap-3">
-        <Label for="name-1">Name</Label>
-        <Input
-          id="name-1"
-          name="name"
-          placeholder={name_placeholder}
-          bind:value={name}
-        />
-      </div>
-      {#if error}
-        <div class="text-sm text-destructive">{error}</div>
-      {/if}
-    </div>
+    <form {...uploadEnhance} enctype="multipart/form-data" class="grid gap-6">
+      <Field.Set>
+        <Field.Legend>File</Field.Legend>
+        <Field.Field data-invalid={fileInvalid ? true : undefined}>
+          <Field.Label>Select File</Field.Label>
+          <Field.Content>
+            <Input
+              accept=".xyz"
+              onchange={handleFileChange}
+              {...uploadForm.fields.file.as('file')}
+            />
+          </Field.Content>
+          {#if fileError}
+            <Field.Error>{fileError}</Field.Error>
+          {/if}
+          {#each fileIssues as issue (issue.message)}
+            <Field.Error>{issue.message}</Field.Error>
+          {/each}
+        </Field.Field>
+      </Field.Set>
 
-    <Dialog.Footer>
-      <Dialog.Close class={buttonVariants({ variant: 'outline' })}>
-        Cancel
-      </Dialog.Close>
-      <Button type="submit" onclick={upload} disabled={uploading || !!error}>
-        Upload
-        {#if uploading}
-          <Spinner class="mr-2 h-4 w-4 animate-spin" />
-        {/if}
-      </Button>
-    </Dialog.Footer>
+      <Field.Set>
+        <Field.Legend>Metadata</Field.Legend>
+        <Field.Group class="grid gap-4">
+          <Field.Field data-invalid={moleculeNameInvalid ? true : undefined}>
+            <Field.FieldLabel>Molecule Name</Field.FieldLabel>
+            <Field.Content>
+              <Input
+                placeholder={filenameStem || 'Molecule name'}
+                {...uploadForm.fields.moleculeName.as('text')}
+              />
+            </Field.Content>
+            {#if nameConflict}
+              <Field.Error
+                >A molecule with this name already exists.</Field.Error
+              >
+            {/if}
+            {#each moleculeNameIssues as issue (issue.message)}
+              <Field.Error>{issue.message}</Field.Error>
+            {/each}
+          </Field.Field>
+
+          <Field.Field data-invalid={descriptionInvalid ? true : undefined}>
+            <Field.FieldLabel>Description</Field.FieldLabel>
+            <Field.Content>
+              <Textarea.Root
+                rows={3}
+                placeholder="Describe the molecule"
+                {...uploadForm.fields.description.as('text')}
+              />
+            </Field.Content>
+            {#each descriptionIssues as issue (issue.message)}
+              <Field.Error>{issue.message}</Field.Error>
+            {/each}
+          </Field.Field>
+
+          <Field.Field data-invalid={stateInvalid ? true : undefined}>
+            <Field.FieldLabel>State</Field.FieldLabel>
+            <Field.Content>
+              <Input
+                min="0"
+                step="1"
+                {...uploadForm.fields.state.as('number')}
+              />
+            </Field.Content>
+            <Field.Description
+              >Use 0 for ground and 1 for excited.</Field.Description
+            >
+            {#each stateIssues as issue (issue.message)}
+              <Field.Error>{issue.message}</Field.Error>
+            {/each}
+          </Field.Field>
+
+          <Field.Field data-invalid={atomCountInvalid ? true : undefined}>
+            <Field.FieldLabel>Atom Count</Field.FieldLabel>
+            <Field.Content>
+              <Input
+                min="1"
+                step="1"
+                {...uploadForm.fields.atomCount.as('number')}
+              />
+            </Field.Content>
+            <Field.Description>Prefilled from the .xyz file.</Field.Description>
+            {#each atomCountIssues as issue (issue.message)}
+              <Field.Error>{issue.message}</Field.Error>
+            {/each}
+          </Field.Field>
+
+          <Field.Field data-invalid={referenceInvalid ? true : undefined}>
+            <Field.FieldLabel>Reference</Field.FieldLabel>
+            <Field.Content>
+              <Input
+                placeholder="DOI or citation (optional)"
+                {...uploadForm.fields.reference.as('text')}
+              />
+            </Field.Content>
+            {#each referenceIssues as issue (issue.message)}
+              <Field.Error>{issue.message}</Field.Error>
+            {/each}
+          </Field.Field>
+        </Field.Group>
+      </Field.Set>
+
+      <Dialog.Footer>
+        <Dialog.Close class={buttonVariants({ variant: 'outline' })}>
+          Cancel
+        </Dialog.Close>
+        <Button.Root
+          type="submit"
+          disabled={!!uploadForm.pending || nameConflict}
+        >
+          {#if uploadForm.pending}
+            <Spinner class="mr-2 h-4 w-4 animate-spin" />
+          {/if}
+          Upload
+        </Button.Root>
+      </Dialog.Footer>
+    </form>
   </Dialog.Content>
 </Dialog.Root>

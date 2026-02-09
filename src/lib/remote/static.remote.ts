@@ -2,7 +2,7 @@
 // deno-lint-ignore-file no-unused-vars
 import z from 'zod';
 
-import { command, form, prerender } from '$app/server';
+import { form, prerender } from '$app/server';
 
 import { db, schema } from '$lib/server/db';
 
@@ -26,15 +26,12 @@ export const listMolecules = prerender(
   },
 );
 
-export const uploadMolecule = command(
-  uploadSchema,
-  ({ name, filename, contents }) => {
-    return {
-      success: false,
-      error: 'Uploading molecules is not supported in the static build.',
-    };
-  },
-);
+export const uploadMolecule = form(uploadSchema, () => {
+  return {
+    success: false,
+    error: 'Uploading molecules is not supported in the static build.',
+  };
+});
 
 export const listSolvents = prerender(
   async () => {
