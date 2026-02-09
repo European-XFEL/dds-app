@@ -7,7 +7,7 @@
   const { simulation, molecules, solvents, short } = $props();
 </script>
 
-<div class="grid h-72 gap-4">
+<div class="flex flex-col gap-4 *:flex-1">
   <SolventCard
     {solvents}
     bind:concentrationSoluteMolar={simulation.sample.concentrationSoluteMolar}

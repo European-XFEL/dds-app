@@ -11,7 +11,7 @@
   }: ComponentProps<typeof DetectorSetup> = $props();
 </script>
 
-<Card.Root class="min-w-sm flex-1">
+<Card.Root>
   <Card.Content>
     <DetectorSetup bind:distance bind:beamCenter />
   </Card.Content>

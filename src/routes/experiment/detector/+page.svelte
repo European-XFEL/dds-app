@@ -9,16 +9,19 @@
   const simulation = useSimulationState();
 </script>
 
-<div class="mt-8 flex flex-wrap gap-6">
-  <DetectorSetupCard
-    bind:distance={simulation.detector.distance}
-    bind:beamCenter={simulation.detector.beamCenter}
-  />
-  <DetectorInfoCard
-    imageShape={simulation.detector.imageShape}
-    pixelSize={simulation.detector.pixelSize}
-    qRange={simulation.detector.qRange}
-  />
+<div class="flex flex-col gap-6">
+  <div class="flex flex-wrap gap-6 [&>div]:min-w-sm [&>div]:flex-1">
+    <DetectorSetupCard
+      bind:distance={simulation.detector.distance}
+      bind:beamCenter={simulation.detector.beamCenter}
+    />
+    <DetectorInfoCard
+      imageShape={simulation.detector.imageShape}
+      pixelSize={simulation.detector.pixelSize}
+      qRange={simulation.detector.qRange}
+    />
+  </div>
+
   <DetectorCakeCard
     bind:modules={simulation.detector.modules}
     bind:beamCenter={simulation.detector.beamCenter}
