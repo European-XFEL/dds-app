@@ -107,45 +107,46 @@
       hasPump,
   );
 
-  $inspect(detectorQRange);
+  let w: number | null = $state(null);
+  let direction: 'horizontal' | 'vertical' = $derived(
+    (w ?? 1000) > 900 ? 'horizontal' : 'vertical',
+  );
 </script>
 
-<div class="h-lvh">
-  <Resizable.PaneGroup
-    direction="horizontal"
-    class="max-w-full gap-4 rounded-lg"
-  >
-    <Resizable.Pane defaultSize={70}>
-      <div class="mt-8">
-        {#if hasAll}
-          <div transition:fade>
-            <ResultsPane
-              {qValues}
-              {deltaSi}
-              {deltaSSoluteScaled}
-              {deltaSSolvent}
-              {detectorQRange}
-            />
-          </div>
-        {:else}
-          <div transition:fade>
-            <SetupChecklist
-              {hasGroundMolecule}
-              {hasExcitedMolecule}
-              {hasSolvent}
-              {hasDetector}
-              {hasPump}
-            />
-          </div>
-        {/if}
-      </div>
+<div class="-mt-4 -mr-4 h-lvh" bind:clientWidth={w}>
+  <Resizable.PaneGroup {direction} class="max-w-full gap-4 rounded-lg">
+    <Resizable.Pane
+      defaultSize={70}
+      class="mt-4 flex items-center justify-center *:w-full"
+    >
+      {#if hasAll}
+        <ResultsPane
+          {qValues}
+          {deltaSi}
+          {deltaSSoluteScaled}
+          {deltaSSolvent}
+          {detectorQRange}
+          deltaTemperatureK={undefined}
+          depositedEnergyJoule={undefined}
+        />
+      {:else}
+        <SetupChecklist
+          {hasGroundMolecule}
+          {hasExcitedMolecule}
+          {hasSolvent}
+          {hasDetector}
+          {hasPump}
+        />
+      {/if}
     </Resizable.Pane>
 
     <Resizable.Handle />
 
-    <Resizable.Pane defaultSize={20} class="flex min-w-110 flex-col">
-      <ScrollArea class="mt-8 flex-1">
-        <ConfigPane {simulation} {molecules} {solvents} {short} />
+    <Resizable.Pane defaultSize={20} class="flex max-w-2xl min-w-110">
+      <ScrollArea class="flex-1">
+        <div class="mt-4 mr-4 mb-4">
+          <ConfigPane {simulation} {molecules} {solvents} {short} />
+        </div>
       </ScrollArea>
     </Resizable.Pane>
   </Resizable.PaneGroup>
