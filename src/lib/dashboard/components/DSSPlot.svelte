@@ -1,7 +1,36 @@
 <script lang="ts">
-  import { ScatterPlot } from 'matterviz';
+  import { type DataSeries, type RefLine, ScatterPlot } from 'matterviz';
 
-  const { qValues, deltaSi, deltaSSoluteScaled, deltaSSolvent } = $props();
+  import { Checkbox } from '$shadcn/ui/checkbox/index.js';
+  import { Label } from '$shadcn/ui/label';
+
+  const {
+    qValues,
+    deltaSi,
+    deltaSSoluteScaled,
+    deltaSSolvent,
+    detectorQRange,
+  } = $props();
+
+  let clipToDetector = $state(true);
+
+  const ref_lines = $derived.by(() => {
+    if (!detectorQRange) return [];
+    return [
+      {
+        type: 'vertical',
+        x: detectorQRange[0],
+        style: { color: `#9b59b6`, width: 1.5, dash: `4 2` },
+        annotation: { text: `q min`, position: `start`, side: `below` },
+      },
+      {
+        type: 'vertical',
+        x: detectorQRange[1],
+        style: { color: `#9b59b6`, width: 1.5, dash: `4 2` },
+        annotation: { text: `q max`, position: `start`, side: `below` },
+      },
+    ];
+  }) as RefLine[];
 
   const series = $derived.by(() => {
     const q = qValues;
@@ -27,12 +56,31 @@
         markers,
       },
     ];
+  }) as DataSeries[];
+
+  const xRange: [number | null, number | null] = $derived.by(() => {
+    if (!clipToDetector) return [0, qValues[qValues.length - 1]];
+
+    let min = detectorQRange ? detectorQRange[0] * 0.9 : null;
+    let max = detectorQRange ? detectorQRange[1] * 1.1 : null;
+    return [min, max];
   });
 </script>
 
-<ScatterPlot
-  {series}
-  x_axis={{ label: 'q (Å⁻¹)' }}
-  y_axis={{ label: 'ΔS (a.u.)' }}
-  style="height: 320px"
-/>
+<div class="flow-col">
+  <ScatterPlot
+    {series}
+    {ref_lines}
+    x_axis={{ label: 'q (Å⁻¹)', range: xRange }}
+    y_axis={{ label: 'ΔS (a.u.)' }}
+    style="height: 320px"
+    legend={{ layout: 'horizontal' }}
+  />
+
+  <div class="flow-row w-max items-center gap-3">
+    <div class="flex items-center gap-3">
+      <Checkbox bind:checked={clipToDetector} />
+      <Label>Clip to Detector Q Range</Label>
+    </div>
+  </div>
+</div>
