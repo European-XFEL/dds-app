@@ -12,7 +12,7 @@
     detectorQRange,
   } = $props();
 
-  let clipToDetector = $state(true);
+  let clipToDetector = $state(false);
 
   const ref_lines = $derived.by(() => {
     if (!detectorQRange) return [];
