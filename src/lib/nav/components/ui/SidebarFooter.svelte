@@ -5,11 +5,11 @@
     sample,
   }: {
     sample: {
-      moleculeName: string | undefined;
-      groundName: string | undefined;
-      excitedName: string | undefined;
-      solventName: string | undefined;
-      concentrationSoluteMolar: number | undefined;
+      moleculeName: string | undefined | null;
+      groundName: string | undefined | null;
+      excitedName: string | undefined | null;
+      solventName: string | undefined | null;
+      concentrationSoluteMolar: number | undefined | null;
     };
   } = $props();
 </script>

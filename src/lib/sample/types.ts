@@ -7,8 +7,8 @@ export type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 export type Solvent = Solvents[number];
 
 export interface Sample {
-  concentrationSoluteMolar: number | undefined;
-  solvent: Solvent | undefined;
-  ground: Molecule | undefined;
-  excited: Molecule | undefined;
+  concentrationSoluteMolar: number | null;
+  solvent: Solvent | null;
+  ground: Molecule | null;
+  excited: Molecule | null;
 }
