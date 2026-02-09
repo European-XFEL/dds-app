@@ -15,12 +15,9 @@
     bind:beamCenter={simulation.detector.beamCenter}
   />
   <DetectorInfoCard
-    modules={simulation.detector.modules}
-    beamCenter={simulation.detector.beamCenter}
-    distance={simulation.detector.distance}
     imageShape={simulation.detector.imageShape}
     pixelSize={simulation.detector.pixelSize}
-    wavelength={simulation.probe.wavelength}
+    qRange={simulation.detector.qRange}
   />
   <DetectorCakeCard
     bind:modules={simulation.detector.modules}
