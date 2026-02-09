@@ -118,6 +118,7 @@
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
+  import AlphaAlert from '$lib/ui/AlphaAlert.svelte';
   import FeedbackDialog from '$lib/ui/FeedbackDialog.svelte';
 
   // Resolve the urls in `data`
@@ -161,6 +162,8 @@
     </Sidebar.GroupContent>
   </Sidebar.Group>
 {/each}
+
+<AlphaAlert />
 
 <Sidebar.Group>
   <Sidebar.GroupContent>
