@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import { command, query } from '$app/server';
+import { command, form, query } from '$app/server';
 
 import {
   getDebyeResultImpl,
@@ -8,6 +8,8 @@ import {
   getSolventIQImpl,
   listMoleculesImpl,
   listSolventsImpl,
+  createFeedbackImpl,
+  feedbackSchema,
   simRequest,
   uploadMoleculeImpl,
   uploadSchema,
@@ -35,4 +37,8 @@ export const getSolventIQ = query(z.string(), async (id: string) => {
 
 export const getDebyeResult = query(simRequest, async (request) => {
   return await getDebyeResultImpl(request);
+});
+
+export const submitFeedback = form(feedbackSchema, async (data) => {
+  return await createFeedbackImpl(data);
 });

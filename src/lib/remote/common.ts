@@ -31,6 +31,24 @@ export const simRequest = z.object({
   }),
 });
 
+const feedbackCategories = [
+  'Content',
+  'Interface',
+  'Bug',
+  'Suggestion',
+] as const;
+
+export const feedbackSchema = z.object({
+  url: z.string().url(),
+  comment: z.string().trim().max(2000).optional(),
+  categories: z
+    .array(z.enum(feedbackCategories))
+    .optional()
+    .transform((value) => value ?? []),
+  region: z.string().optional(),
+  regionImage: z.string().optional(),
+});
+
 export async function listMoleculesImpl() {
   return await db.select(schema.moleculesInfo).from(schema.molecules);
 }
@@ -184,6 +202,32 @@ export async function uploadMoleculeImpl({
     }
     throw error;
   }
+}
+
+export async function createFeedbackImpl(
+  data: z.infer<typeof feedbackSchema>,
+) {
+  let region: unknown = null;
+  if (data.region) {
+    try {
+      region = JSON.parse(data.region);
+    } catch (error) {
+      console.warn('Failed to parse feedback region JSON', error);
+    }
+  }
+
+  const inserted = await db
+    .insert(schema.feedback)
+    .values({
+      url: data.url,
+      comment: data.comment?.length ? data.comment : null,
+      categories: data.categories.length ? data.categories : null,
+      region,
+      regionImage: data.regionImage?.length ? data.regionImage : null,
+    })
+    .returning({ id: schema.feedback.id });
+
+  return { success: true, id: inserted?.[0]?.id ?? null };
 }
 
 export { schema as dbSchema };

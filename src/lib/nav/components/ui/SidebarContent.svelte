@@ -118,6 +118,8 @@
 
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
 
+  import FeedbackDialog from '$lib/ui/FeedbackDialog.svelte';
+
   // Resolve the urls in `data`
   for (const group of data) {
     for (const item of group.items) {
@@ -159,3 +161,11 @@
     </Sidebar.GroupContent>
   </Sidebar.Group>
 {/each}
+
+<Sidebar.Group>
+  <Sidebar.GroupContent>
+    <Sidebar.Menu>
+      <FeedbackDialog />
+    </Sidebar.Menu>
+  </Sidebar.GroupContent>
+</Sidebar.Group>

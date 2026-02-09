@@ -2,7 +2,7 @@
 // deno-lint-ignore-file no-unused-vars
 import z from 'zod';
 
-import { command, prerender } from '$app/server';
+import { command, form, prerender } from '$app/server';
 
 import { db, schema } from '$lib/server/db';
 
@@ -12,6 +12,7 @@ import {
   getSolventIQImpl,
   listMoleculesImpl,
   listSolventsImpl,
+  feedbackSchema,
   simRequest,
   uploadSchema,
 } from './common';
@@ -103,3 +104,10 @@ export const getDebyeResult = prerender(
     },
   },
 );
+
+export const submitFeedback = form(feedbackSchema, async () => {
+  return {
+    success: false,
+    error: 'Feedback submission is not supported in the static build.',
+  };
+});
