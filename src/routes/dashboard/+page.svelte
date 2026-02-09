@@ -15,6 +15,8 @@
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
+  import { listMolecules, listSolvents } from '$remote';
+
   import { SetupChecklist } from '$lib/dashboard';
   import { DetectorSetupCard } from '$lib/detector';
   import {
@@ -48,6 +50,11 @@
   >;
 
   const simulation = useSimulationState();
+
+  const [solvents, molecules] = await Promise.all([
+    listSolvents(),
+    listMolecules(),
+  ]);
 
   let short = $state(true);
   let vizOpen = $state(false);
@@ -350,6 +357,7 @@
       <ScrollArea class="mt-8 flex-1">
         <div class="grid h-72 gap-4">
           <SolventCard
+            {solvents}
             bind:concentrationSoluteMolar={
               simulation.sample.concentrationSoluteMolar
             }
@@ -357,10 +365,9 @@
             {short}
           />
           <MoleculeCard
+            {molecules}
             bind:ground={simulation.sample.ground}
             bind:excited={simulation.sample.excited}
-            vizOpen={false}
-            vizCollapseShow={false}
           />
           <DetectorSetupCard
             bind:distance={simulation.detector.distance}

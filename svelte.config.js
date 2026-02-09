@@ -18,7 +18,7 @@ const config = {
   },
   compilerOptions: {
     experimental: {
-      async: false,
+      async: true,
     },
   },
   extensions: [".svelte", ".svx"],

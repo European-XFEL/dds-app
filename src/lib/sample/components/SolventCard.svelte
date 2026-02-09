@@ -4,8 +4,6 @@
   import * as Card from '$shadcn/ui/card/index.js';
   import { Spinner } from '$shadcn/ui/spinner/index.js';
 
-  import { listSolvents } from '$remote';
-
   import type { Sample, Solvents } from '$lib/types';
   import NumSlider from '$lib/ui/NumSlider.svelte';
 
@@ -14,7 +12,7 @@
   interface Props {
     solvent: Sample['solvent'];
     concentrationSoluteMolar: Sample['concentrationSoluteMolar'];
-    solvents?: Solvents;
+    solvents: Solvents;
     short?: boolean;
     loading?: boolean;
   }
@@ -24,16 +22,8 @@
     concentrationSoluteMolar = $bindable(),
     solvents,
     short = false,
-    loading = true,
+    loading = false,
   }: Props = $props();
-
-  // svelte-ignore state_referenced_locally
-  if (!solvents) {
-    listSolvents().then((data) => {
-      solvents = data;
-      loading = false;
-    });
-  }
 </script>
 
 <Card.Root>
