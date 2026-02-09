@@ -20,9 +20,9 @@ const transport = createConnectTransport({
   httpVersion: '1.1',
 });
 
-const simulation_client = createClient(SimulationService, transport);
+export const simClient = createClient(SimulationService, transport);
 
-export const simulation_request = z.object({
+export const simRequest = z.object({
   fileId: z.string(),
   qRange: z.object({
     min: z.number(),
@@ -84,9 +84,7 @@ export async function getSolventIQImpl(id: string) {
   return { q, dSdT };
 }
 
-export async function getDebyeResultImpl(
-  request: z.infer<typeof simulation_request>,
-) {
+export async function getDebyeResultImpl(request: z.infer<typeof simRequest>) {
   const fetched = await db.query.intensities.findFirst({
     where: {
       moleculeId: request.fileId,
@@ -127,7 +125,7 @@ export async function getDebyeResultImpl(
   };
 
   try {
-    const result = await simulation_client.calcDebye(request_body);
+    const result = await simClient.calcDebye(request_body);
 
     db.insert(schema.intensities)
       .values({
