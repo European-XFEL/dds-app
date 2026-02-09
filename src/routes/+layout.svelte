@@ -73,6 +73,10 @@ createSimulationState,
   const showSidebar = $derived(page.url.pathname !== heroPathname);
 </script>
 
+<svelte:head>
+  <link rel="icon" href="/favicon.png" />
+</svelte:head>
+
 <Sidebar.Provider style="--sidebar-width: 19rem">
   {#if showSidebar}
     <AppSidebar {sample} />
