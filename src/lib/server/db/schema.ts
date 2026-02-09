@@ -4,6 +4,7 @@ import { sql } from 'drizzle-orm';
 import {
   char,
   integer,
+  jsonb,
   numeric,
   pgTable,
   pgView,
@@ -148,3 +149,16 @@ export const solvents = pgTable(
 const { contents: _s_contents, ...solventsInfo } = getColumns(solvents);
 
 export { solventsInfo };
+
+export const feedback = pgTable('feedback', {
+  id: char({ length: uIdLength })
+    .primaryKey()
+    .unique()
+    .$defaultFn(() => createId()),
+  url: text().notNull(),
+  comment: text(),
+  categories: text().array(),
+  region: jsonb('region'),
+  regionImage: text('region_image'),
+  ...timestamps,
+});
