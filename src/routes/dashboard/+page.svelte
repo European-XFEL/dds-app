@@ -18,6 +18,7 @@
   import { listMolecules, listSolvents } from '$remote';
 
   import { SetupChecklist } from '$lib/dashboard';
+  import DSSPlot from '$lib/dashboard/components/DSSPlot.svelte';
   import { DetectorSetupCard } from '$lib/detector';
   import {
     MoleculeCard,
@@ -37,17 +38,6 @@
     scaleSoluteByExcitedFraction,
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
-  import { LineChart } from '$lib/ui';
-
-  // Compose type for type-safe options
-  type ECOption = ComposeOption<
-    | LineSeriesOption
-    | TitleComponentOption
-    | TooltipComponentOption
-    | GridComponentOption
-    | LegendComponentOption
-    | DataZoomComponentOption
-  >;
 
   const simulation = useSimulationState();
 
@@ -104,6 +94,22 @@
     ),
   );
 
+  const deltaSi = $derived(deltaS?.i ?? null);
+
+  const qValues = $derived(
+    deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
+  );
+
+  // Solute contribution scaled by excited fraction for display
+  const deltaSSoluteScaled = $derived(
+    scaleSoluteByExcitedFraction(
+      soluteResource.value,
+      calculations.excitedStateFraction,
+    ),
+  );
+
+  const deltaSSolvent = $derived(solventResource.value?.i ?? null);
+
   const hasGroundMolecule = $derived(!!simulation.sample.ground?.id);
   const hasExcitedMolecule = $derived(!!simulation.sample.excited?.id);
   const hasSolvent = $derived(!!simulation.sample.solvent?.id);
@@ -116,98 +122,6 @@
       hasDetector &&
       hasPump,
   );
-
-  // Solute contribution scaled by excited fraction for display
-  const deltaSSoluteScaled = $derived(
-    scaleSoluteByExcitedFraction(
-      soluteResource.value,
-      calculations.excitedStateFraction,
-    ),
-  );
-
-  const constant_options: ECOption = {
-    title: { text: 'Difference Scattering Signals ΔS(q)' },
-    legend: { top: 'bottom' },
-    grid: {
-      left: '10%',
-      right: '10%',
-      bottom: '15%',
-    },
-    xAxis: {
-      id: 'q',
-      name: 'q (Å⁻¹)',
-      data: [],
-      axisLabel: {
-        formatter: (value: number) => Number(value).toPrecision(3),
-      },
-    },
-    yAxis: { type: 'value', animationDuration: 150 },
-    dataZoom: [
-      {
-        type: 'inside',
-        xAxisIndex: 0,
-        filterMode: 'none',
-      },
-      {
-        type: 'inside',
-        yAxisIndex: 0,
-        filterMode: 'none',
-      },
-      {
-        type: 'slider',
-        xAxisIndex: 0,
-        filterMode: 'none',
-        height: 20,
-        bottom: 10,
-      },
-      {
-        type: 'slider',
-        yAxisIndex: 0,
-        filterMode: 'none',
-        width: 20,
-        right: 10,
-      },
-    ],
-    series: [],
-    animationDuration: 150,
-    tooltip: { trigger: 'axis' },
-  };
-
-  let xAxis = $derived<ECOption['xAxis']>({
-    id: 'q',
-    data:
-      deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
-  });
-
-  const series_common: LineSeriesOption = {
-    type: 'line',
-    showSymbol: false,
-    symbol: 'none',
-    smooth: true,
-    animationDuration: 150,
-    animationEasing: 'cubicOut',
-  };
-
-  let series = $derived.by<ECOption['series']>(() => [
-    {
-      id: 'deltaS',
-      name: 'ΔS (Total)',
-      data: deltaS?.i ?? [],
-      ...series_common,
-    },
-    {
-      id: 'deltaSSoluteExFrac',
-      name: 'ΔS Solute (α·ΔS)',
-      data: deltaSSoluteScaled ?? [],
-      ...series_common,
-    },
-    {
-      id: 'deltaSSolvent',
-      name: 'ΔS Solvent',
-      data: solventResource.value?.i ?? [],
-      ...series_common,
-    },
-  ]);
 </script>
 
 <div class="h-lvh">
@@ -232,7 +146,12 @@
         <div class="h-96">
           {#if hasAll}
             <div class="h-full" transition:fade>
-              <LineChart {constant_options} {xAxis} {series} />
+              <DSSPlot
+                {qValues}
+                {deltaSi}
+                {deltaSSoluteScaled}
+                {deltaSSolvent}
+              />
             </div>
           {:else}
             <div class="h-full" transition:fade>
@@ -248,7 +167,7 @@
         </div>
 
         <!-- Molecule Visualizations -->
-        {#if hasAll}
+        <!-- {#if hasAll}
           {#if vizCollapseShow}
             <Collapsible.Root bind:open={vizOpen} class="w-full">
               <Collapsible.Trigger
@@ -326,28 +245,29 @@
               </div>
               {#if vizMode === 'trajectory'}
                 <MoleculeTrajectoryViz
-                  ground={simulation.sample.ground}
-                  excited={simulation.sample.excited}
+                  ground={sim.sample.ground}
+                  excited={sim.sample.excited}
                 />
               {:else}
                 <div class="grid grid-cols-2 gap-4">
                   <div class="flex flex-col gap-2">
                     <h3 class="text-sm font-semibold">Ground State</h3>
-                    {#if simulation.sample.ground}
-                      <MoleculeViz molecule={simulation.sample.ground} />
+                    {#if sim.sample.ground}
+                      <MoleculeViz molecule={sim.sample.ground} />
                     {/if}
                   </div>
                   <div class="flex flex-col gap-2">
                     <h3 class="text-sm font-semibold">Excited State</h3>
-                    {#if simulation.sample.excited}
-                      <MoleculeViz molecule={simulation.sample.excited} />
+                    {#if sim.sample.excited}
+                      <MoleculeViz molecule={sim.sample.excited} />
                     {/if}
                   </div>
                 </div>
               {/if}
             </div>
           {/if}
-        {/if}
+        {/if} -->
+        <MoleculeViz molecule={simulation.sample.ground} />
       </div>
     </Resizable.Pane>
 
