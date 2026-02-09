@@ -2,60 +2,15 @@
   import * as Field from '$shadcn/ui/field/index.js';
   import { Input } from '$shadcn/ui/input/index.js';
 
-  import type {
-    CartesianPoint,
-    DetectorModule,
-    QRange,
-    Shape,
-  } from '$lib/types';
-
-  import * as qConvert from './DetectorInfo.helper';
+  import type { QRange, Shape } from '$lib/types';
 
   type Props = {
-    modules: DetectorModule[];
-    distance: number;
-    beamCenter: CartesianPoint;
     imageShape: Shape;
     pixelSize: number;
-    wavelength: number;
+    qRange: QRange;
   };
 
-  let {
-    modules,
-    distance,
-    beamCenter,
-    imageShape,
-    pixelSize,
-    wavelength,
-  }: Props = $props();
-
-  let qRange: QRange = $state({
-    min: 0,
-    max: 0,
-    step: 0,
-  });
-
-  let r_range = $state({
-    min: 0,
-    max: 0,
-  });
-
-  $effect(() => {
-    let new_q_vals = qConvert.computeQRangeFromModules({
-      distance: distance,
-      pixelSize: pixelSize,
-      beamCenter: beamCenter,
-      modules: modules,
-      wavelength: wavelength,
-    });
-
-    qRange.min = new_q_vals.min;
-    qRange.max = new_q_vals.max;
-    qRange.step = new_q_vals.step;
-
-    r_range.min = new_q_vals.rMinPx;
-    r_range.max = new_q_vals.rMaxPx;
-  });
+  let { imageShape, pixelSize, qRange }: Props = $props();
 
   let qFields = $derived([
     ['Q Min', qRange.min],
