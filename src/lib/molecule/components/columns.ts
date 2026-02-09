@@ -24,12 +24,8 @@ export type MoleculeRow = Molecule & {
 
 // Type for external state handlers
 export type MoleculeTableHandlers = {
-  selectedGroundId: string | null;
-  selectedExcitedId: string | null;
   editingCell: { id: string; field: string } | null;
   editValue: string;
-  onSelectGround: (molecule: Molecule) => void;
-  onSelectExcited: (molecule: Molecule) => void;
   onStartEdit: (
     id: string,
     field: string,
@@ -54,22 +50,17 @@ export function createMoleculeColumns(handlers: MoleculeTableHandlers) {
           text: 'Molecule',
           onclick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         }),
-      cell: ({ row, getValue }) => {
+      cell: ({ row }) => {
         if (row.depth === 0) {
           // Group header - show molecule name and count
-          return renderComponent(Cells.Text, {
-            text: getValue(),
-            class: 'font-medium',
+          return renderComponent(Cells.MoleculeTitle, {
+            group: row.original as GroupRow,
           });
         }
+
         if (row.depth > 0) {
-          const molecule = row.original as MoleculeRow;
           return renderComponent(Cells.Selection, {
-            molecule,
-            isSelectedGround: handlers.selectedGroundId === molecule.id,
-            isSelectedExcited: handlers.selectedExcitedId === molecule.id,
-            onSelectGround: handlers.onSelectGround,
-            onSelectExcited: handlers.onSelectExcited,
+            molecule: row.original as MoleculeRow,
           });
         }
         // Hide in child rows since shown in group header
