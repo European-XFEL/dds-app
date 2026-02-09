@@ -50,8 +50,8 @@
     <NumSlider
       label="Sample Detector Distance(mm)"
       bind:value={distance}
-      min="15"
-      max="150"
+      min="100"
+      max="500"
     />
   </Field.Field>
 
