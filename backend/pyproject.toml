@@ -10,12 +10,14 @@ dependencies = [
     "debyecalculator>=1.0.14",
     "numpy>=2.3.5",
     "periodictable>=2.0.2",
+    "protobuf>=6.33.5",
     "protoc-gen-connect-python>=0.5.0",
     "pydantic>=2.12.5",
     "pyfai>=2025.3.0",
     "scipy>=1.16.3",
     "simex-debye",
     "simex-lite",
+    "starlette>=0.52.1",
     "thermo>=0.6.0",
     "torch>=2.9.1",
     "uvicorn>=0.38.0",
@@ -24,9 +26,17 @@ dependencies = [
 [tool.uv.sources]
 simex-debye = { git = "ssh://git@git.xfel.eu:10022/simulation/simex-debye.git" }
 simex-lite = { git = "https://github.com/PaNOSC-ViNYL/SimEx-Lite.git" }
+torch = [
+    { index = "pytorch-cpu" },
+]
 
 [tool.ruff]
 exclude = ["src/server/api"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.hatch.build.targets.wheel]
 include = ["src/simex_debye_grpc"]
