@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from '$app/state';
+
   import * as Button from '$shadcn/ui/button/index.js';
   import { buttonVariants } from '$shadcn/ui/button/index.js';
   import * as Dialog from '$shadcn/ui/dialog/index.js';
@@ -6,18 +8,29 @@
   import { Input } from '$shadcn/ui/input/index.js';
   import Spinner from '$shadcn/ui/spinner/spinner.svelte';
   import * as Textarea from '$shadcn/ui/textarea/index.js';
+  import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
   import { listMolecules, uploadMolecule } from '$remote';
 
   import { uploadSchema } from '$lib/remote/schema';
+  import type { Capability } from '$lib/types';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 
   interface Props {
     molecules?: Molecules;
+    capability?: Capability;
   }
 
-  let { molecules = $bindable() }: Props = $props();
+  let {
+    molecules = $bindable(),
+    capability = page.data.capabilities.upload,
+  }: Props = $props();
+
+  let disabled = $derived(!capability.available);
+  let disabledMessage = $derived(
+    !capability.available ? capability.reason : '',
+  );
 
   let open = $state(false);
   let lastUploadedId = $state<string | null>(null);
@@ -127,9 +140,27 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
-    Upload
-  </Dialog.Trigger>
+  {#if disabled}
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <span class="inline-flex">
+          <Dialog.Trigger
+            class={buttonVariants({ variant: 'outline' })}
+            disabled
+          >
+            Upload
+          </Dialog.Trigger>
+        </span>
+      </Tooltip.Trigger>
+      <Tooltip.Content side="top" align="center">
+        {disabledMessage}
+      </Tooltip.Content>
+    </Tooltip.Root>
+  {:else}
+    <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>
+      Upload
+    </Dialog.Trigger>
+  {/if}
   <Dialog.Content class="sm:max-w-130">
     <Dialog.Header>
       <Dialog.Title>Upload Molecule File</Dialog.Title>
