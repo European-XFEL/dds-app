@@ -1,19 +1,14 @@
-from collections.abc import Iterable as _Iterable
-from collections.abc import Mapping as _Mapping
-from typing import ClassVar as _ClassVar
-from typing import Optional as _Optional
-from typing import Union as _Union
-
+import files_pb2 as _files_pb2
+from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from google.protobuf.internal import containers as _containers
-
-from . import files_pb2 as _files_pb2
+from collections.abc import Iterable as _Iterable, Mapping as _Mapping
+from typing import ClassVar as _ClassVar, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class QRange(_message.Message):
-    __slots__ = ()
+    __slots__ = ("min", "max", "step")
     MIN_FIELD_NUMBER: _ClassVar[int]
     MAX_FIELD_NUMBER: _ClassVar[int]
     STEP_FIELD_NUMBER: _ClassVar[int]
@@ -28,7 +23,11 @@ class QRange(_message.Message):
     ) -> None: ...
 
 class Pump(_message.Message):
-    __slots__ = ()
+    __slots__ = (
+        "photon_energy_ev",
+        "excited_state_energy_ev",
+        "excited_state_fraction",
+    )
     PHOTON_ENERGY_EV_FIELD_NUMBER: _ClassVar[int]
     EXCITED_STATE_ENERGY_EV_FIELD_NUMBER: _ClassVar[int]
     EXCITED_STATE_FRACTION_FIELD_NUMBER: _ClassVar[int]
@@ -43,7 +42,7 @@ class Pump(_message.Message):
     ) -> None: ...
 
 class SimulationRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("q_range", "structure")
     Q_RANGE_FIELD_NUMBER: _ClassVar[int]
     STRUCTURE_FIELD_NUMBER: _ClassVar[int]
     q_range: QRange
@@ -55,7 +54,7 @@ class SimulationRequest(_message.Message):
     ) -> None: ...
 
 class SimulationResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("q", "i")
     Q_FIELD_NUMBER: _ClassVar[int]
     I_FIELD_NUMBER: _ClassVar[int]
     q: _containers.RepeatedScalarFieldContainer[float]
@@ -65,7 +64,7 @@ class SimulationResponse(_message.Message):
     ) -> None: ...
 
 class SolventInfoRequest(_message.Message):
-    __slots__ = ()
+    __slots__ = ("solvent",)
     SOLVENT_FIELD_NUMBER: _ClassVar[int]
     solvent: _files_pb2.File
     def __init__(
@@ -73,7 +72,7 @@ class SolventInfoRequest(_message.Message):
     ) -> None: ...
 
 class SolventInfoResponse(_message.Message):
-    __slots__ = ()
+    __slots__ = ("rohm", "cpm", "q", "ds")
     ROHM_FIELD_NUMBER: _ClassVar[int]
     CPM_FIELD_NUMBER: _ClassVar[int]
     Q_FIELD_NUMBER: _ClassVar[int]
