@@ -1,5 +1,9 @@
 from typing import Annotated
 
+from starlette.applications import Starlette
+from starlette.responses import PlainTextResponse
+from starlette.routing import Route, Mount
+
 from connectrpc.request import RequestContext
 from pydantic import BaseModel, Field
 
@@ -14,7 +18,7 @@ class QRange(BaseModel):
 
 
 class File(BaseModel):
-    filename: Annotated[str, Field(min_length=4, pattern=r"^\w*\.xyz$")]
+    filename: Annotated[str, Field(min_length=4, pattern=r"^.*\.xyz$")]
     contents: Annotated[bytes, Field(min_length=8)]
 
 
@@ -37,18 +41,23 @@ class SimulationService(simulation_connect.SimulationService):
 
         return SimulationResponse(q=result[0], i=result[1])
 
+async def healthz(_request):
+    return PlainTextResponse("ok", status_code=200)
 
-app = simulation_connect.SimulationServiceASGIApplication(service=SimulationService())
 
+connect_app = simulation_connect.SimulationServiceASGIApplication(
+    service=SimulationService()
+)
+
+app = Starlette(
+    routes=[
+        Route("/healthz", healthz, methods=["GET"]),
+        Mount("/", app=connect_app),
+    ]
+)
 
 if __name__ == "__main__":
     import asyncio
     import uvicorn
 
-    app = simulation_connect.SimulationServiceASGIApplication(
-        service=SimulationService()
-    )
-
-    asyncio.run(
-        uvicorn.run(app, host="127.0.0.1", port=50051)
-    )
+    asyncio.run(uvicorn.run(app, host="0.0.0.0", port=50051))
