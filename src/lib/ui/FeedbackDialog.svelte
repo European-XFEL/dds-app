@@ -13,8 +13,22 @@
   import * as Field from '$shadcn/ui/field/index.js';
   import * as Sidebar from '$shadcn/ui/sidebar/index.js';
   import * as Textarea from '$shadcn/ui/textarea/index.js';
+  import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
   import { submitFeedback } from '$remote';
+
+  import type { Capability } from '$lib/types';
+
+  interface Props {
+    capability?: Capability;
+  }
+
+  let { capability = page.data.capabilities.feedback }: Props = $props();
+
+  let disabled = $derived(!capability.available);
+  let disabledMessage = $derived(
+    !capability.available ? capability.reason : '',
+  );
 
   type DragState = {
     startX: number;
@@ -199,15 +213,31 @@
 <svelte:window onkeydown={handleKeydown} />
 
 <Sidebar.MenuItem>
-  <Sidebar.MenuButton
-    tooltipContent="Feedback"
-    onclick={() => {
-      open = true;
-    }}
-  >
-    <MessageSquare />
-    <span>Feedback</span>
-  </Sidebar.MenuButton>
+  {#if disabled}
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <span class="inline-flex w-full">
+          <Sidebar.MenuButton aria-disabled="true" tabindex={-1}>
+            <MessageSquare />
+            <span>Feedback</span>
+          </Sidebar.MenuButton>
+        </span>
+      </Tooltip.Trigger>
+      <Tooltip.Content side="right" align="center">
+        {disabledMessage}
+      </Tooltip.Content>
+    </Tooltip.Root>
+  {:else}
+    <Sidebar.MenuButton
+      tooltipContent="Feedback"
+      onclick={() => {
+        open = true;
+      }}
+    >
+      <MessageSquare />
+      <span>Feedback</span>
+    </Sidebar.MenuButton>
+  {/if}
 </Sidebar.MenuItem>
 
 <Dialog.Root bind:open>
