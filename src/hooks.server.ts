@@ -1,6 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 
-import { getCapabilities, getHealth } from '$lib/health.svelte';
+import { getCapabilities, getHealth } from '$lib/server/health';
 
 export const handle: Handle = async ({ event, resolve }) => {
   const [health, capabilities] = await Promise.all([
