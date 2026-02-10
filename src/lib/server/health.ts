@@ -2,7 +2,8 @@ import { sql } from 'drizzle-orm';
 
 import { env } from '$env/dynamic/private';
 
-import { db } from './server/db';
+import { db } from './db';
+import type { Capabilities, Health } from './types';
 
 const HEALTH_TTL_MS = 10_000;
 let healthCache: { value: Health; expiresAt: number } | null = null;
@@ -10,16 +11,6 @@ let healthInFlight: Promise<Health> | null = null;
 
 const DB_CONFIGURED = Boolean(env?.DB_HOST && env?.DB_USER && env?.DB_PASSWORD);
 const BACKEND_CONFIGURED = Boolean(env?.BACKEND_URL);
-
-export interface ServiceHealth {
-  configured: boolean;
-  healthy: boolean;
-}
-
-export interface Health {
-  db: ServiceHealth;
-  backend: ServiceHealth;
-}
 
 async function computeHealthFlags(fetcher: typeof fetch): Promise<Health> {
   const [dbOk, backendOk] = await Promise.all([
@@ -58,12 +49,6 @@ export async function getHealth(
   }
 
   return healthInFlight;
-}
-
-export interface Capabilities {
-  upload: boolean;
-  feedback: boolean;
-  simulation: boolean;
 }
 
 export async function getCapabilities(

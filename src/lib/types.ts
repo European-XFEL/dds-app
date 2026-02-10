@@ -7,6 +7,7 @@ export * from './probe/types.ts';
 export * from './pump/types.ts';
 export * from './sample/types.ts';
 export * from './simulation/types.ts';
+export * from './server/types.ts';
 
 export type RealismFlags = {
   applyGeometryMask: boolean;
