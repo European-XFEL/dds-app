@@ -117,23 +117,38 @@ export async function getHealth(
   return healthInFlight;
 }
 
+const DB_UNAVAILABLE_REASON = 'Database connection unavailable';
+const BACKEND_UNAVAILABLE_REASON = 'Backend service unavailable';
+
 export async function getCapabilities(
   fetcher: typeof fetch = fetch,
 ): Promise<Capabilities> {
   const health = await getHealth(fetcher);
 
-  return {
+  const res = {
     upload: {
       available: health.db.healthy,
-      reason: 'Database connection unavailable',
+      reason: DB_UNAVAILABLE_REASON,
     },
     feedback: {
       available: health.db.healthy,
-      reason: 'Database connection unavailable',
+      reason: DB_UNAVAILABLE_REASON,
     },
     simulation: {
       available: health.backend.healthy,
-      reason: 'Backend service unavailable',
+      reason: BACKEND_UNAVAILABLE_REASON,
     },
   };
+
+  if (env?.TARGET === 'static') {
+    // Set all capabilities to unavailable in static mode
+    for (const key in res) {
+      res[key as keyof Capabilities] = {
+        available: false,
+        reason: 'Static build - no backend connectivity',
+      };
+    }
+  }
+
+  return res;
 }
