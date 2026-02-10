@@ -1,35 +1,35 @@
 # syntax=docker/dockerfile:1.7
-FROM python:3.13-slim AS base
+FROM ghcr.io/astral-sh/uv:debian AS base
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    UV_SYSTEM_PYTHON=1
-
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --install-dir /usr/local/bin
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    UV_PYTHON_CACHE_DIR=/root/.cache/uv/python
 
 WORKDIR /app
+
+RUN apt update && apt install -y python3-dev
 
 FROM base AS deps
 
-COPY pyproject.toml uv.lock ./
+RUN mkdir -p -m 0700 /root/.ssh && ssh-keyscan -p 10022 git.xfel.eu >> /root/.ssh/known_hosts
 
-RUN --mount=type=cache,target=/root/.cache \
-    /usr/local/bin/uv sync --frozen --no-dev --no-editable --system
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=ssh \
+    uv sync --locked --no-install-project
 
-FROM python:3.13-slim AS runtime
+FROM base
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+COPY --from=deps /app/.venv /app/.venv
 
-COPY --from=deps /usr/local /usr/local
+COPY . /app
 
-RUN useradd -u 1000 -m appuser
-USER appuser
-
-WORKDIR /app
-
-COPY --chown=appuser:appuser . .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked
 
 EXPOSE 50051
 
-CMD ["python", "-m", "simex_debye_grpc.main"]
+CMD ["uv", "run", "-m", "simex_debye_grpc.main"]
