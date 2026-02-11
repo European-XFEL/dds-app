@@ -121,16 +121,6 @@
   import AlphaAlert from '$lib/ui/AlphaAlert.svelte';
   import BugsFeatures from '$lib/ui/BugsFeatures.svelte';
   import FeedbackDialog from '$lib/ui/FeedbackDialog.svelte';
-
-  // Resolve the urls in `data`
-  for (const group of data) {
-    for (const item of group.items) {
-      if (item.url) {
-        // @ts-expect-error
-        item.url = resolve(item.url);
-      }
-    }
-  }
 </script>
 
 {#each data as group (group.title)}
@@ -151,7 +141,8 @@
                 {item.title}
               {/snippet}
               {#snippet child({ props })}
-                <a href={item?.url} {...props}>
+                {@const href = item?.url ? resolve(item.url) : ''}
+                <a {href} {...props}>
                   <item.icon />
                   <span>{item.title}</span>
                 </a>
