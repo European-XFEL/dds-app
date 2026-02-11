@@ -9,6 +9,7 @@
     deltaSi,
     deltaSSoluteScaled,
     deltaSSolvent,
+    deltaSSolventPerMolecule,
     detectorQRange,
   } = $props();
 
@@ -52,7 +53,13 @@
       {
         x: q,
         y: deltaSSolvent ?? [],
-        label: 'ΔS Solvent',
+        label: 'ΔS Solvent (normalized)',
+        markers,
+      },
+      {
+        x: q,
+        y: deltaSSolventPerMolecule ?? [],
+        label: 'ΔS Solvent (per molecule)',
         markers,
       },
     ];

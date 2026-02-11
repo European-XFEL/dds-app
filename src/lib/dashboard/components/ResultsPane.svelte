@@ -8,6 +8,7 @@
     deltaSi: number[] | null;
     deltaSSoluteScaled: number[] | null;
     deltaSSolvent: number[] | null;
+    deltaSSolventPerMolecule: number[] | null;
     deltaTemperatureK: number | undefined;
     depositedEnergyJoule: number | undefined;
     detectorQRange: [number | null, number | null];
