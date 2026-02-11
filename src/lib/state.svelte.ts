@@ -55,15 +55,6 @@ export class SimulationState {
 
     this.probe.wavelength = seed.probe.wavelength;
   }
-
-  syncQRangeFromSample() {
-    const solvent = this.sample.solvent;
-    if (!solvent) return;
-
-    this.qRange.min = solvent.qMin ?? this.qRange.min;
-    this.qRange.max = solvent.qMax ?? this.qRange.max;
-    this.qRange.step = solvent.qStep ?? this.qRange.step;
-  }
 }
 
 export function createSimulationSeed(

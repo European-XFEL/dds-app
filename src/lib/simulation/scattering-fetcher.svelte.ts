@@ -2,108 +2,64 @@ import { getDebyeResult, getSolventIQ } from '$remote';
 
 import type { QRange } from '$lib/types';
 
-export type ScatteringData = {
-  q: number[];
-  i: number[];
+import {
+  createQGrid,
+  interpolateLinear,
+  type ScatteringSeries,
+} from './math';
+
+export type ScatteringResource<T> = {
+  readonly value: T | null;
+  readonly loading: boolean;
+  readonly error: Error | null;
+  refetch: () => Promise<void>;
 };
 
-export type ScatteringResult = {
-  data: ScatteringData | null;
-  loading: boolean;
-  error: Error | null;
-};
-
-/**
- * Fetches difference scattering data for the solute (excited - ground state).
- */
-export async function fetchDeltaSSolute(
-  qRange: QRange,
-  groundId: string,
-  excitedId: string,
-): Promise<ScatteringData | null> {
-  const [ground, excited] = await Promise.all([
-    getDebyeResult({ fileId: groundId, qRange }),
-    getDebyeResult({ fileId: excitedId, qRange }),
-  ]);
-
-  if (!ground || !excited) return null;
-
-  // Validate Q ranges match
-  if (
-    ground.q.map((v) => v.toFixed(6)).toString() !==
-    excited.q.map((v) => v.toFixed(6)).toString()
-  ) {
-    throw new Error('Q ranges of ground and excited states do not match.');
-  }
-
-  const deltaS = excited.i.map((val, index) => val - ground.i[index]);
-  return { q: ground.q, i: deltaS };
-}
-
-/**
- * Fetches difference scattering data for the solvent.
- */
-export async function fetchDeltaSSolvent(
-  solventId: string,
-  ratioSolventSolute: number,
-  deltaT: number,
-): Promise<ScatteringData> {
-  const iqSolvent = await getSolventIQ(solventId);
-  const deltaS = iqSolvent.dSdT.map((val) => val * ratioSolventSolute * deltaT);
-  return { q: iqSolvent.q, i: deltaS };
-}
-
-/**
- * Creates a reactive resource for fetching scattering data.
- */
 export function createScatteringResource<T>(
-  fetcher: () => Promise<T | null>,
-  deps: () => boolean,
-): {
-  value: T | null;
-  loading: boolean;
-  error: Error | null;
-  refetch: () => void;
-} {
+  fetcher: () => Promise<T>,
+  ready: () => boolean,
+): ScatteringResource<T> {
   let value = $state<T | null>(null);
   let loading = $state(false);
   let error = $state<Error | null>(null);
-  let version = $state(0);
+  let requestId = 0;
 
-  function refetch() {
-    version += 1;
-  }
-
-  $effect(() => {
-    // Track version for manual refetches - reading it creates a dependency
-    const currentVersion = version;
-
-    // Check if we should fetch
-    if (!deps()) {
+  const runFetch = async () => {
+    if (!ready()) {
       value = null;
       loading = false;
       error = null;
       return;
     }
 
+    const currentRequest = (requestId += 1);
     loading = true;
     error = null;
 
-    fetcher()
-      .then((result) => {
-        // Only update if this is still the current fetch
-        if (currentVersion === version) {
-          value = result;
-          loading = false;
-        }
-      })
-      .catch((e) => {
-        if (currentVersion === version) {
-          error = e instanceof Error ? e : new Error(String(e));
-          value = null;
-          loading = false;
-        }
-      });
+    try {
+      const result = await fetcher();
+      if (currentRequest !== requestId) return;
+      value = result;
+    } catch (err) {
+      if (currentRequest !== requestId) return;
+      error = err instanceof Error ? err : new Error('Unknown fetch error');
+      value = null;
+    } finally {
+      if (currentRequest === requestId) {
+        loading = false;
+      }
+    }
+  };
+
+  $effect(() => {
+    if (!ready()) {
+      value = null;
+      loading = false;
+      error = null;
+      return;
+    }
+
+    void runFetch();
   });
 
   return {
@@ -116,6 +72,44 @@ export function createScatteringResource<T>(
     get error() {
       return error;
     },
-    refetch,
+    refetch: runFetch,
   };
+}
+
+export async function fetchDeltaSSolute(
+  qRange: QRange,
+  groundId: string,
+  excitedId: string,
+): Promise<ScatteringSeries> {
+  const [ground, excited] = await Promise.all([
+    getDebyeResult({ fileId: groundId, qRange }),
+    getDebyeResult({ fileId: excitedId, qRange }),
+  ]);
+
+  if (ground.q.length !== excited.q.length) {
+    throw new Error('Ground/excited Q ranges do not match.');
+  }
+
+  const deltaI = ground.i.map((value, index) => excited.i[index] - value);
+  return { q: ground.q, i: deltaI };
+}
+
+export async function fetchDeltaSSolvent(
+  qRange: QRange,
+  solventId: string,
+  ratioSolventSolute: number,
+  deltaT: number,
+): Promise<ScatteringSeries> {
+  const solvent = await getSolventIQ(solventId);
+  const targetQ = createQGrid(qRange);
+  const solventQ = solvent.q.map((value) => Number(value));
+  const solventDSdT = solvent.dSdT.map((value) => Number(value));
+
+  const interpolated = interpolateLinear(solventQ, solventDSdT, targetQ);
+  const scaled = interpolated.map((value) => {
+    if (!Number.isFinite(value)) return Number.NaN;
+    return value * ratioSolventSolute * deltaT;
+  });
+
+  return { q: targetQ, i: scaled };
 }
