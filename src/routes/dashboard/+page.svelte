@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
-
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
@@ -10,9 +8,9 @@
   import ConfigPane from '$lib/dashboard/components/ConfigPane.svelte';
   import ResultsPane from '$lib/dashboard/components/ResultsPane.svelte';
   import {
-    createScatteringResource,
     fetchDeltaSSolute,
     fetchDeltaSSolvent,
+    createScatteringResource,
   } from '$lib/simulation/scattering-fetcher.svelte';
   import {
     computeDeltaS,
@@ -23,17 +21,29 @@
 
   const simulation = useSimulationState();
 
-  const [solvents, molecules] = await Promise.all([
-    listSolvents(),
-    listMolecules(),
-  ]);
+  type ListsResult = {
+    solvents: Awaited<ReturnType<typeof listSolvents>>;
+    molecules: Awaited<ReturnType<typeof listMolecules>>;
+  };
+
+  const listResource = createScatteringResource<ListsResult>(
+    async () => {
+      const [solvents, molecules] = await Promise.all([
+        listSolvents(),
+        listMolecules(),
+      ]);
+      return { solvents, molecules };
+    },
+    () => true,
+  );
+
+  const solvents = $derived(listResource.value?.solvents ?? []);
+  const molecules = $derived(listResource.value?.molecules ?? []);
 
   let short = $state(true);
 
-  // Use extracted calculations module
   const calculations = createScatteringCalculations(simulation);
 
-  // Reactive scattering data fetching using resource pattern
   const soluteResource = createScatteringResource(
     () =>
       fetchDeltaSSolute(
@@ -52,6 +62,7 @@
   const solventResource = createScatteringResource(
     () =>
       fetchDeltaSSolvent(
+        simulation.qRange,
         simulation.sample.solvent!.id,
         calculations.ratioSolventSolute!,
         calculations.deltaT!,
@@ -59,12 +70,11 @@
     () =>
       !!(
         simulation.sample.solvent?.id &&
-        calculations.ratioSolventSolute &&
-        calculations.deltaT
+        calculations.ratioSolventSolute != null &&
+        calculations.deltaT != null
       ),
   );
 
-  // Combined difference scattering signal
   const deltaS = $derived(
     computeDeltaS(
       soluteResource.value,
@@ -74,12 +84,10 @@
   );
 
   const deltaSi = $derived(deltaS?.i ?? null);
-
   const qValues = $derived(
     deltaS?.q ?? solventResource.value?.q ?? soluteResource.value?.q ?? [],
   );
 
-  // Solute contribution scaled by excited fraction for display
   const deltaSSoluteScaled = $derived(
     scaleSoluteByExcitedFraction(
       soluteResource.value,
@@ -88,10 +96,28 @@
   );
 
   const deltaSSolvent = $derived(solventResource.value?.i ?? null);
+  const deltaSSolventPerMolecule = $derived(
+    solventResource.value && calculations.ratioSolventSolute != null
+      ? solventResource.value.i.map(
+          (value) => value / calculations.ratioSolventSolute!,
+        )
+      : null,
+  );
 
   const detectorQRange: [number | null, number | null] = $derived.by(() => {
     const qRange = simulation.detector?.qRange;
     return qRange ? [qRange.min, qRange.max] : [null, null];
+  });
+
+  const results = $derived({
+    qValues,
+    deltaSi,
+    deltaSSoluteScaled,
+    deltaSSolvent,
+    deltaSSolventPerMolecule,
+    detectorQRange,
+    deltaTemperatureK: calculations.deltaT,
+    depositedEnergyJoule: calculations.deltaEJ,
   });
 
   const hasGroundMolecule = $derived(!!simulation.sample.ground?.id);
@@ -120,15 +146,7 @@
       class="mt-4 flex items-center justify-center *:w-full"
     >
       {#if hasAll}
-        <ResultsPane
-          {qValues}
-          {deltaSi}
-          {deltaSSoluteScaled}
-          {deltaSSolvent}
-          {detectorQRange}
-          deltaTemperatureK={undefined}
-          depositedEnergyJoule={undefined}
-        />
+        <ResultsPane {...results} />
       {:else}
         <SetupChecklist
           {hasGroundMolecule}
