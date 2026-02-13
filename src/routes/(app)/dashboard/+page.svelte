@@ -8,9 +8,9 @@
   import ConfigPane from '$lib/dashboard/components/ConfigPane.svelte';
   import ResultsPane from '$lib/dashboard/components/ResultsPane.svelte';
   import {
+    createScatteringResource,
     fetchDeltaSSolute,
     fetchDeltaSSolvent,
-    createScatteringResource,
   } from '$lib/simulation/scattering-fetcher.svelte';
   import {
     computeDeltaS,
@@ -19,7 +19,7 @@
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
 
-  const simulation = useSimulationState();
+  let simulation = $state(useSimulationState());
 
   type ListsResult = {
     solvents: Awaited<ReturnType<typeof listSolvents>>;
@@ -163,7 +163,7 @@
     <Resizable.Pane defaultSize={20} class="flex max-w-2xl min-w-110">
       <ScrollArea class="flex-1">
         <div class="mt-4 mr-4 mb-4">
-          <ConfigPane {simulation} {molecules} {solvents} {short} />
+          <ConfigPane bind:simulation {molecules} {solvents} {short} />
         </div>
       </ScrollArea>
     </Resizable.Pane>
