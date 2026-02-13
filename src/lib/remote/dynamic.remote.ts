@@ -1,4 +1,5 @@
 import z from 'zod';
+import { LRUCache } from 'lru-cache'
 
 import { invalid } from '@sveltejs/kit';
 
@@ -16,6 +17,16 @@ import {
   uploadMoleculeImpl,
   uploadSchema,
 } from './common';
+
+const immutableCache = new LRUCache<
+  string,
+  Awaited<ReturnType<typeof getMoleculeFileContentImpl>> | Awaited<ReturnType<typeof getSolventIQImpl>> | Awaited<ReturnType<typeof getDebyeResultImpl>>
+>({
+  max: 1000,
+  onInsert: (value, key, reason) => {
+    console.log(`Cache insert: key=${key}, reason=${reason}`);
+  },
+});
 
 export const listMolecules = query(async () => {
   return await listMoleculesImpl();
@@ -36,15 +47,36 @@ export const listSolvents = query(async () => {
 });
 
 export const getMoleculeFileContent = query(z.string(), async (id: string) => {
-  return await getMoleculeFileContentImpl(id);
+  let res = immutableCache.get(id);
+
+  if (!res) {
+    res = await getMoleculeFileContentImpl(id);
+    immutableCache.set(id, res);
+  }
+  return res;
 });
 
 export const getSolventIQ = query(z.string(), async (id: string) => {
-  return await getSolventIQImpl(id);
+  let res = immutableCache.get(id);
+
+  if (!res) {
+    res = await getSolventIQImpl(id);
+    immutableCache.set(id, res);
+  }
+
+  return res;
 });
 
 export const getDebyeResult = query(simRequest, async (request) => {
-  return await getDebyeResultImpl(request);
+  const id = JSON.stringify(request);
+  let res = immutableCache.get(id);
+
+  if (!res) {
+    res = await getDebyeResultImpl(request);
+    immutableCache.set(id, res);
+  }
+
+  return res;
 });
 
 export const submitFeedback = form(feedbackSchema, async (data) => {

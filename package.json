@@ -59,6 +59,7 @@
     "globals": "^16.5.0",
     "html-to-image": "^1.11.13",
     "katex": "^0.16.27",
+    "lru-cache": "^11.2.6",
     "matterviz": "^0.3.0",
     "paneforge": "^1.0.2",
     "papaparse": "^5.5.3",
