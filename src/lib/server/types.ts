@@ -43,8 +43,8 @@ export interface Capability {
   reason: string;
 }
 
-export interface Capabilities {
+export type Capabilities = {
   upload: Capability;
   feedback: Capability;
   simulation: Capability;
-}
+};

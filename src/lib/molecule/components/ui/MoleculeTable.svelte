@@ -16,6 +16,7 @@
   } from '@tanstack/table-core';
 
   import { flip } from 'svelte/animate';
+  import { SvelteMap } from 'svelte/reactivity';
   import { slide } from 'svelte/transition';
 
   import { FlexRender, createSvelteTable } from '$shadcn/ui/data-table';
@@ -88,7 +89,7 @@
 
   // Group molecules by name - this transforms flat molecule list into hierarchical data
   let groupedData = $derived.by((): TableRow[] => {
-    const groups = new Map<string, MoleculeRow[]>();
+    const groups = new SvelteMap<string, MoleculeRow[]>();
 
     for (const molecule of molecules) {
       const existing = groups.get(molecule.moleculeName);

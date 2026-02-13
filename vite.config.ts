@@ -6,9 +6,14 @@ import { defineConfig } from 'vite';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import lucidePreprocess from 'vite-plugin-lucide-preprocess';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 export default defineConfig({
+  define: {
+    'process.env.NODE_ENV': isProd ? '"production"' : '"development"',
+  },
   plugins: [
-    devtoolsJson(),
+    isProd ? devtoolsJson() : null,
     lucidePreprocess(),
     tailwindcss(),
     sveltekit(),
@@ -18,4 +23,14 @@ export default defineConfig({
       filename: 'stats.html',
     }),
   ],
+  server: {
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/.svelte-kit/**',
+        '**/build/**',
+        '**/backend/**',
+      ],
+    },
+  },
 });

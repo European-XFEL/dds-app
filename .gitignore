@@ -1,5 +1,7 @@
 node_modules
 .deno-deploy
+.gh-pages
+.svelte-kit-static
 
 # Output
 .output

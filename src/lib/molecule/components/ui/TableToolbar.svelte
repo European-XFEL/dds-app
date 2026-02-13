@@ -46,7 +46,7 @@
       <DropdownMenu.Content align="end" class="w-45">
         {#each table
           .getAllColumns()
-          .filter((col) => col.getCanHide()) as column}
+          .filter((col) => col.getCanHide()) as column (column.id)}
           <DropdownMenu.CheckboxItem
             checked={column.getIsVisible()}
             onCheckedChange={(value) => {
