@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type DataSeries, type RefLine, ScatterPlot } from 'matterviz';
+  import { type DataSeries, type RefLine } from 'matterviz';
 
   import { Checkbox } from '$shadcn/ui/checkbox/index.js';
   import { Label } from '$shadcn/ui/label';
@@ -75,14 +75,16 @@
 </script>
 
 <div class="flow-col">
-  <ScatterPlot
-    {series}
-    {ref_lines}
-    x_axis={{ label: 'q (Å⁻¹)', range: xRange }}
-    y_axis={{ label: 'ΔS (a.u.)' }}
-    style="height: 320px"
-    legend={{ layout: 'horizontal' }}
-  />
+  {#await import('matterviz/plot') then { ScatterPlot }}
+    <ScatterPlot
+      {series}
+      {ref_lines}
+      x_axis={{ label: 'q (Å⁻¹)', range: xRange }}
+      y_axis={{ label: 'ΔS (a.u.)' }}
+      style="height: 320px"
+      legend={{ layout: 'horizontal' }}
+    />
+  {/await}
 
   <div class="flow-row w-max items-center gap-3">
     <div class="flex items-center gap-3">
