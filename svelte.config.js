@@ -2,11 +2,32 @@ import adapter_deno from "@deno/svelte-adapter";
 import adapter_static from "@sveltejs/adapter-static";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import process from "node:process";
+import { execSync } from "node:child_process";
+
+const TARGET = process.env.PUBLIC_TARGET;
+const STATIC = TARGET === 'static';
+
+function gitVersion() {
+  try {
+    const gv = execSync('git describe --tags --always --dirty --long', {
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).toString().trim();
+    return `${TARGET}-${gv}`;
+  } catch (err) {
+    console.log(err)
+    return process.env.APP_VERSION ?? undefined;
+  }
+}
+
+const VERSION = gitVersion();
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   preprocess: [vitePreprocess()],
   kit: {
+    paths: {
+      base: process.env.BASE_PATH,
+    },
     alias: {
       $css: "./src/app.css",
       $components: "./src/components",
@@ -15,6 +36,14 @@ const config = {
     experimental: {
       remoteFunctions: true,
     },
+    serviceWorker: {
+      register: true,
+    },
+    csrf: {
+      trustedOrigins: ["https://exfldadev01.desy.de", "https://european-xfel.github.io"],
+    },
+    version: {name: VERSION},
+    outDir: STATIC ? ".svelte-kit-static" : ".svelte-kit",
   },
   compilerOptions: {
     experimental: {
@@ -33,6 +62,9 @@ const config_deno = {
       ...config.kit?.alias,
       $remote: "./src/lib/remote/dynamic.remote.ts",
     },
+    prerender: {
+      entries: ["/", "/docs", "/experiment/detector", "/experiment/pump-probe"]
+    }
   },
 };
 
@@ -41,28 +73,19 @@ const config_static = {
   kit: {
     ...config.kit,
     adapter: adapter_static(),
-    paths: {
-      base: process.argv.includes("dev") ? "" : process.env.BASE_PATH,
-    },
     alias: {
       ...config.kit?.alias,
       $remote: "./src/lib/remote/static.remote.ts",
-    },
-    prerender: {
-      entries: ["*"],
-    },
+    }
   },
 };
 
-// Pick configuration: env var TARGET or CLI arg --target=*
-const cliArg = process.argv.find((a) => a.startsWith("--target="));
-const target = process.env.TARGET || (cliArg && cliArg.split("=")[1]) || "deno";
 
 /**
  * Export the selected config. Defaults to `config_deno` when nothing is set.
  */
-const selectedConfig = target === "static" ? config_static : config_deno;
+const selectedConfig = STATIC ? config_static : config_deno;
 
-console.log(`Using SvelteKit config for target: ${target}`);
+console.log(`Target: ${TARGET}, Version: ${VERSION}`);
 
 export default selectedConfig;
