@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 
 import { env } from '$env/dynamic/private';
+import { PUBLIC_TARGET } from '$env/static/public';
 
 import { db } from './db';
 import type { BackendHealth, Capabilities, DbHealth, Health } from './types';
@@ -140,7 +141,7 @@ export async function getCapabilities(
     },
   };
 
-  if (env?.TARGET === 'static') {
+  if (PUBLIC_TARGET === 'static') {
     // Set all capabilities to unavailable in static mode
     for (const key in res) {
       res[key as keyof Capabilities] = {

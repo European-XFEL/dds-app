@@ -7,3 +7,4 @@
 !/vite.config.ts
 !/svelte.config.js
 !/drizzle.config.ts
+!/utils/**

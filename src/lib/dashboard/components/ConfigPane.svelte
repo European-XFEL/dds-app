@@ -4,7 +4,7 @@
   import { PumpSetupCard } from '$lib/pump';
   import { SolventCard } from '$lib/sample';
 
-  const { simulation, molecules, solvents, short } = $props();
+  const { simulation = $bindable(), molecules, solvents, short } = $props();
 </script>
 
 <div class="flex flex-col gap-4 *:flex-1">
