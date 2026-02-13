@@ -14,6 +14,7 @@ import {
 } from '$lib/server/grpc';
 
 import { uploadSchema } from './schema';
+import { error } from '@sveltejs/kit';
 
 const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:50051';
 
@@ -60,10 +61,16 @@ export async function listSolventsImpl() {
 }
 
 export async function getMoleculeFileContentImpl(id: string) {
-  return await db.query.molecules.findFirst({
+  const res = await db.query.molecules.findFirst({
     where: { id },
     columns: { contents: true },
   });
+
+  if (!res) {
+    return error(404, 'Molecule not found');
+  }
+
+  return res
 }
 
 type SolventDifferentials = {
@@ -84,7 +91,7 @@ export async function getSolventIQImpl(id: string) {
       (s) =>
         s?.contents ??
         (() => {
-          throw new Error('Solvent not found');
+          return error(404, 'Solvent not found');
         })(),
     );
 
@@ -126,7 +133,7 @@ export async function getDebyeResultImpl(request: z.infer<typeof simRequest>) {
   });
 
   if (!file) {
-    throw new Error('Molecule not found');
+    return error(404, 'Molecule not found');
   }
 
   const encoder = new TextEncoder();
