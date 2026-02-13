@@ -1,0 +1,31 @@
+{
+  "apps": {
+    "http": {
+      "servers": {
+        "srv0": {
+          "listen": [":8080"],
+          "routes": [
+            {
+              "match": [
+                {
+                  "path": ["/xss-app", "/xss-app/*"]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "rewrite",
+                  "strip_path_prefix": "/xss-app"
+                },
+                {
+                  "handler": "file_server",
+                  "root": "build"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
