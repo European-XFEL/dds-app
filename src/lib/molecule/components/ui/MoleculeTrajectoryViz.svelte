@@ -8,7 +8,6 @@
 
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
-  import { preloadMatterviz } from '$lib/utils/matterviz';
 
   interface Props {
     ground: Sample['ground'];
@@ -61,9 +60,7 @@
   });
 
   onMount(async () => {
-    let matterviz = await preloadMatterviz();
-    // @ts-ignore
-    Trajectory = matterviz.Trajectory;
+    Trajectory = await import('matterviz/trajectory');
   });
 </script>
 

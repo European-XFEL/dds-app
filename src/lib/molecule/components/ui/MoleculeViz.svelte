@@ -8,7 +8,6 @@
 
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
-  import { preloadMatterviz } from '$lib/utils/matterviz';
 
   interface Props {
     molecule: Sample['ground'] | Sample['excited'];
@@ -56,6 +55,10 @@
 
   let Structure = $state<any>(null);
 
+  onMount(async () => {
+    Structure = await import('matterviz/structure');
+  });
+
   let placeholder_title = $derived.by(() => {
     if (!Structure) return 'Loading MatterViz...';
     if (!molecule?.id) return 'No molecule selected';
@@ -68,13 +71,6 @@
     if (!Structure) return '';
     if (!molecule?.id) return 'Select a molecule to view its structure.';
     if (loading_structure && !structure_string) return 'Loading molecule';
-  });
-
-  onMount(async () => {
-    // Get structure from preloaded MatterViz
-    let matterviz = await preloadMatterviz();
-    // @ts-ignore
-    Structure = matterviz.Structure;
   });
 </script>
 
