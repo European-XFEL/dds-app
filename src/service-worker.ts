@@ -1,91 +1,173 @@
-// Disables access to DOM typings like `HTMLElement` which are not available
-// inside a service worker and instantiates the correct globals
 /// <reference no-default-lib="true"/>
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
-// Ensures that the `$service-worker` import has proper type definitions
 /// <reference types="@sveltejs/kit" />
-// Only necessary if you have an import from `$env/static/public`
 /// <reference types="../.svelte-kit/ambient.d.ts" />
 import { build, files, version } from '$service-worker';
+import {
+  imageCache,
+  offlineFallback,
+  pageCache,
+  staticResourceCache,
+} from 'workbox-recipes';
+import { registerRoute, setDefaultHandler } from 'workbox-routing';
+import { StaleWhileRevalidate } from 'workbox-strategies';
 
-// This gives `self` the correct types
+import { resolve } from '$app/paths';
+
+import { PUBLIC_REMOTE_HOST } from '$env/static/public';
+
+const PROXY_URL = PUBLIC_REMOTE_HOST ? new URL(PUBLIC_REMOTE_HOST) : null;
+
 const self = globalThis.self as unknown as ServiceWorkerGlobalScope;
 
-// Create a unique cache name for this deployment
-const CACHE = `cache-${version}`;
+const ASSETS = [...build, ...files];
 
-const ASSETS = [
-  ...build, // the app itself
-  ...files, // everything in `static`
-];
+const CACHE = {
+  STATIC: `static-resources: ${version}`,
+  PAGES: `pages: ${version}`,
+  IMAGES: `images: ${version}`,
+  SWR: `swr: ${version}`,
+  PROXY: `swr-proxy: ${version}`,
+};
 
+// Precache app shell and static assets
 self.addEventListener('install', (event) => {
-  // Create a new cache and add all files to it
   async function addFilesToCache() {
-    const cache = await caches.open(CACHE);
-    await cache.addAll(ASSETS);
+    const cache = await caches.open(CACHE.STATIC);
+    console.log('Caching assets:', ASSETS);
+    const result = Promise.all(
+      ASSETS.map(async (asset) => {
+        try {
+          await cache.add(asset);
+        } catch (err) {
+          console.error(`Failed to cache ${asset}:`, err);
+        }
+      }),
+    );
+    return result;
   }
-
   event.waitUntil(addFilesToCache());
 });
 
+// Clean up old caches
 self.addEventListener('activate', (event) => {
-  // Remove previous cached data from disk
   async function deleteOldCaches() {
     for (const key of await caches.keys()) {
-      if (key !== CACHE) await caches.delete(key);
+      if (key.endsWith(version)) {
+        console.log(`Keeping cache: ${key}`);
+      } else {
+        console.log(`Deleting old cache: ${key}`);
+        await caches.delete(key);
+      }
     }
   }
 
   event.waitUntil(deleteOldCaches());
+
+  registerProxyRoute();
 });
 
-self.addEventListener('fetch', (event) => {
-  // ignore POST requests etc
-  if (event.request.method !== 'GET') return;
-
-  async function respond() {
-    const url = new URL(event.request.url);
-    const cache = await caches.open(CACHE);
-
-    // `build`/`files` can always be served from the cache
-    if (ASSETS.includes(url.pathname)) {
-      const response = await cache.match(url.pathname);
-
-      if (response) {
-        return response;
-      }
-    }
-
-    // for everything else, try the network first, but
-    // fall back to the cache if we're offline
-    try {
-      const response = await fetch(event.request);
-
-      // if we're offline, fetch can return a value that is not a Response
-      // instead of throwing - and we can't pass this non-Response to respondWith
-      if (!(response instanceof Response)) {
-        throw new Error('invalid response from fetch');
-      }
-
-      if (response.status === 200) {
-        cache.put(event.request, response.clone());
-      }
-
-      return response;
-    } catch (err) {
-      const response = await cache.match(event.request);
-
-      if (response) {
-        return response;
-      }
-
-      // if there's no cache, then just error out
-      // as there is nothing we can do to respond to this request
-      throw err;
-    }
+function registerProxyRoute() {
+  if (!PUBLIC_REMOTE_HOST || !PROXY_URL) {
+    console.warn(
+      'No remote host configured, skipping proxy route registration.',
+    );
+    return;
   }
 
-  event.respondWith(respond());
+  const urlStart = resolve('/_app/remote', {});
+
+  console.log(
+    `Registering proxy route to ${PUBLIC_REMOTE_HOST} for ${urlStart}`,
+  );
+
+  const proxyStrategy = new StaleWhileRevalidate({
+    cacheName: CACHE.PROXY,
+  });
+
+  registerRoute(
+    ({ url }) => {
+      console.log(url.pathname);
+      return url.pathname.startsWith(urlStart);
+    },
+    async ({ event, request, url }) => {
+      // if (!await checkShouldProxy()) {
+      console.log('[proxy]:', request.method, request.url, PUBLIC_REMOTE_HOST);
+      url.host = PROXY_URL.host;
+      url.protocol = PROXY_URL.protocol;
+      request = new Request(url, request);
+      console.log('[proxy]: rewritten URL:', request.url);
+      // }
+
+      return proxyStrategy.handle({ request, event });
+    },
+  );
+}
+
+pageCache({
+  cacheName: CACHE.PAGES,
+  warmCache: [
+    '/',
+    '/dashboard',
+    '/docs',
+    '/experiment/samples',
+    '/experiment/pump-probe',
+    '/experiment/detector',
+  ],
 });
+
+staticResourceCache({ cacheName: CACHE.STATIC });
+
+imageCache({ cacheName: CACHE.IMAGES });
+
+offlineFallback();
+
+setDefaultHandler(new StaleWhileRevalidate({ cacheName: CACHE.SWR }));
+
+// async function checkRemoteVersion() {
+//   const remoteVersion = await fetch(PUBLIC_REMOTE_HOST + '/version')
+
+//   if (!remoteVersion.ok) {
+//     console.warn(
+//       `Failed to fetch version from remote host ${PUBLIC_REMOTE_HOST}: ${remoteVersion.status} ${remoteVersion.statusText}`,
+//     );
+//     return false;
+//   }
+//   const remoteVersionRes = await remoteVersion.text();
+//   console.info(`Remote host ${PUBLIC_REMOTE_HOST} is running version ${remoteVersionRes}`);
+//   if (remoteVersionRes !== version) {
+//     console.warn(
+//       `Remote host version does not match static site version ${version}.`,
+//     );
+//     return false;
+//   } else {
+//     console.info(`Remote host version matches static site version ${version}.`);
+//     return true;
+//   }
+// }
+
+// async function checkShouldProxy() {
+//   if (PUBLIC_TARGET !== 'static' && !PUBLIC_REMOTE_HOST) return false;
+
+//   const remoteHostUrl = new URL(PUBLIC_REMOTE_HOST);
+
+//   if (remoteHostUrl.hostname !== 'localhost' && remoteHostUrl.protocol !== 'https:') {
+//     console.warn(
+//       `Remote host ${PUBLIC_REMOTE_HOST} is not using HTTPS. Refusing to proxy.`,
+//     );
+//     return false;
+//   }
+
+//   try {
+//     if (!await checkRemoteVersion()) return false;
+//   } catch (err) {
+//     console.warn(
+//       `Failed to check remote host version at ${PUBLIC_REMOTE_HOST}:`,
+//       err,
+//     );
+//     return true;
+//   }
+
+//   return true;
+// }
