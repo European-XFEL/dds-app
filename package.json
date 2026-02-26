@@ -13,7 +13,7 @@
     "preview": "_EF=.env deno task _preview",
     "preview:s": "_EF=.env.gh deno task _preview",
     "prod": "deno run --env-file -A .deno-deploy/server.ts",
-    "prod:s": "caddy run --config ./utils/caddy-prod-s.json",
+    "prod:s": "caddy run --config ./utils/static.Caddyfile",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
