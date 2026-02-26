@@ -15,7 +15,7 @@ function gitVersion() {
     return `${TARGET}-${gv}`;
   } catch (err) {
     console.log(err)
-    return process.env.APP_VERSION ?? undefined;
+    return process.env.PUBLIC_APP_VERSION ?? undefined;
   }
 }
 
@@ -26,7 +26,7 @@ const config = {
   preprocess: [vitePreprocess()],
   kit: {
     paths: {
-      base: process.env.BASE_PATH,
+      base: process.env.PUBLIC_BASE_PATH,
     },
     alias: {
       $css: "./src/app.css",
