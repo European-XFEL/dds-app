@@ -24,7 +24,7 @@ export default defineConfig({
       manifest: {
         name: 'XSS App',
         short_name: 'XSS',
-        description: 'X-ay solution scattering simulation app',
+        description: 'X-ray Solution Scattering simulation app',
         start_url: '/',
         scope: '/',
         display: 'standalone',
