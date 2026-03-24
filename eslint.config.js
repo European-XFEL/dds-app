@@ -1,4 +1,3 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import { URL, fileURLToPath } from 'node:url';
 
 import { includeIgnoreFile } from '@eslint/compat';
@@ -15,23 +14,23 @@ const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
+  { ignores: ['stories/**'] },
   js.configs.recommended,
-  ...ts.configs.recommended,
-  ...svelte.configs.recommended,
+  ts.configs.recommended,
+  svelte.configs.recommended,
   prettier,
-  ...svelte.configs.prettier,
+  svelte.configs.prettier,
   {
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
     },
     rules: {
-      // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
-      // see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+      // typescript-eslint recommends disabling no-undef on TypeScript projects:
+      // https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
       'no-undef': 'off',
-      // Override no-unused-vars to ignore variables that start with _
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
-        'warn', // or "error"
+        'warn',
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
