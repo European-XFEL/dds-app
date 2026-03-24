@@ -49,7 +49,7 @@
       <span class="font-bold">not</span> the range used by the simulation.
     </Field.Description>
     <Field.Group class="flex flex-row">
-      {#each qFields as [label, value]}
+      {#each qFields as [label, value] (label)}
         <Field.Field>
           <Field.Label>{label}</Field.Label>
           <Input {value} readonly class="truncate opacity-50" />

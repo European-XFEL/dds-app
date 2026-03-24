@@ -43,6 +43,7 @@
     });
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let Trajectory = $state<any>(null);
 
   let placeholder_title = $derived.by(() => {

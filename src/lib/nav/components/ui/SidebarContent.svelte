@@ -141,11 +141,17 @@
                 {item.title}
               {/snippet}
               {#snippet child({ props })}
-                {@const href = item?.url ? resolve(item.url) : ''}
-                <a {href} {...props}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
+                {#if item?.url}
+                  <a href={resolve(item.url)} {...props}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </a>
+                {:else}
+                  <div {...props}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </div>
+                {/if}
               {/snippet}
             </Sidebar.MenuButton>
           </Sidebar.MenuItem>

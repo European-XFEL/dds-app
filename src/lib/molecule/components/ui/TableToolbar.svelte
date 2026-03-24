@@ -9,7 +9,7 @@
   import { Input } from '$shadcn/ui/input';
 
   type Props = {
-    table: Table<any>; // Accept any table type
+    table: Table<unknown>;
     globalFilter: string;
     onGlobalFilterChange: (value: string) => void;
   };

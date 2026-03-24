@@ -23,13 +23,14 @@
     PumpSetupCard,
     SolventCard,
     SolventInfoCard,
-  } satisfies Record<CardType, any>;
+  } satisfies Record<CardType, object>;
 
   let { data, type }: NodeProps = $props();
 
   const cardType = $derived(
     typeof type === 'string' ? (type as CardType) : undefined,
   );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Card = $derived<any>(cardType ? cardByType[cardType] : undefined);
 </script>
 
@@ -37,10 +38,9 @@
   <Handle type="target" position={Position.Left} />
   {#if Card}
     {#if data}
-      {@debug Card, data}
-      <Card {...data as any} />
+      <!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
+      <Card {...(data as any)} />
     {:else}
-      {@debug Card, data}
       <Card />
     {/if}
   {:else}

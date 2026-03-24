@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { draw, fade } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
 
   import type { CartesianPoint, DetectorModule } from '$lib/types';
 

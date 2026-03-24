@@ -35,7 +35,7 @@
 
   const series = $derived.by(() => {
     const q = qValues;
-    const markers: 'line' = 'line';
+    const markers = 'line' as const;
 
     return [
       {
