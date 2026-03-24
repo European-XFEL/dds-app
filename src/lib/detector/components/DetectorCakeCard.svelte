@@ -58,7 +58,7 @@
           class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner"
         >
           {#await import('./ui/CakeCartesian.svelte')}
-            <!-- deno-fmt-ignore -->
+            <!-- prettier-ignore -->
             <Skeleton
               class="mx-auto block rounded-lg bg-muted/30"
               style="width: {panelShape.width}px; height: {panelShape.height}px;"
@@ -75,7 +75,7 @@
           class="flow rounded-2xl border border-border/80 bg-muted/30 p-3 shadow-inner"
         >
           {#await import('./ui/CakePolar.svelte')}
-            <!-- deno-fmt-ignore -->
+            <!-- prettier-ignore -->
             <Skeleton
               class="mx-auto block rounded-lg bg-muted/30"
               style="width: {panelShape.width}px; height: {panelShape.height}px;"

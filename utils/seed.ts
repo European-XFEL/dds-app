@@ -1,17 +1,16 @@
-/// <reference lib="deno.ns" />
 import solvents_data from '../data/solvents.json' with { type: 'json' };
-import '@std/dotenv/load';
-import * as path from '@std/path';
+import * as path from 'node:path';
+import { opendir, readFile } from 'node:fs/promises';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import Papa from 'papaparse';
 
 import process from 'node:process';
 
-import { relations } from '$lib/server/db/relations.ts';
-import * as schema from '$lib/server/db/schema.ts';
-import { sha256HexFromText } from '$lib/server/db/util.ts';
+import { relations } from '../src/lib/server/db/relations.ts';
+import * as schema from '../src/lib/server/db/schema.ts';
+import { sha256HexFromText } from '../src/lib/server/db/util.ts';
 
-const env = Deno.env.toObject();
+const env = process.env;
 
 const DB_USER = env['DB_USER'];
 const DB_PASSWORD = env['DB_PASSWORD'];
@@ -58,13 +57,13 @@ const urlRegex = /(https?:\/\/[^\s]+)/g;
 async function seedMolecules(directory: string) {
   const moleculeDirs: { [key: string]: string[] } = {};
 
-  for await (const entry of Deno.readDir(directory)) {
-    if (entry.isDirectory) {
+  for await (const entry of await opendir(directory)) {
+    if (entry.isDirectory()) {
       const subdir = path.join(directory, entry.name);
       moleculeDirs[entry.name] = [];
 
-      for await (const subentry of Deno.readDir(subdir)) {
-        if (subentry.isFile && subentry.name.endsWith('.xyz')) {
+      for await (const subentry of await opendir(subdir)) {
+        if (subentry.isFile() && subentry.name.endsWith('.xyz')) {
           moleculeDirs[entry.name].push(path.join(entry.name, subentry.name));
         }
       }
@@ -92,7 +91,7 @@ async function seedMolecules(directory: string) {
           }
         })();
 
-        const contents = await Deno.readTextFile(filePath);
+        const contents = await readFile(filePath, 'utf-8');
         const contentsLines = contents.split('\n');
 
         const sha = await sha256HexFromText(contents);
@@ -159,9 +158,9 @@ const solvent_name_map: { [key: string]: string } = {
 async function seedSolvents(directory: string) {
   const solventFiles: string[] = [];
 
-  for await (const entry of Deno.readDir(directory)) {
+  for await (const entry of await opendir(directory)) {
     if (
-      entry.isFile &&
+      entry.isFile() &&
       entry.name.endsWith('.txt') &&
       !entry.name.endsWith('-error.txt')
     ) {
@@ -172,7 +171,7 @@ async function seedSolvents(directory: string) {
   // Read all files and start chemical queries in parallel
   const solventDataPromises = solventFiles.map(async (filename) => {
     const filePath = path.join(directory, filename);
-    const contents = await Deno.readTextFile(filePath);
+    const contents = await readFile(filePath, 'utf-8');
     const fileName = path.parse(filename).name;
     const name = solvent_name_map[fileName] || fileName;
     const sha = await sha256HexFromText(contents);
@@ -206,7 +205,7 @@ async function seedSolvents(directory: string) {
       rhom = parseFloat(saved_solvent_data.rhom);
       cpm = parseFloat(saved_solvent_data.cpm);
     } else {
-      const queryChemicalPyodide = await import('$lib/server/thermo.ts').then(
+      const queryChemicalPyodide = await import('../src/lib/server/thermo.ts').then(
         (mod) => mod.queryChemicalPyodide,
       );
       const chemPromise = queryChemicalPyodide(name);

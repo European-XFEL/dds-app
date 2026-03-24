@@ -1,4 +1,4 @@
-import adapter_deno from "@deno/svelte-adapter";
+import adapter_node from "@sveltejs/adapter-node";
 import adapter_static from "@sveltejs/adapter-static";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import process from "node:process";
@@ -53,11 +53,11 @@ const config = {
   extensions: [".svelte", ".svx"],
 };
 
-const config_deno = {
+const config_node = {
   ...config,
   kit: {
     ...config.kit,
-    adapter: adapter_deno(),
+    adapter: adapter_node(),
     alias: {
       ...config.kit?.alias,
       $remote: "./src/lib/remote/dynamic.remote.ts",
@@ -84,7 +84,7 @@ const config_static = {
 /**
  * Export the selected config. Defaults to `config_deno` when nothing is set.
  */
-const selectedConfig = STATIC ? config_static : config_deno;
+const selectedConfig = STATIC ? config_static : config_node;
 
 console.log(`Target: ${TARGET}, Version: ${VERSION}`);
 
