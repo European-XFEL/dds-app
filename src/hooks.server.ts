@@ -2,8 +2,11 @@ import type { Handle } from '@sveltejs/kit';
 
 import { getCapabilities, getHealth } from '$lib/server/health';
 
-const ORIGINS = ["http://localhost", "https://exfldadev01.desy.de", "https://european-xfel.github.io"]
-
+const ORIGINS = [
+  'http://localhost',
+  'https://exfldadev01.desy.de',
+  'https://european-xfel.github.io',
+];
 
 export const handle: Handle = async ({ event, resolve }) => {
   // Only add locals for non-remote requests
@@ -18,18 +21,20 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   if (event.request.method === 'OPTIONS') {
-    if (ORIGINS.includes(event.request.headers.get("origin") ?? "")) {
+    if (ORIGINS.includes(event.request.headers.get('origin') ?? '')) {
       event.setHeaders({
-        "access-control-allow-origin": event.request.headers.get("origin")!,
-        "access-control-allow-methods": "*",
-        "access-control-allow-headers": "*",
+        'access-control-allow-origin': event.request.headers.get('origin')!,
+        'access-control-allow-methods': '*',
+        'access-control-allow-headers': '*',
       });
     } else {
-      console.warn(`Blocked CORS preflight request from origin: ${event.request.headers.get("origin")}`);
+      console.warn(
+        `Blocked CORS preflight request from origin: ${event.request.headers.get('origin')}`,
+      );
     }
     console.log('Handled OPTIONS request, returning 204 No Content');
     return new Response(null, { status: 204 });
-  };
+  }
 
   const res = await resolve(event);
 

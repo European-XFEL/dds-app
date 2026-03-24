@@ -1,11 +1,10 @@
 import type { SimulationState } from '$lib/state.svelte';
-
 import { throttled } from '$lib/utils/throttled.svelte';
 
 import { THROTTLE_INTERVAL_MS } from './constants';
 import {
-  ScatteringMathState,
   type ScatteringMathSources,
+  ScatteringMathState,
 } from './state.svelte';
 
 export type ScatteringCalculations = ScatteringMathState;

@@ -1,8 +1,9 @@
-import adapter_node from "@sveltejs/adapter-node";
-import adapter_static from "@sveltejs/adapter-static";
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
-import process from "node:process";
-import { execSync } from "node:child_process";
+import { execSync } from 'node:child_process';
+import process from 'node:process';
+
+import adapter_node from '@sveltejs/adapter-node';
+import adapter_static from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 const TARGET = process.env.PUBLIC_TARGET;
 const STATIC = TARGET === 'static';
@@ -10,11 +11,13 @@ const STATIC = TARGET === 'static';
 function gitVersion() {
   try {
     const gv = execSync('git describe --tags --always --dirty --long', {
-      stdio: ['ignore', 'pipe', 'ignore']
-    }).toString().trim();
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trim();
     return `${TARGET}-${gv}`;
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return process.env.PUBLIC_APP_VERSION ?? undefined;
   }
 }
@@ -29,9 +32,9 @@ const config = {
       base: process.env.PUBLIC_BASE_PATH,
     },
     alias: {
-      $css: "./src/app.css",
-      $components: "./src/components",
-      $shadcn: "./src/lib/shadcn/components",
+      $css: './src/app.css',
+      $components: './src/components',
+      $shadcn: './src/lib/shadcn/components',
     },
     experimental: {
       remoteFunctions: true,
@@ -40,17 +43,20 @@ const config = {
       register: true,
     },
     csrf: {
-      trustedOrigins: ["https://exfldadev01.desy.de", "https://european-xfel.github.io"],
+      trustedOrigins: [
+        'https://exfldadev01.desy.de',
+        'https://european-xfel.github.io',
+      ],
     },
-    version: {name: VERSION},
-    outDir: STATIC ? ".svelte-kit-static" : ".svelte-kit",
+    version: { name: VERSION },
+    outDir: STATIC ? '.svelte-kit-static' : '.svelte-kit',
   },
   compilerOptions: {
     experimental: {
       async: true,
     },
   },
-  extensions: [".svelte", ".svx"],
+  extensions: ['.svelte', '.svx'],
 };
 
 const config_node = {
@@ -60,11 +66,11 @@ const config_node = {
     adapter: adapter_node(),
     alias: {
       ...config.kit?.alias,
-      $remote: "./src/lib/remote/dynamic.remote.ts",
+      $remote: './src/lib/remote/dynamic.remote.ts',
     },
     prerender: {
-      entries: ["/", "/docs", "/experiment/detector", "/experiment/pump-probe"]
-    }
+      entries: ['/', '/docs', '/experiment/detector', '/experiment/pump-probe'],
+    },
   },
 };
 
@@ -75,11 +81,10 @@ const config_static = {
     adapter: adapter_static(),
     alias: {
       ...config.kit?.alias,
-      $remote: "./src/lib/remote/static.remote.ts",
-    }
+      $remote: './src/lib/remote/static.remote.ts',
+    },
   },
 };
-
 
 /**
  * Export the selected config. Defaults to `config_deno` when nothing is set.

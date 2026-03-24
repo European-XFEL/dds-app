@@ -1,14 +1,13 @@
-import solvents_data from '../data/solvents.json' with { type: 'json' };
-import * as path from 'node:path';
 import { opendir, readFile } from 'node:fs/promises';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import Papa from 'papaparse';
-
+import * as path from 'node:path';
 import process from 'node:process';
 
+import solvents_data from '../data/solvents.json' with { type: 'json' };
 import { relations } from '../src/lib/server/db/relations.ts';
 import * as schema from '../src/lib/server/db/schema.ts';
 import { sha256HexFromText } from '../src/lib/server/db/util.ts';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import Papa from 'papaparse';
 
 const env = process.env;
 
@@ -205,9 +204,10 @@ async function seedSolvents(directory: string) {
       rhom = parseFloat(saved_solvent_data.rhom);
       cpm = parseFloat(saved_solvent_data.cpm);
     } else {
-      const queryChemicalPyodide = await import('../src/lib/server/thermo.ts').then(
-        (mod) => mod.queryChemicalPyodide,
-      );
+      const queryChemicalPyodide =
+        await import('../src/lib/server/thermo.ts').then(
+          (mod) => mod.queryChemicalPyodide,
+        );
       const chemPromise = queryChemicalPyodide(name);
       [rhom, cpm] = await chemPromise;
     }
