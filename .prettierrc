@@ -1,11 +1,23 @@
 {
-  "arrowParens": "always",
-  "bracketSpacing": true,
-  "htmlWhitespaceSensitivity": "css",
+  "singleQuote": true,
+  "plugins": [
+    "prettier-plugin-svelte",
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ],
+  "overrides": [
+    {
+      "files": "*.svelte",
+      "options": {
+        "parser": "svelte"
+      }
+    }
+  ],
   "importOrder": [
-    "^node:.*$",
+    "<BUILTIN_MODULES>",
+    "<THIRD_PARTY_MODULES>",
     "^svelte",
-    "^@sveltejs/kit$",
+    "^@sveltejs/kit",
     "^\\$app(/.*)?$",
     "^\\$env/(static|dynamic)/(private|public)$",
     "^\\$shadcn(/.*)?$",
@@ -16,30 +28,5 @@
   ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
-  "insertPragma": false,
-  "jsxBracketSameLine": false,
-  "jsxSingleQuote": true,
-  "overrides": [
-    {
-      "files": "*.svelte",
-      "options": {
-        "parser": "svelte"
-      }
-    }
-  ],
-  "plugins": [
-    "prettier-plugin-svelte",
-    "@trivago/prettier-plugin-sort-imports",
-    "prettier-plugin-tailwindcss"
-  ],
-  "printWidth": 80,
-  "proseWrap": "always",
-  "quoteProps": "as-needed",
-  "requirePragma": false,
-  "semi": true,
-  "singleQuote": true,
-  "tabWidth": 2,
-  "tailwindStylesheet": "./src/app.css",
-  "trailingComma": "all",
-  "useTabs": false
+  "tailwindStylesheet": "./src/app.css"
 }
