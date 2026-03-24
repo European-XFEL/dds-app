@@ -68,11 +68,12 @@
     </Button>
   </div>
 {:else if isValidUrl(value)}
+  <!-- eslint-disable svelte/no-navigation-without-resolve -->
   <a
     href={value}
     target="_blank"
     rel="noopener noreferrer"
-    class="flex max-w-[200px] items-center gap-1 truncate text-primary hover:underline"
+    class="flex max-w-50 items-center gap-1 truncate text-primary hover:underline"
     ondblclick={(e) => {
       e.preventDefault();
       onStartEdit();
@@ -81,6 +82,7 @@
     <span class="truncate">{value}</span>
     <ExternalLink class="size-3 shrink-0" />
   </a>
+  <!-- eslint-enable svelte/no-navigation-without-resolve -->
 {:else}
   <button
     type="button"

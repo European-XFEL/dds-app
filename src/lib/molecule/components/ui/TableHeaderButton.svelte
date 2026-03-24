@@ -9,7 +9,7 @@
   import { Button } from '$lib/shadcn/components/ui/button';
 
   type Props = ComponentProps<typeof Button> & {
-    column: Column<any, any>;
+    column: Column<unknown, unknown>;
     text?: string;
   };
 

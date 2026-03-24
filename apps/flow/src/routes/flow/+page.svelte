@@ -170,7 +170,7 @@
   ]);
 
   // Prepare chart data for FlowDashboard
-  let chartData = $derived({
+  let _chartData = $derived({
     constantOptions: constant_options,
     xAxis,
     series,

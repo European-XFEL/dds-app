@@ -84,7 +84,7 @@
     return Number.isFinite(parsed) ? parsed : null;
   }
 
-  function parseComment(contents: string) {
+  function _parseComment(contents: string) {
     return contents.split(/\r?\n/, 2)[1]?.trim();
   }
 

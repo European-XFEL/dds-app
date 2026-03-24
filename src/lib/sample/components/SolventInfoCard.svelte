@@ -33,10 +33,12 @@
   <Card.Content class="max-w-md">
     <Table.Root>
       <Table.Body>
-        {#each tooltip as [key, unit, value], i (key)}
+        {#each tooltip as [key, unit, value] (key)}
           <Table.Row>
+            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
             <Table.Cell class="font-medium">{@html key}</Table.Cell>
             <Table.Cell>{value}</Table.Cell>
+            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
             <Table.Cell class="text-end">{@html unit}</Table.Cell>
           </Table.Row>
         {/each}

@@ -14,8 +14,6 @@
     molecules: Molecules;
     ground?: Sample['ground'];
     excited?: Sample['excited'];
-    vizOpen?: boolean;
-    vizCollapseShow?: boolean;
     loading?: boolean;
   };
 
@@ -27,7 +25,7 @@
   }: Props = $props();
 
   let moleculesNames = $derived(
-    new Set(molecules?.map((m) => m.moleculeName)) ?? [],
+    new Set(molecules?.map((m) => m.moleculeName)),
   );
 
   let moleculeName = $state<string>();
