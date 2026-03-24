@@ -34,10 +34,9 @@
 <svelte:head>
   <link rel="icon" href={asset('/favicon.png')} />
   {#await import('katex/dist/katex.min.css') then katexCss}
-    <style>
-{katexCss.default}
-    </style>
+    {katexCss.default}
   {/await}
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
   {@html webManifest}
 </svelte:head>
 
