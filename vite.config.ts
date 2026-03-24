@@ -1,4 +1,3 @@
-import deno from '@deno/vite-plugin';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
@@ -43,11 +42,11 @@ export default defineConfig({
         type: 'module',
       },
     }),
-    deno(),
     visualizer({
       emitFile: true,
       filename: 'stats.html',
-    }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any,
   ],
   server: {
     watch: {

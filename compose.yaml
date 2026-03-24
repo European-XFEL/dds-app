@@ -41,11 +41,9 @@ services:
           path: ./src
           target: /app/src
         - action: rebuild
-          path: ./deno.json
-        - action: rebuild
-          path: ./deno.lock
-        - action: rebuild
           path: ./package.json
+        - action: rebuild
+          path: ./pnpm-lock.yaml
 
   web-preview:
     profiles: [ "preview" ]

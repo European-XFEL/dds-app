@@ -1,12 +1,14 @@
 # syntax=docker/dockerfile:1.20
 
-FROM denoland/deno:2.6.6 AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 
-COPY deno.json* deno.lock* package.json* ./
+RUN corepack enable pnpm
 
-RUN --mount=type=cache,target=/deno-dir \
-    deno install
+COPY package.json pnpm-lock.yaml ./
+
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 
 FROM deps AS dev
@@ -15,28 +17,25 @@ COPY . .
 
 EXPOSE 5173
 
-CMD ["deno", "task", "dev", "--host", "0.0.0.0", "--port", "5173"]
+CMD ["node_modules/.bin/vite", "dev", "--host", "0.0.0.0", "--port", "5173"]
 
 
 FROM dev AS build
 
-RUN deno task build
+RUN pnpm build
 
 
 FROM build AS preview
 
-COPY --from=build /app/ /app/
-
 EXPOSE 4173
 
-CMD ["deno", "task", "preview", "--host", "0.0.0.0", "--port", "4173"]
+CMD ["node_modules/.bin/vite", "preview", "--host", "0.0.0.0", "--port", "4173"]
 
 
-FROM denoland/deno:2.6.6 AS prod
+FROM deps AS prod
 
-COPY --from=build /app/.deno-deploy ./.deno-deploy
-COPY --from=build /app/deno.json* /app/deno.lock* /app/package.json ./
+COPY --from=build /app/build ./build
 
 EXPOSE 3000
 
-CMD ["deno", "run", "-A", "./.deno-deploy/server.ts"]
+CMD ["node", "build/index.js"]
