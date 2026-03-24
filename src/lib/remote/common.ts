@@ -2,6 +2,8 @@ import { DrizzleQueryError } from 'drizzle-orm';
 import Papa from 'papaparse';
 import z from 'zod';
 
+import { error } from '@sveltejs/kit';
+
 import { env } from '$env/dynamic/private';
 
 import { db } from '$lib/server/db';
@@ -14,7 +16,6 @@ import {
 } from '$lib/server/grpc';
 
 import { uploadSchema } from './schema';
-import { error } from '@sveltejs/kit';
 
 const BACKEND_URL = env.BACKEND_URL ?? 'http://localhost:50051';
 
@@ -70,7 +71,7 @@ export async function getMoleculeFileContentImpl(id: string) {
     return error(404, 'Molecule not found');
   }
 
-  return res
+  return res;
 }
 
 type SolventDifferentials = {
@@ -231,9 +232,7 @@ export async function uploadMoleculeImpl({
   }
 }
 
-export async function createFeedbackImpl(
-  data: z.infer<typeof feedbackSchema>,
-) {
+export async function createFeedbackImpl(data: z.infer<typeof feedbackSchema>) {
   let region: unknown = null;
   if (data.region) {
     try {

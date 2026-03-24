@@ -1,18 +1,18 @@
+import { LRUCache } from 'lru-cache';
 import z from 'zod';
-import { LRUCache } from 'lru-cache'
 
 import { invalid } from '@sveltejs/kit';
 
 import { form, query } from '$app/server';
 
 import {
+  createFeedbackImpl,
+  feedbackSchema,
   getDebyeResultImpl,
   getMoleculeFileContentImpl,
   getSolventIQImpl,
   listMoleculesImpl,
   listSolventsImpl,
-  createFeedbackImpl,
-  feedbackSchema,
   simRequest,
   uploadMoleculeImpl,
   uploadSchema,
@@ -20,7 +20,9 @@ import {
 
 const immutableCache = new LRUCache<
   string,
-  Awaited<ReturnType<typeof getMoleculeFileContentImpl>> | Awaited<ReturnType<typeof getSolventIQImpl>> | Awaited<ReturnType<typeof getDebyeResultImpl>>
+  | Awaited<ReturnType<typeof getMoleculeFileContentImpl>>
+  | Awaited<ReturnType<typeof getSolventIQImpl>>
+  | Awaited<ReturnType<typeof getDebyeResultImpl>>
 >({
   max: 1000,
   onInsert: (value, key, reason) => {

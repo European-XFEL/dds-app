@@ -2,11 +2,7 @@ import { getDebyeResult, getSolventIQ } from '$remote';
 
 import type { QRange } from '$lib/types';
 
-import {
-  createQGrid,
-  interpolateLinear,
-  type ScatteringSeries,
-} from './math';
+import { type ScatteringSeries, createQGrid, interpolateLinear } from './math';
 
 export type ScatteringResource<T> = {
   readonly value: T | null;

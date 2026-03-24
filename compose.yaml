@@ -1,8 +1,8 @@
 x-common-env: &common-env
-  BACKEND_URL: "http://backend:50051"
-  DB_USER: "${DB_USER:?error}"
-  DB_PASSWORD: "${DB_PASSWORD:?error}"
-  DB_HOST: "${DOCKER_DB_HOST:-db}"
+  BACKEND_URL: 'http://backend:50051'
+  DB_USER: '${DB_USER:?error}'
+  DB_PASSWORD: '${DB_PASSWORD:?error}'
+  DB_HOST: '${DOCKER_DB_HOST:-db}'
 
 services:
   db:
@@ -15,7 +15,7 @@ services:
       POSTGRES_DB: ${DB_NAME:?error}
     volumes:
       - pgdata:/var/lib/postgresql
-    restart: "unless-stopped"
+    restart: 'unless-stopped'
 
   backend:
     build: ./backend
@@ -23,15 +23,15 @@ services:
       - 50051:50051
 
   web-dev:
-    profiles: [ "dev" ]
+    profiles: ['dev']
     environment:
       <<: *common-env
-      DB_NAME: "xss-app-dev"
+      DB_NAME: 'xss-app-dev'
     build:
       context: .
       target: dev
     ports:
-      - "5173:5173"
+      - '5173:5173'
     depends_on:
       - db
       - backend
@@ -46,27 +46,27 @@ services:
           path: ./pnpm-lock.yaml
 
   web-preview:
-    profiles: [ "preview" ]
+    profiles: ['preview']
     environment:
       <<: *common-env
-      DB_NAME: "xss-app-preview"
+      DB_NAME: 'xss-app-preview'
     build:
       context: .
       target: preview
     ports:
-      - "4173:4173"
+      - '4173:4173'
 
   web:
-    profiles: [ "prod" ]
+    profiles: ['prod']
     environment:
       <<: *common-env
-      DB_NAME: "xss-app"
-      BASE_PATH: "/xss-app"
+      DB_NAME: 'xss-app'
+      BASE_PATH: '/xss-app'
     build:
       context: .
       target: prod
     ports:
-      - "8000:8000"
+      - '8000:8000'
 
 volumes:
   pgdata:

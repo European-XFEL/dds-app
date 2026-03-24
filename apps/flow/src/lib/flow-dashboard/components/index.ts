@@ -1,1 +1,1 @@
-export { default as CardNode } from "./CardNode.svelte";
+export { default as CardNode } from './CardNode.svelte';

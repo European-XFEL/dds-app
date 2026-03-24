@@ -33,8 +33,10 @@
 
 <svelte:head>
   <link rel="icon" href={asset('/favicon.png')} />
-  {#await import("katex/dist/katex.min.css") then katexCss}
-    <style>{katexCss.default}</style>
+  {#await import('katex/dist/katex.min.css') then katexCss}
+    <style>
+{katexCss.default}
+    </style>
   {/await}
   {@html webManifest}
 </svelte:head>
