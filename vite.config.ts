@@ -15,7 +15,6 @@ const disabledRoutes = process.env.DISABLED_ROUTES
   ? process.env.DISABLED_ROUTES.split(',')
   : ['(app)/flow'];
 
-
 function stubDisabledRoute(disabledRoute: string) {
   return {
     name: `stub-disabled-${disabledRoute}-routes`,
@@ -92,7 +91,9 @@ export default defineConfig({
       ignored: [
         '**/node_modules/**',
         '**/.svelte-kit/**',
+        '**/.svelte-kit-static/**',
         '**/build/**',
+        '**/build-static/**',
         '**/backend/**',
       ],
     },
