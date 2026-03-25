@@ -122,7 +122,11 @@ function parseRemotePath(pathname: string): RemotePathInfo | null {
   const normalizedPath = pathname.replace(/^\/+|\/+$/g, '');
   const segments = normalizedPath.split('/');
 
-  if (segments.length < 4 || segments[0] !== '_app' || segments[1] !== 'remote') {
+  if (
+    segments.length < 4 ||
+    segments[0] !== '_app' ||
+    segments[1] !== 'remote'
+  ) {
     return null;
   }
 
@@ -185,7 +189,9 @@ function rewriteRemoteUrl(requestUrl: URL, proxyUrl: string): URL | null {
   return nextUrl;
 }
 
-async function tryServeLocalPrerenderedRemote(request: Request): Promise<Response | null> {
+async function tryServeLocalPrerenderedRemote(
+  request: Request,
+): Promise<Response | null> {
   if (!['GET', 'HEAD'].includes(request.method)) {
     return null;
   }
@@ -298,7 +304,8 @@ function ensureProxyRoute(): void {
         return fetch(request);
       }
 
-      const localPrerenderedResponse = await tryServeLocalPrerenderedRemote(request);
+      const localPrerenderedResponse =
+        await tryServeLocalPrerenderedRemote(request);
       if (localPrerenderedResponse) {
         return localPrerenderedResponse;
       }
