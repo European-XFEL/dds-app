@@ -1,0 +1,2 @@
+patchedDependencies:
+  '@sveltejs/kit': utils/@sveltejs__kit.patch
