@@ -24,9 +24,7 @@
     loading = false,
   }: Props = $props();
 
-  let moleculesNames = $derived(
-    new Set(molecules?.map((m) => m.moleculeName)),
-  );
+  let moleculesNames = $derived(new Set(molecules?.map((m) => m.moleculeName)));
 
   let moleculeName = $state<string>();
 

@@ -35,7 +35,7 @@
       () => solvent?.id,
       (v) => {
         if (solvents && v !== undefined) {
-          solvent = solvents.find((s) => s.id === v);
+          solvent = solvents.find((s) => s.id === v) ?? null;
         }
       }
     }

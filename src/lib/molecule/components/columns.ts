@@ -129,7 +129,7 @@ export function createMoleculeColumns(handlers: MoleculeTableHandlers) {
           });
 
         return renderComponent(Cells.StateBadge, {
-          state: getValue(),
+          state: getValue() as number,
         });
       },
     }),
@@ -148,7 +148,11 @@ export function createMoleculeColumns(handlers: MoleculeTableHandlers) {
           isEditing,
           editValue: handlers.editValue,
           onStartEdit: () =>
-            handlers.onStartEdit(molecule.id, 'reference', molecule.reference),
+            handlers.onStartEdit(
+              molecule.id,
+              'reference',
+              molecule.reference ?? null,
+            ),
           onSave: handlers.onSaveEdit,
           onCancel: handlers.onCancelEdit,
           onEditValueChange: handlers.onEditValueChange,
@@ -179,7 +183,7 @@ export function createMoleculeColumns(handlers: MoleculeTableHandlers) {
       cell: ({ row, getValue }) => {
         if (row.depth === 0) return '';
         return renderComponent(Cells.Text, {
-          text: getValue(),
+          text: getValue() ?? null,
           class: 'text-xs text-muted-foreground font-mono',
         });
       },
@@ -190,7 +194,7 @@ export function createMoleculeColumns(handlers: MoleculeTableHandlers) {
       cell: ({ row, getValue }) => {
         if (row.depth === 0) return '';
         return renderComponent(Cells.SHA, {
-          sha: getValue(),
+          sha: getValue() as string,
         });
       },
     }),
@@ -200,7 +204,7 @@ export function createMoleculeColumns(handlers: MoleculeTableHandlers) {
       cell: ({ row, getValue }) => {
         if (row.depth === 0) return '';
         return renderComponent(Cells.Date, {
-          date: getValue(),
+          date: getValue() as string,
         });
       },
     }),
@@ -210,7 +214,7 @@ export function createMoleculeColumns(handlers: MoleculeTableHandlers) {
       cell: ({ row, getValue }) => {
         if (row.depth === 0) return '';
         return renderComponent(Cells.Date, {
-          date: getValue(),
+          date: getValue() as string,
         });
       },
     }),

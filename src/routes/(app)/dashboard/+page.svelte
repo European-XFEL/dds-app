@@ -19,7 +19,7 @@
   } from '$lib/simulation/scattering.svelte';
   import { useSimulationState } from '$lib/state.svelte';
 
-  let simulation = $state(useSimulationState());
+  const simulation = useSimulationState();
 
   type ListsResult = {
     solvents: Awaited<ReturnType<typeof listSolvents>>;
@@ -163,7 +163,7 @@
     <Resizable.Pane defaultSize={20} class="flex max-w-2xl min-w-110">
       <ScrollArea class="flex-1">
         <div class="mt-4 mr-4 mb-4">
-          <ConfigPane bind:simulation {molecules} {solvents} {short} />
+          <ConfigPane {simulation} {molecules} {solvents} {short} />
         </div>
       </ScrollArea>
     </Resizable.Pane>

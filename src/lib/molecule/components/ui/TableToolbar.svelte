@@ -9,7 +9,8 @@
   import { Input } from '$shadcn/ui/input';
 
   type Props = {
-    table: Table<unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    table: Table<any>;
     globalFilter: string;
     onGlobalFilterChange: (value: string) => void;
   };
