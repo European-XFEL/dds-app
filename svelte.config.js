@@ -76,7 +76,7 @@ const config_static = {
   ...config,
   kit: {
     ...config.kit,
-    adapter: adapter_static(),
+    adapter: adapter_static({pages: 'build-static'}),
   },
 };
 
