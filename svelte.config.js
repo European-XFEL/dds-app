@@ -36,6 +36,7 @@ const config = {
       $css: './src/app.css',
       $components: './src/components',
       $shadcn: './src/lib/shadcn/components',
+      $remote: "./src/lib/remote/dynamic.remote.ts",
     },
     experimental: {
       remoteFunctions: true,
@@ -65,10 +66,6 @@ const config_node = {
   kit: {
     ...config.kit,
     adapter: adapter_node(),
-    alias: {
-      ...config.kit?.alias,
-      $remote: './src/lib/remote/dynamic.remote.ts',
-    },
     prerender: {
       entries: ['/', '/docs', '/experiment/detector', '/experiment/pump-probe'],
     },
@@ -80,10 +77,6 @@ const config_static = {
   kit: {
     ...config.kit,
     adapter: adapter_static(),
-    alias: {
-      ...config.kit?.alias,
-      $remote: './src/lib/remote/static.remote.ts',
-    },
   },
 };
 
