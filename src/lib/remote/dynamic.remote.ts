@@ -49,7 +49,8 @@ export const listSolvents = query(async () => {
 });
 
 export const getMoleculeFileContent = query(z.string(), async (id: string) => {
-  let res = immutableCache.get(id);
+  type R = Awaited<ReturnType<typeof getMoleculeFileContentImpl>>;
+  let res = immutableCache.get(id) as R | undefined;
 
   if (!res) {
     res = await getMoleculeFileContentImpl(id);
@@ -59,7 +60,8 @@ export const getMoleculeFileContent = query(z.string(), async (id: string) => {
 });
 
 export const getSolventIQ = query(z.string(), async (id: string) => {
-  let res = immutableCache.get(id);
+  type R = Awaited<ReturnType<typeof getSolventIQImpl>>;
+  let res = immutableCache.get(id) as R | undefined;
 
   if (!res) {
     res = await getSolventIQImpl(id);
@@ -70,8 +72,9 @@ export const getSolventIQ = query(z.string(), async (id: string) => {
 });
 
 export const getDebyeResult = query(simRequest, async (request) => {
+  type R = Awaited<ReturnType<typeof getDebyeResultImpl>>;
   const id = JSON.stringify(request);
-  let res = immutableCache.get(id);
+  let res = immutableCache.get(id) as R | undefined;
 
   if (!res) {
     res = await getDebyeResultImpl(request);

@@ -9,7 +9,8 @@
   import { Button } from '$lib/shadcn/components/ui/button';
 
   type Props = ComponentProps<typeof Button> & {
-    column: Column<unknown, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    column: Column<any, any>;
     text?: string;
   };
 

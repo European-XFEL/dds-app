@@ -1,6 +1,6 @@
 import { listSolvents } from '$remote';
 
-import { Molecule } from '$lib/types';
+import type { Molecule } from '$lib/types';
 
 export type Solvents = Awaited<ReturnType<typeof listSolvents>>;
 
