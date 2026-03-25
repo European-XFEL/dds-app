@@ -36,7 +36,7 @@ const config = {
       $css: './src/app.css',
       $components: './src/components',
       $shadcn: './src/lib/shadcn/components',
-      $remote: "./src/lib/remote/dynamic.remote.ts",
+      $remote: "./src/lib/remote/remote.ts",
     },
     experimental: {
       remoteFunctions: true,
