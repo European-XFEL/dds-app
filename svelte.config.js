@@ -36,7 +36,7 @@ const config = {
       $css: './src/app.css',
       $components: './src/components',
       $shadcn: './src/lib/shadcn/components',
-      $remote: "./src/lib/remote/common.remote.ts",
+      $remote: './src/lib/remote/common.remote.ts',
     },
     experimental: {
       remoteFunctions: true,
@@ -76,7 +76,7 @@ const config_static = {
   ...config,
   kit: {
     ...config.kit,
-    adapter: adapter_static({pages: 'build-static'}),
+    adapter: adapter_static({ pages: 'build-static' }),
   },
 };
 

@@ -179,7 +179,9 @@
   <Card.Root>
     <Card.Header>
       <Card.Title>Service Worker Status</Card.Title>
-      <Card.Description>Current runtime state of the PWA worker.</Card.Description>
+      <Card.Description
+        >Current runtime state of the PWA worker.</Card.Description
+      >
     </Card.Header>
     <Card.Content>
       <Field.Set>
@@ -187,11 +189,15 @@
           <Field.Field>
             <Field.Label>Support</Field.Label>
             <div class="flex items-center gap-2">
-              <Badge variant={supportsServiceWorker ? 'secondary' : 'destructive'}>
+              <Badge
+                variant={supportsServiceWorker ? 'secondary' : 'destructive'}
+              >
                 {supportsServiceWorker ? 'Available' : 'Unavailable'}
               </Badge>
               <span class="text-sm text-muted-foreground">
-                {supportsServiceWorker ? 'Browser supports service workers.' : 'Upgrade your browser.'}
+                {supportsServiceWorker
+                  ? 'Browser supports service workers.'
+                  : 'Upgrade your browser.'}
               </span>
             </div>
           </Field.Field>
@@ -295,9 +301,8 @@
               <Field.Label>Proxy URL</Field.Label>
               <Input
                 bind:value={draftProxyUrl}
-                placeholder={
-                  defaults.proxyUrl ?? 'https://sim.foo.bar:8080/_app/remote'
-                }
+                placeholder={defaults.proxyUrl ??
+                  'https://sim.foo.bar:8080/_app/remote'}
               />
               <Field.Description>
                 Example: https://sim.foo.bar:8080/_app/remote
