@@ -6,6 +6,7 @@
 
   import { SetupChecklist } from '$lib/dashboard';
   import ConfigPane from '$lib/dashboard/components/ConfigPane.svelte';
+  import MoleculePane from '$lib/dashboard/components/MoleculePane.svelte';
   import ResultsPane from '$lib/dashboard/components/ResultsPane.svelte';
   import {
     createScatteringResource,
@@ -141,12 +142,14 @@
 
 <div class="-mt-4 -mr-4 h-lvh" bind:clientWidth={w}>
   <Resizable.PaneGroup {direction} class="max-w-full gap-4 rounded-lg">
-    <Resizable.Pane
-      defaultSize={70}
-      class="mt-4 flex items-center justify-center *:w-full"
-    >
+    <Resizable.Pane defaultSize={70} class="mt-4 flex overflow-hidden *:w-full">
       {#if hasAll}
-        <ResultsPane {...results} />
+        <ScrollArea class="flex-1">
+          <div class="mr-2 pb-4">
+            <ResultsPane {...results} />
+            <MoleculePane {simulation} {hasAll} />
+          </div>
+        </ScrollArea>
       {:else}
         <SetupChecklist
           {hasGroundMolecule}

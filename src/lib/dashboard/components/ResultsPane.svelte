@@ -17,7 +17,7 @@
   const { ...results }: Props = $props();
 </script>
 
-<div class="flex h-lvh flex-col items-center gap-6 overflow-hidden p-4">
+<div class="flex w-full flex-col items-center gap-6 p-4">
   <h1 class="text-2xl font-bold">Simulation Results</h1>
 
   <div class="flow-row w-max items-center gap-3">
