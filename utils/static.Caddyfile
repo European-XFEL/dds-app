@@ -1,7 +1,7 @@
 :8080
 
 handle_path /xss-app/* {
-	root * build
+	root * build-static
 	try_files {path}.html
 	file_server
 }
