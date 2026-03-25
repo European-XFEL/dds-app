@@ -6,9 +6,10 @@
     Position,
   } from '@xyflow/svelte';
 
+  import { MoleculeCard } from '$lib/molecule';
   import { ProbeSetupCard } from '$lib/probe';
   import { PumpSetupCard } from '$lib/pump/';
-  import { MoleculeCard, SolventCard, SolventInfoCard } from '$lib/sample';
+  import { SolventCard, SolventInfoCard } from '$lib/sample';
 
   type CardType =
     | 'MoleculeCard'
@@ -39,7 +40,7 @@
   {#if Card}
     {#if data}
       <!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
-      <Card {...(data as any)} />
+      <Card {...data as any} />
     {:else}
       <Card />
     {/if}

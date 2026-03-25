@@ -17,7 +17,7 @@
 
   import { browser } from '$app/environment';
 
-  import * as components from './components/';
+  import * as components from './components';
 
   const nodeTypes: NodeTypes = {
     SolventCard: components.CardNode,

@@ -56,6 +56,7 @@
   const solventResource = createScatteringResource(
     () =>
       fetchDeltaSSolvent(
+        simulation.qRange,
         simulation.sample.solvent!.id,
         calculations.ratioSolventSolute!,
         calculations.deltaT!,
