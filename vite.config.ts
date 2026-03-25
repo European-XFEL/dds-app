@@ -8,6 +8,39 @@ import lucidePreprocess from 'vite-plugin-lucide-preprocess';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 const isProd = process.env.NODE_ENV === 'production';
+const disabledRoutes = process.env.DISABLED_ROUTES
+  ? process.env.DISABLED_ROUTES.split(',')
+  : ['(app)/flow'];
+
+
+function stubDisabledRoute(disabledRoute: string) {
+  return {
+    name: `stub-disabled-${disabledRoute}-routes`,
+    enforce: 'pre' as const,
+    load(id: string) {
+      // Vite may append query parameters to module IDs
+      const cleanId = id.split('?', 1)[0];
+
+      const isDisabledRouteModule =
+        cleanId.includes(`/routes/${disabledRoute}/`) ||
+        cleanId.includes(`\\routes\\${disabledRoute}\\`);
+
+      if (!isDisabledRouteModule) {
+        return;
+      }
+
+      if (cleanId.endsWith('.svelte')) {
+        console.log(`Stubbing out route ${disabledRoute} component ${cleanId}`);
+
+        return `
+          <h1>Disabled route</h1>
+        `;
+      }
+
+      return;
+    },
+  };
+}
 
 export default defineConfig({
   define: {
@@ -18,6 +51,7 @@ export default defineConfig({
     lucidePreprocess(),
     tailwindcss(),
     sveltekit(),
+    ...disabledRoutes.map(stubDisabledRoute),
     SvelteKitPWA({
       mode: isProd ? 'production' : 'development',
       includeAssets: ['favicon.png'],
