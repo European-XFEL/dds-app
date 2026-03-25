@@ -8,6 +8,9 @@ import lucidePreprocess from 'vite-plugin-lucide-preprocess';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 const isProd = process.env.NODE_ENV === 'production';
+
+const enableServiceWorker = process.env.ENABLE_SERVICE_WORKER === 'true';
+
 const disabledRoutes = process.env.DISABLED_ROUTES
   ? process.env.DISABLED_ROUTES.split(',')
   : ['(app)/flow'];
@@ -53,6 +56,7 @@ export default defineConfig({
     sveltekit(),
     ...disabledRoutes.map(stubDisabledRoute),
     SvelteKitPWA({
+      disable: !enableServiceWorker,
       mode: isProd ? 'production' : 'development',
       includeAssets: ['favicon.png'],
       manifest: {
