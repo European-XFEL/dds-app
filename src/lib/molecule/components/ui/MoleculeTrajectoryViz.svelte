@@ -18,55 +18,56 @@
 
   // `Trajectory` only accepts a URL — no raw string prop — so we encode the
   // merged XYZ as a data: URI.  This keeps the heavy matterviz dep client-side.
-  const merge_xyz = (
-    ground_xyz?: string,
-    excited_xyz?: string,
+  const mergeXyz = (
+    groundXyz?: string,
+    excitedXyz?: string,
   ): string | undefined => {
-    if (!ground_xyz || !excited_xyz) return undefined;
-    return `${ground_xyz.trimEnd()}\n${excited_xyz.trimEnd()}\n`;
+    if (!groundXyz || !excitedXyz) return undefined;
+    return `${groundXyz.trimEnd()}\n${excitedXyz.trimEnd()}\n`;
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let Trajectory = $state<any>(null);
+  let Trajectory = $state<
+    null | (typeof import('matterviz/trajectory'))['Trajectory']
+  >(null);
 
-  let data_url = $state<string | null>(null);
+  let dataUrl = $state<string | null>(null);
   let loading = $state(false);
-  let load_error = $state(false);
+  let loadError = $state(false);
 
   $effect(() => {
-    const ground_id = ground?.id;
-    const excited_id = excited?.id;
+    const groundId = ground?.id;
+    const excitedId = excited?.id;
 
-    if (!ground_id || !excited_id) {
-      data_url = null;
+    if (!groundId || !excitedId) {
+      dataUrl = null;
       loading = false;
-      load_error = false;
+      loadError = false;
       return;
     }
 
     let cancelled = false;
     loading = true;
-    load_error = false;
-    data_url = null;
+    loadError = false;
+    dataUrl = null;
 
     Promise.all([
-      getMoleculeFileContent(ground_id),
-      getMoleculeFileContent(excited_id),
+      getMoleculeFileContent(groundId),
+      getMoleculeFileContent(excitedId),
     ])
       .then(([ground_data, excited_data]) => {
         if (cancelled) return;
-        const merged = merge_xyz(ground_data?.contents, excited_data?.contents);
+        const merged = mergeXyz(ground_data?.contents, excited_data?.contents);
         if (merged) {
           const encoded = encodeURIComponent(merged);
-          data_url = `data:chemical/x-xyz;charset=utf-8,${encoded}#trajectory.xyz`;
+          dataUrl = `data:chemical/x-xyz;charset=utf-8,${encoded}#trajectory.xyz`;
         } else {
-          load_error = true;
+          loadError = true;
         }
         loading = false;
       })
       .catch(() => {
         if (cancelled) return;
-        load_error = true;
+        loadError = true;
         loading = false;
       });
 
@@ -80,21 +81,21 @@
     Trajectory = mod.Trajectory;
   });
 
-  let placeholder_title = $derived.by(() => {
+  let placeholderTitle = $derived.by(() => {
     if (!Trajectory) return 'Loading MatterViz...';
     if (!ground?.id || !excited?.id)
       return 'Select ground and excited molecules';
     if (loading) return 'Loading trajectory...';
-    if (load_error) return 'Molecule files not found';
+    if (loadError) return 'Molecule files not found';
     return undefined;
   });
 
-  let placeholder_description = $derived.by(() => {
+  let placeholderDescription = $derived.by(() => {
     if (!Trajectory) return '';
     if (!ground?.id || !excited?.id)
       return 'Select a ground and excited molecule to view the trajectory.';
     if (loading) return 'Concatenating XYZ structures for animation.';
-    if (load_error) return 'Check the selected structures.';
+    if (loadError) return 'Check the selected structures.';
     return undefined;
   });
 </script>
@@ -104,21 +105,21 @@
     <div
       class="relative aspect-square max-h-[50vh] w-full max-w-3xl border border-muted/50"
     >
-      {#if Trajectory && data_url}
+      {#if Trajectory && dataUrl}
         <div class="absolute inset-0" transition:fade>
           <Trajectory
-            {data_url}
+            data_url={dataUrl}
             auto_play={false}
             fps={10}
             style="height: 100%; width: 100%"
           />
         </div>
       {:else}
-        {#key `${placeholder_title}|${placeholder_description}`}
+        {#key `${placeholderTitle}|${placeholderDescription}`}
           <div class="absolute inset-0" transition:fade>
             <Placeholder
-              title={placeholder_title}
-              description={placeholder_description}
+              title={placeholderTitle}
+              description={placeholderDescription}
             />
           </div>
         {/key}

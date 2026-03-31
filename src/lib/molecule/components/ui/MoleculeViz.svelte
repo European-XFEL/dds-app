@@ -15,53 +15,61 @@
 
   let { molecule }: Props = $props();
 
-  let structure_string = $state<string | undefined>(undefined);
+  let structureString = $state<string | undefined>(undefined);
   let loading = $state(false);
-  let not_found = $state(false);
+  let notFound = $state(false);
 
   $effect(() => {
-    const molecule_id = molecule?.id;
+    const moleculeId = molecule?.id;
 
-    if (!molecule_id) {
-      structure_string = undefined;
+    if (!moleculeId) {
+      structureString = undefined;
       loading = false;
-      not_found = false;
+      notFound = false;
       return;
     }
 
     let cancelled = false;
     loading = true;
-    not_found = false;
-    structure_string = undefined;
+    notFound = false;
+    structureString = undefined;
 
-    getMoleculeFileContent(molecule_id).then((data) => {
-      if (cancelled) return;
-      structure_string = data?.contents;
-      not_found = !data?.contents;
-      loading = false;
-    });
+    getMoleculeFileContent(moleculeId)
+      .then((data) => {
+        if (cancelled) return;
+        structureString = data?.contents;
+        notFound = !data?.contents;
+        loading = false;
+      })
+      .catch(() => {
+        if (cancelled) return;
+        structureString = undefined;
+        notFound = true;
+        loading = false;
+      });
 
     return () => {
       cancelled = true;
     };
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let Structure = $state<any>(null);
+  let Structure = $state<
+    null | (typeof import('matterviz/structure'))['Structure']
+  >(null);
 
   onMount(async () => {
     const mod = await import('matterviz/structure');
     Structure = mod.Structure;
   });
 
-  let placeholder_title = $derived.by(() => {
+  let placeholderTitle = $derived.by(() => {
     if (!Structure) return 'Loading MatterViz...';
     if (!molecule?.id) return 'No molecule selected';
-    if (not_found) return 'Molecule file not found';
+    if (notFound) return 'Molecule file not found';
     return undefined;
   });
 
-  let placeholder_description = $derived.by(() => {
+  let placeholderDescription = $derived.by(() => {
     if (!Structure) return '';
     if (!molecule?.id) return 'Select a molecule to view its structure.';
     if (loading) return 'Loading molecule...';
@@ -71,17 +79,22 @@
 
 <Field.Field>
   <Field.Content class="flex items-center justify-center">
-    <div class="relative aspect-square w-full max-w-3xl border border-muted/50">
-      {#if Structure && structure_string}
+    <div
+      class="relative aspect-square max-h-[50vh] w-full max-w-3xl border border-muted/50"
+    >
+      {#if Structure && structureString}
         <div class="absolute inset-0" transition:fade>
-          <Structure {structure_string} style="height: 100%; width: 100%" />
+          <Structure
+            structure_string={structureString}
+            style="height: 100%; width: 100%"
+          />
         </div>
       {:else}
-        {#key `${placeholder_title}|${placeholder_description}`}
+        {#key `${placeholderTitle}|${placeholderDescription}`}
           <div class="absolute inset-0" transition:fade>
             <Placeholder
-              title={placeholder_title}
-              description={placeholder_description}
+              title={placeholderTitle}
+              description={placeholderDescription}
             />
           </div>
         {/key}

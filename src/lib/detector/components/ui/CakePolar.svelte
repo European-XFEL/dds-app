@@ -157,9 +157,9 @@
     </text>
   {/each}
   {#each chiLabels as chi (chi)}
-    {@const chi_rad = (chi * Math.PI) / 180}
+    {@const chiRad = (chi * Math.PI) / 180}
     {@const y =
-      ((chi_rad - chiRange[0]) / (chiRange[1] - chiRange[0])) *
+      ((chiRad - chiRange[0]) / (chiRange[1] - chiRange[0])) *
       panelShape.height}
     <text
       x="6"

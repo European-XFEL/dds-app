@@ -35,7 +35,7 @@
     );
   }
 
-  const radius_rings = [50, 100, 150, 200] as const;
+  const radiusRings = [50, 100, 150, 200] as const;
 
   // This was previously in a div wrapper:
   // <div
@@ -71,7 +71,7 @@
     height={panelShape.height}
     fill="url(#detectorGrid)"
   />
-  {#each radius_rings as radius (radius)}
+  {#each radiusRings as radius (radius)}
     <circle
       in:draw|global={{ duration: 3000, delay: 500 }}
       cx={beamCenter.x}

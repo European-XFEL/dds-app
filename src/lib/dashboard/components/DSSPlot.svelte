@@ -15,7 +15,7 @@
 
   let clipToDetector = $state(false);
 
-  const ref_lines = $derived.by(() => {
+  const refLines = $derived.by(() => {
     if (!detectorQRange) return [];
     return [
       {
@@ -78,7 +78,7 @@
   {#await import('matterviz/plot') then { ScatterPlot }}
     <ScatterPlot
       {series}
-      {ref_lines}
+      ref_lines={refLines}
       x_axis={{ label: 'q (Å⁻¹)', range: xRange }}
       y_axis={{ label: 'ΔS (a.u.)' }}
       style="height: 320px"
