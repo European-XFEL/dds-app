@@ -142,22 +142,24 @@
 
 <div class="-mt-4 -mr-4 h-lvh" bind:clientWidth={w}>
   <Resizable.PaneGroup {direction} class="max-w-full gap-4 rounded-lg">
-    <Resizable.Pane defaultSize={70} class="mt-4 flex overflow-hidden *:w-full">
+    <Resizable.Pane defaultSize={70} class="mt-4 flex overflow-hidden">
       {#if hasAll}
-        <ScrollArea class="flex-1">
+        <ScrollArea class="w-full flex-1">
           <div class="mr-2 pb-4">
             <ResultsPane {...results} />
             <MoleculePane {simulation} {hasAll} />
           </div>
         </ScrollArea>
       {:else}
-        <SetupChecklist
-          {hasGroundMolecule}
-          {hasExcitedMolecule}
-          {hasSolvent}
-          {hasDetector}
-          {hasPump}
-        />
+        <div class="flex w-full flex-1 items-center justify-center px-4 pb-4">
+          <SetupChecklist
+            {hasGroundMolecule}
+            {hasExcitedMolecule}
+            {hasSolvent}
+            {hasDetector}
+            {hasPump}
+          />
+        </div>
       {/if}
     </Resizable.Pane>
 
