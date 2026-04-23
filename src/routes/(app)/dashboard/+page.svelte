@@ -1,5 +1,5 @@
 <script lang="ts">
-  import * as Resizable from '$shadcn/ui/resizable/index.js';
+  
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
   import { listMolecules, listSolvents } from '$remote';
@@ -134,38 +134,30 @@
   );
 
   let w: number | null = $state(null);
-  let direction: 'horizontal' | 'vertical' = $derived(
-    (w ?? 1000) > 900 ? 'horizontal' : 'vertical',
-  );
 </script>
 
-<div class="-mt-4 -mr-4 h-lvh" bind:clientWidth={w}>
-  <Resizable.PaneGroup {direction} class="max-w-full gap-4 rounded-lg">
-    <Resizable.Pane
-      defaultSize={70}
-      class="mt-4 flex items-center justify-center *:w-full"
-    >
-      {#if hasAll}
-        <ResultsPane {...results} />
-      {:else}
-        <SetupChecklist
-          {hasGroundMolecule}
-          {hasExcitedMolecule}
-          {hasSolvent}
-          {hasDetector}
-          {hasPump}
-        />
-      {/if}
-    </Resizable.Pane>
+<div class="h-lvh pr-[460px]" bind:clientWidth={w}>
+  <div class="flex h-full items-center justify-center">
+    {#if hasAll}
+      <ResultsPane {...results} />
+    {:else}
+      <SetupChecklist
+        {hasGroundMolecule}
+        {hasExcitedMolecule}
+        {hasSolvent}
+        {hasDetector}
+        {hasPump}
+      />
+    {/if}
+  </div>
 
-    <Resizable.Handle />
-
-    <Resizable.Pane defaultSize={20} class="flex max-w-2xl min-w-110">
-      <ScrollArea class="flex-1">
-        <div class="mt-4 mr-4 mb-4">
-          <ConfigPane {simulation} {molecules} {solvents} {short} />
-        </div>
-      </ScrollArea>
-    </Resizable.Pane>
-  </Resizable.PaneGroup>
+  <div
+    class="bg-background/80 fixed top-16 right-4 bottom-4 w-[440px] overflow-hidden rounded-xl border shadow-lg backdrop-blur-sm"
+  >
+    <ScrollArea class="h-full">
+      <div class="p-4">
+        <ConfigPane {simulation} {molecules} {solvents} {short} />
+      </div>
+    </ScrollArea>
+  </div>
 </div>
