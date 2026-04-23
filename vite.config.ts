@@ -51,8 +51,8 @@ export default defineConfig({
   plugins: [
     isProd ? devtoolsJson() : null,
     lucidePreprocess(),
-    tailwindcss(),
     sveltekit(),
+    tailwindcss(),
     ...disabledRoutes.map(stubDisabledRoute),
     SvelteKitPWA({
       disable: !enableServiceWorker,
