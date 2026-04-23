@@ -47,7 +47,7 @@
 </script>
 
 <div
-  class="chart"
+  class="h-[400px] w-full"
   {@attach (node) => {
     const chart = echarts.init(node);
 
@@ -70,10 +70,3 @@
     };
   }}
 ></div>
-
-<style>
-  .chart {
-    width: 100%;
-    height: 400px;
-  }
-</style>
