@@ -2,7 +2,6 @@
   import {
     Beaker,
     BookOpen,
-    Flower,
     Fullscreen,
     GitCompare,
     History,
@@ -37,12 +36,6 @@
           title: 'Dashboard',
           url: '/dashboard',
           icon: LayoutDashboard,
-        },
-        {
-          title: 'Flow',
-          // url: '/flow',
-          icon: Flower,
-          disabled: true,
         },
         {
           title: 'Docs',
