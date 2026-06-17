@@ -127,15 +127,10 @@ export function createQGrid(qRange: QRange): number[] {
   const { min, max, step } = qRange;
   const estimatedSteps = Math.floor((max - min) / step);
   const count = Math.max(estimatedSteps + 1, 1);
-  const qValues: number[] = [];
 
-  for (let index = 0; index < count; index += 1) {
-    const value = min + index * step;
-    if (value > max + step * 0.5) break;
-    qValues.push(value);
-  }
-
-  return qValues;
+  return Array.from({ length: count }, (_, index) => min + index * step).filter(
+    (value) => value <= max + step * 0.5,
+  );
 }
 
 export function interpolateLinear(
@@ -149,7 +144,7 @@ export function interpolateLinear(
   }
 
   if (!x.length) {
-    return xNew.map(() => Number.NaN);
+    return new Array(xNew.length).fill(Number.NaN);
   }
 
   const clamp = options.clamp ?? false;
@@ -200,13 +195,13 @@ export function computeDeltaS(
     return null;
   }
 
-  const combinedI = deltaSSolute.i.map((soluteVal, index) => {
-    const soluteContribution = soluteVal * excitedFraction;
-    const solventContribution = deltaSSolvent.i[index];
-    return soluteContribution + solventContribution;
-  });
-
-  return { q: deltaSSolute.q, i: combinedI };
+  return {
+    q: deltaSSolute.q,
+    i: deltaSSolute.i.map(
+      (soluteVal, index) =>
+        soluteVal * excitedFraction + deltaSSolvent.i[index],
+    ),
+  };
 }
 
 export function scaleSoluteByExcitedFraction(
