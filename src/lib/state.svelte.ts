@@ -2,15 +2,8 @@ import { getContext, hasContext, setContext } from 'svelte';
 
 import { DetectorState } from '$lib/detector/state.svelte';
 import { SampleState } from '$lib/sample/state.svelte';
-import type { Pump, QRange, XRayProbe } from '$lib/types';
 
-export type SimulationSeed = {
-  qRange: QRange;
-  pump: Pump;
-  probe: XRayProbe;
-};
-
-const DEFAULT_SEED: SimulationSeed = {
+const DEFAULT = {
   qRange: {
     min: 0.005253,
     max: 8.498164,
@@ -28,47 +21,17 @@ const DEFAULT_SEED: SimulationSeed = {
 
 const APP_STATE_KEY = Symbol('simulation-state');
 
-function mergeSeed(seed?: Partial<SimulationSeed>): SimulationSeed {
-  return {
-    qRange: { ...DEFAULT_SEED.qRange, ...seed?.qRange },
-    pump: { ...DEFAULT_SEED.pump, ...seed?.pump },
-    probe: { ...DEFAULT_SEED.probe, ...seed?.probe },
-  };
-}
-
 export class SimulationState {
-  qRange = $state(structuredClone(DEFAULT_SEED.qRange));
-  pump = $state(structuredClone(DEFAULT_SEED.pump));
-  probe = $state(structuredClone(DEFAULT_SEED.probe));
+  qRange = $state(structuredClone(DEFAULT.qRange));
+  pump = $state(structuredClone(DEFAULT.pump));
+  probe = $state(structuredClone(DEFAULT.probe));
 
   detector = new DetectorState('LPD');
   sample = new SampleState();
-
-  reset(seed: SimulationSeed) {
-    this.qRange.min = seed.qRange.min;
-    this.qRange.max = seed.qRange.max;
-    this.qRange.step = seed.qRange.step;
-
-    this.pump.photonEnergyEv = seed.pump.photonEnergyEv;
-    this.pump.excitedStateEnergyEv = seed.pump.excitedStateEnergyEv;
-    this.pump.excitedStateFraction = seed.pump.excitedStateFraction;
-
-    this.probe.wavelength = seed.probe.wavelength;
-  }
 }
 
-export function createSimulationSeed(
-  seed?: Partial<SimulationSeed>,
-): SimulationSeed {
-  return structuredClone(mergeSeed(seed));
-}
-
-export function createSimulationState(
-  seed = createSimulationSeed(),
-): SimulationState {
-  const state = new SimulationState();
-  state.reset(seed);
-  return state;
+export function createSimulationState(): SimulationState {
+  return new SimulationState();
 }
 
 export function setSimulationState(state: SimulationState): void {
