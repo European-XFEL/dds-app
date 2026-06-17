@@ -12,6 +12,14 @@ const pyodideReady = (async () => {
   return pyodide;
 })();
 
+/**
+ * Looks up thermodynamic properties for a chemical by name via the `thermo`
+ * Python package running in Pyodide.
+ *
+ * @returns A tuple `[rhom, Cpm]`:
+ *   - `rhom` — molar density in mol/m³
+ *   - `Cpm`  — molar heat capacity in J/mol/K
+ */
 export async function queryChemicalPyodide(
   name: string,
 ): Promise<[number, number]> {
