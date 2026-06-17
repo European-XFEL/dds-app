@@ -1,4 +1,7 @@
 <script lang="ts">
+  import ChevronDown from '@lucide/svelte/icons/chevron-down';
+
+  import { Button } from '$shadcn/ui/button/index.js';
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
@@ -146,8 +149,35 @@
   );
 </script>
 
-<div class="-mt-4 -mr-4 h-lvh" bind:clientWidth={w}>
-  <Resizable.PaneGroup {direction} class="max-w-full gap-4 rounded-lg">
+<div class="-mt-4 -mr-4 flex h-lvh flex-col" bind:clientWidth={w}>
+  <header
+    class="flex min-h-20 shrink-0 flex-wrap items-center justify-between gap-4 border-b bg-background px-7 py-4"
+  >
+    <div class="min-w-0">
+      <h1 class="truncate text-lg font-semibold">FeBpy3: LS → HS in DCM</h1>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Untitled run · last run 2 min ago
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <Button variant="outline" class="h-12 bg-transparent px-4 text-sm">
+        Save run
+      </Button>
+      <Button variant="outline" class="h-12 bg-transparent px-4 text-sm">
+        Export
+        <ChevronDown class="size-4" />
+      </Button>
+      <Button variant="outline" class="h-12 bg-transparent px-4 text-sm">
+        Add to compare
+      </Button>
+    </div>
+  </header>
+
+  <Resizable.PaneGroup
+    {direction}
+    class="min-h-0 max-w-full flex-1 gap-4 rounded-lg"
+  >
     <Resizable.Pane defaultSize={70} class="mt-4 flex overflow-hidden">
       {#if hasAll}
         <ScrollArea class="w-full flex-1">
@@ -189,7 +219,7 @@
 
     <Resizable.Pane defaultSize={20} class="flex max-w-2xl min-w-110">
       <ScrollArea class="flex-1">
-        <div class="mt-4 mr-4 mb-4">
+        <div class="m-4">
           <ConfigPane {simulation} {molecules} {solvents} {short} />
         </div>
       </ScrollArea>

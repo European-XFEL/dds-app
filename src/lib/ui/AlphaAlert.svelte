@@ -4,7 +4,7 @@
   import * as Alert from '$shadcn/ui/alert';
 </script>
 
-<Alert.Root variant="destructive" class="border-0">
+<Alert.Root variant="destructive" class="bg-destructive/10">
   <Alert.Title>
     <div class="flex items-center gap-2">
       <CircleAlert class="h-4 w-4" />
