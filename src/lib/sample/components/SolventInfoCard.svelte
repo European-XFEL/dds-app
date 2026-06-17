@@ -10,7 +10,7 @@
 
   let { solvent }: Props = $props();
 
-  const tooltip = $derived.by(() => {
+  const rows = $derived.by(() => {
     // if (!solvent) return;
     return [
       ['ρ<sub>m</sub>', 'mol/m<sup>3</sup>', solvent?.rhom.toPrecision(5)],
@@ -33,7 +33,7 @@
   <Card.Content class="max-w-md">
     <Table.Root>
       <Table.Body>
-        {#each tooltip as [key, unit, value] (key)}
+        {#each rows as [key, unit, value] (key)}
           <Table.Row>
             <!-- eslint-disable-next-line svelte/no-at-html-tags -->
             <Table.Cell class="font-medium">{@html key}</Table.Cell>
