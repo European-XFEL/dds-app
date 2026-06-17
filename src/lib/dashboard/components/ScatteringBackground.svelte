@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
-  import { browser } from '$app/environment';
-
   const CONFIG = {
     pixelSize: 8,
     maxIntensity: 30,
@@ -282,7 +280,7 @@
     pixelsY = Math.ceil(height / CONFIG.pixelSize);
     const beamCenterX = pixelsX * CONFIG.beamCenter.x;
     const beamCenterY = pixelsY * CONFIG.beamCenter.y;
-    const maxRadius = Math.sqrt(pixelsX * pixelsX + pixelsY * pixelsY) / 2;
+    const maxRadius = Math.hypot(pixelsX, pixelsY) / 2;
 
     // Create programs
     updateProgram = createProgram(VERTEX_SHADER, UPDATE_SHADER);
@@ -343,7 +341,7 @@
         const idx = (py * pixelsX + px) * 4;
         const dx = px - beamCenterX;
         const dy = py - beamCenterY;
-        const normalizedRadius = Math.sqrt(dx * dx + dy * dy) / maxRadius;
+        const normalizedRadius = Math.hypot(dx, dy) / maxRadius;
         probData[idx] = computeScatteringIntensity(normalizedRadius);
       }
     }
@@ -538,8 +536,6 @@
   }
 
   onMount(() => {
-    if (!browser) return;
-
     // Detect dark mode
     isDarkMode = document.documentElement.classList.contains('dark');
 

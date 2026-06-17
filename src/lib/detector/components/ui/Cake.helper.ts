@@ -59,7 +59,7 @@ export function detectorToPolar(
   const dx = point.x - center.x;
   const dy = point.y - center.y;
 
-  const r = Math.sqrt(dx * dx + dy * dy);
+  const r = Math.hypot(dx, dy);
   const phi = Math.atan2(dy, dx);
   const twoTheta = radiusToTwoTheta(r, detectorDistance);
 
