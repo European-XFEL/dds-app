@@ -50,17 +50,6 @@ export function computeQRangeFromModules(params: {
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-  const distancePointToPointPx = (
-    cx: number,
-    cy: number,
-    x: number,
-    y: number,
-  ): number => {
-    const dx = x - cx;
-    const dy = y - cy;
-    return Math.sqrt(dx * dx + dy * dy);
-  };
-
   let rMinPx = Number.POSITIVE_INFINITY;
   let rMaxPx = 0;
 
@@ -88,7 +77,7 @@ export function computeQRangeFromModules(params: {
       [x1, y1],
     ];
     for (const [cx, cy] of corners) {
-      const r = distancePointToPointPx(bc.x, bc.y, cx, cy);
+      const r = Math.hypot(cx - bc.x, cy - bc.y);
       if (r > rMaxPx) rMaxPx = r;
     }
   }
