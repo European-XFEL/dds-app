@@ -67,9 +67,10 @@
   const xRange: [number | null, number | null] = $derived.by(() => {
     if (!clipToDetector) return [0, qValues[qValues.length - 1]];
 
-    let min = detectorQRange ? detectorQRange[0] * 0.9 : null;
-    let max = detectorQRange ? detectorQRange[1] * 1.1 : null;
-    return [min, max];
+    return [
+      detectorQRange ? detectorQRange[0] * 0.9 : null,
+      detectorQRange ? detectorQRange[1] * 1.1 : null,
+    ];
   });
 </script>
 
