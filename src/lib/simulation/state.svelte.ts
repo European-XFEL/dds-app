@@ -1,5 +1,4 @@
 import {
-  type ScatteringMathResults,
   computeConcentrationExcited,
   computeConcentrationSolvent,
   computeDeltaEJ,
@@ -18,7 +17,7 @@ export type ScatteringMathSources = {
   solventCpm: () => number | null | undefined;
 };
 
-export class ScatteringMathState implements ScatteringMathResults {
+export class ScatteringMathState {
   readonly concentrationSolvent = $derived.by(() =>
     computeConcentrationSolvent(this.sources.solventRhom()),
   );

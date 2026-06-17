@@ -7,16 +7,6 @@ export type ScatteringSeries = {
   i: number[];
 };
 
-export interface ScatteringMathResults {
-  readonly concentrationSolvent?: number;
-  readonly concentrationExcited?: number;
-  readonly ratioSolventSolute?: number;
-  readonly deltaEeV: number;
-  readonly deltaEJ: number;
-  readonly deltaT?: number;
-  readonly excitedStateFraction: number;
-}
-
 export type InterpolationOptions = {
   clamp?: boolean;
 };

@@ -7,11 +7,9 @@ import {
   ScatteringMathState,
 } from './state.svelte';
 
-export type ScatteringCalculations = ScatteringMathState;
-
 export function createScatteringCalculations(
   simulation: SimulationState,
-): ScatteringCalculations {
+): ScatteringMathState {
   const throttledExcitedStateFraction = throttled(
     () => simulation.pump.excitedStateFraction,
     THROTTLE_INTERVAL_MS,
