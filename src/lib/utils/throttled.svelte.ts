@@ -10,7 +10,7 @@
  * @example
  * ```svelte
  * <script>
- *   import { throttled } from '$lib/utils/debounce.svelte';
+ *   import { throttled } from '$lib/utils/throttled.svelte';
  *
  *   let count = $state(0);
  *   const throttledCount = throttled(() => count, 200);
