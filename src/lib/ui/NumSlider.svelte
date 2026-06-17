@@ -5,7 +5,7 @@
   import { Label } from '$shadcn/ui/label/index.js';
 
   type Props = {
-    value: any;
+    value: number | string | null;
     label: string;
     classNum?: string;
     classRange?: string;

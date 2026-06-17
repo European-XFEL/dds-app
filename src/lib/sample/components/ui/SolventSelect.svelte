@@ -44,7 +44,7 @@
       {triggerSolvent}
     </Select.Trigger>
     <Select.Content class="w-(--radix-select-trigger-width)">
-      {#each solvents as { id, name } (id)}
+      {#each solvents ?? [] as { id, name } (id)}
         <Select.Item value={id} label={name}>
           {name}
         </Select.Item>

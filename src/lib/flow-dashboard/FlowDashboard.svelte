@@ -21,7 +21,7 @@
 
   const nodeTypes: NodeTypes = {
     SolventCard: components.CardNode,
-    SampleCard: components.CardNode,
+    MoleculeCard: components.CardNode,
     ProbeSetupCard: components.CardNode,
     PumpSetupCard: components.CardNode,
   };
