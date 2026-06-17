@@ -38,10 +38,9 @@ export interface Health {
   backend: BackendHealth;
 }
 
-export interface Capability {
-  available: boolean;
-  reason: string;
-}
+export type Capability =
+  | { available: true }
+  | { available: false; reason: string };
 
 export type Capabilities = {
   upload: Capability;

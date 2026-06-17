@@ -1,4 +1,4 @@
-import { Capabilities, Health } from '$lib/server/health';
+import type { Capabilities, Health } from '$lib/server/types';
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces

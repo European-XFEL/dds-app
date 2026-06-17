@@ -4,7 +4,13 @@ import { env } from '$env/dynamic/private';
 import { PUBLIC_TARGET } from '$env/static/public';
 
 import { db } from './db';
-import type { BackendHealth, Capabilities, DbHealth, Health } from './types';
+import type {
+  BackendHealth,
+  Capabilities,
+  Capability,
+  DbHealth,
+  Health,
+} from './types';
 
 const HEALTH_TTL_MS = 10_000;
 const BACKEND_TIMEOUT_MS = 300;
@@ -121,24 +127,19 @@ export async function getHealth(
 const DB_UNAVAILABLE_REASON = 'Database connection unavailable';
 const BACKEND_UNAVAILABLE_REASON = 'Backend service unavailable';
 
+function capability(available: boolean, reason: string): Capability {
+  return available ? { available: true } : { available: false, reason };
+}
+
 export async function getCapabilities(
   fetcher: typeof fetch = fetch,
 ): Promise<Capabilities> {
   const health = await getHealth(fetcher);
 
-  const res = {
-    upload: {
-      available: health.db.healthy,
-      reason: DB_UNAVAILABLE_REASON,
-    },
-    feedback: {
-      available: health.db.healthy,
-      reason: DB_UNAVAILABLE_REASON,
-    },
-    simulation: {
-      available: health.backend.healthy,
-      reason: BACKEND_UNAVAILABLE_REASON,
-    },
+  const res: Capabilities = {
+    upload: capability(health.db.healthy, DB_UNAVAILABLE_REASON),
+    feedback: capability(health.db.healthy, DB_UNAVAILABLE_REASON),
+    simulation: capability(health.backend.healthy, BACKEND_UNAVAILABLE_REASON),
   };
 
   if (PUBLIC_TARGET === 'static') {
