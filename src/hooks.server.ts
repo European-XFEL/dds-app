@@ -22,6 +22,11 @@ const ORIGINS = parseAllowedOrigins(
   env.ALLOWED_ORIGINS ?? env.PUBLIC_TRUSTED_ORIGINS,
 );
 
+// Remote query methods whose results are dynamic (e.g. change after an upload)
+// and so must NOT receive the long-lived immutable cache headers below. The
+// remote path format is `/_app/remote/<hash>/<method>[/<payload>]`.
+const DYNAMIC_REMOTE_METHODS = /\/(listMolecules|listSolvents)(\/|$)/;
+
 export const handle: Handle = async ({ event, resolve }) => {
   const origin = event.request.headers.get('origin') ?? '';
   const isAllowedOrigin = ORIGINS.includes(origin);
@@ -77,7 +82,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   if (isRemoteRequest && res.ok) {
     if (event.request.method === 'GET') {
-      if (!event.url.pathname.endsWith('(listMolecules|listSolvents)')) {
+      if (!DYNAMIC_REMOTE_METHODS.test(event.url.pathname)) {
         res.headers.set(
           'cache-control',
           'public, max-age=31536000, s-maxage=31536000, immutable',
