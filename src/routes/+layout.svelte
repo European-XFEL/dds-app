@@ -1,8 +1,5 @@
 <script lang="ts">
   import '$css';
-  import { pwaInfo } from 'virtual:pwa-info';
-
-  import { onMount } from 'svelte';
 
   import { asset } from '$app/paths';
 
@@ -14,21 +11,6 @@
 
   const simulation = createSimulationState();
   setSimulationState(simulation);
-
-  function applySystemTheme() {
-    document.documentElement.classList.toggle(
-      'dark',
-      localStorage.theme === 'dark' ||
-        (!('theme' in localStorage) &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches),
-    );
-  }
-
-  const webManifest = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
-
-  onMount(async () => {
-    applySystemTheme();
-  });
 </script>
 
 <svelte:head>
@@ -36,8 +18,6 @@
   {#await import('katex/dist/katex.min.css') then katexCss}
     {katexCss.default}
   {/await}
-  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-  {@html webManifest}
 </svelte:head>
 
 <Sidebar.Provider style="--sidebar-width: 19rem">
