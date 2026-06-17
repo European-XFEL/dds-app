@@ -57,11 +57,7 @@
     ro.observe(node);
 
     $effect(() => {
-      chart.setOption({ series: series }, { lazyUpdate: true });
-    });
-
-    $effect(() => {
-      chart.setOption({ xAxis: xAxis }, { lazyUpdate: true });
+      chart.setOption({ series: series, xAxis: xAxis }, { lazyUpdate: true });
     });
 
     return () => {
