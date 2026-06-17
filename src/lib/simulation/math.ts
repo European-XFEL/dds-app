@@ -7,15 +7,6 @@ export type ScatteringSeries = {
   i: number[];
 };
 
-export type ScatteringMathInputs = {
-  concentrationSoluteMolar?: number | null;
-  excitedStateFraction?: number | null;
-  photonEnergyEv?: number | null;
-  excitedStateEnergyEv?: number | null;
-  solventRhom?: number | null;
-  solventCpm?: number | null;
-};
-
 export interface ScatteringMathResults {
   readonly concentrationSolvent?: number;
   readonly concentrationExcited?: number;
@@ -30,6 +21,12 @@ export type InterpolationOptions = {
   clamp?: boolean;
 };
 
+/**
+ * Solvent molar concentration in mol/L.
+ *
+ * `rhom` is the solvent molar density in mol/m³ (as stored from the thermo
+ * data); dividing by 1000 converts mol/m³ → mol/L.
+ */
 export function computeConcentrationSolvent(
   solventRhom?: number | null,
 ): number | undefined {
@@ -70,6 +67,22 @@ export function computeDeltaEJ(deltaEeV: number): number {
   return deltaEeV * EV_TO_JOULES;
 }
 
+/**
+ * Solvent temperature rise (in Kelvin) from energy deposited by the excited
+ * solute molecules.
+ *
+ * Physical model: each excited molecule releases `deltaEJ` joules into the
+ * surrounding solvent. The energy released per mole of excited solute is
+ * `deltaEJ * N_AVOGADRO` (J/mol), and the per-molecule energy is shared across
+ * the solvent in proportion to the excited-solute / solvent concentration
+ * ratio. Dividing by the solvent molar heat capacity `solventCpm` (J/mol/K)
+ * yields a temperature change in Kelvin:
+ *
+ *   ΔT = (cExcited / cSolvent) * (deltaEJ / Cpm) * Nₐ
+ *
+ * `concentrationExcited` and `concentrationSolvent` must share units (mol/L);
+ * the ratio is dimensionless so their unit cancels.
+ */
 export function computeDeltaT(
   concentrationExcited?: number | null,
   concentrationSolvent?: number | null,
@@ -104,58 +117,26 @@ export function normalizeExcitedStateFraction(
   return excitedStateFraction ?? 0;
 }
 
-export function computeScatteringMath(
-  inputs: ScatteringMathInputs,
-): ScatteringMathResults {
-  const concentrationSolvent = computeConcentrationSolvent(inputs.solventRhom);
-  const concentrationExcited = computeConcentrationExcited(
-    inputs.concentrationSoluteMolar,
-    inputs.excitedStateFraction,
+/**
+ * Validates a Q range: all values finite, a positive step, and `max >= min`.
+ * Single source of truth for the QRange invariant, used both to guard grid
+ * construction and to gate reactive fetches.
+ */
+export function isValidQRange(qRange: QRange): boolean {
+  const { min, max, step } = qRange;
+  return (
+    Number.isFinite(min) &&
+    Number.isFinite(max) &&
+    Number.isFinite(step) &&
+    step > 0 &&
+    max >= min
   );
-  const ratioSolventSolute = computeRatioSolventSolute(
-    concentrationSolvent,
-    inputs.concentrationSoluteMolar,
-  );
-  const deltaEeV = computeDeltaEeV(
-    inputs.photonEnergyEv,
-    inputs.excitedStateEnergyEv,
-  );
-  const deltaEJ = computeDeltaEJ(deltaEeV);
-  const deltaT = computeDeltaT(
-    concentrationExcited,
-    concentrationSolvent,
-    deltaEJ,
-    inputs.solventCpm,
-  );
-  const excitedStateFraction = normalizeExcitedStateFraction(
-    inputs.excitedStateFraction,
-  );
-
-  return {
-    concentrationSolvent,
-    concentrationExcited,
-    ratioSolventSolute,
-    deltaEeV,
-    deltaEJ,
-    deltaT,
-    excitedStateFraction,
-  };
 }
 
 export function createQGrid(qRange: QRange): number[] {
+  if (!isValidQRange(qRange)) return [];
+
   const { min, max, step } = qRange;
-  if (
-    !Number.isFinite(min) ||
-    !Number.isFinite(max) ||
-    !Number.isFinite(step)
-  ) {
-    return [];
-  }
-
-  if (step <= 0 || max < min) {
-    return [];
-  }
-
   const estimatedSteps = Math.floor((max - min) / step);
   const count = Math.max(estimatedSteps + 1, 1);
   const qValues: number[] = [];
@@ -210,6 +191,15 @@ export function interpolateLinear(
   });
 }
 
+/**
+ * Combined difference-scattering signal ΔS(q): the solute contribution scaled
+ * by the excited-state fraction, summed with the solvent contribution.
+ *
+ *   ΔS = (excitedFraction · ΔS_solute) + ΔS_solvent
+ *
+ * Both series are assumed to be sampled on the same q-grid, aligned by index
+ * (enforced via the length check below); mismatched grids return null.
+ */
 export function computeDeltaS(
   deltaSSolute: ScatteringSeries | null,
   deltaSSolvent: ScatteringSeries | null,
