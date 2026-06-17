@@ -14,16 +14,9 @@
 
   let { apps }: { apps: AppOption[] } = $props();
 
-  // svelte-ignore state_referenced_locally
-  // TODO: remove this when/if multiple apps exist
-  const currentApp = apps[0];
-
   const sidebar = useSidebar();
-  let selectedApp = $state<AppOption | undefined>(currentApp);
-  const fallbackApp = $derived(apps[0]) as AppOption | undefined;
-  const displayApp = $derived(
-    selectedApp && apps.includes(selectedApp) ? selectedApp : fallbackApp,
-  ) as AppOption | undefined;
+  let selectedApp = $state<AppOption | undefined>(apps[0]);
+  const displayApp = $derived(selectedApp ?? apps[0]) as AppOption | undefined;
   const displayTitle = $derived(displayApp?.title ?? 'Select App');
 
   function handleSelect(app: AppOption) {
