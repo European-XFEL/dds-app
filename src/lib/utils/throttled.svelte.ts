@@ -33,12 +33,6 @@ export function throttled<T>(
     const now = Date.now();
     const timeSinceLastUpdate = now - lastUpdateTime;
 
-    // Clear any pending trailing update
-    if (pendingTimeoutId !== undefined) {
-      clearTimeout(pendingTimeoutId);
-      pendingTimeoutId = undefined;
-    }
-
     if (timeSinceLastUpdate >= interval) {
       // Enough time has passed, update immediately
       value = newValue;
