@@ -37,6 +37,12 @@ export default defineConfig(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      'complexity': ['warn', 10],
+      'max-depth': ['warn', 4],
+      'max-params': ['warn', 4],
+      'max-lines-per-function': ['warn', 50],
+      'max-statements': ['warn', 20],
+      'max-nested-callbacks': ['warn', 3]
     },
   },
   {
