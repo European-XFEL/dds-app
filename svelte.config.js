@@ -7,7 +7,6 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 const TARGET = process.env.PUBLIC_TARGET;
 const STATIC = TARGET === 'static';
-const enableServiceWorker = process.env.ENABLE_SERVICE_WORKER === 'true';
 
 function gitVersion() {
   try {
@@ -40,9 +39,6 @@ const config = {
     },
     experimental: {
       remoteFunctions: true,
-    },
-    serviceWorker: {
-      register: enableServiceWorker,
     },
     csrf: {
       trustedOrigins: [

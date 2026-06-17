@@ -8,7 +8,6 @@
     LayoutDashboard,
     Microscope,
     Projector,
-    Settings,
     TestTube,
     Upload,
   } from '@lucide/svelte';
@@ -162,20 +161,6 @@
     <Sidebar.Menu>
       <FeedbackDialog />
       <BugsFeatures />
-      <Sidebar.MenuItem>
-        <Sidebar.MenuButton>
-          {#snippet tooltipContent()}
-            Settings
-          {/snippet}
-          {#snippet child({ props })}
-            {@const href = resolve('/settings')}
-            <a {href} {...props}>
-              <Settings />
-              <span>Settings</span>
-            </a>
-          {/snippet}
-        </Sidebar.MenuButton>
-      </Sidebar.MenuItem>
     </Sidebar.Menu>
   </Sidebar.GroupContent>
 </Sidebar.Group>
