@@ -1,12 +1,5 @@
 <script lang="ts">
-  import {
-    Atom,
-    Beaker,
-    Check,
-    FlaskConical,
-    Fullscreen,
-    Projector,
-  } from '@lucide/svelte';
+  import { Atom, Beaker, Check, FlaskConical } from '@lucide/svelte';
 
   import * as Card from '$lib/shadcn/components/ui/card';
   import { cn } from '$lib/shadcn/utils';
@@ -21,17 +14,9 @@
     hasGroundMolecule: boolean;
     hasExcitedMolecule: boolean;
     hasSolvent: boolean;
-    hasDetector: boolean;
-    hasPump: boolean;
   }
 
-  let {
-    hasGroundMolecule,
-    hasExcitedMolecule,
-    hasSolvent,
-    hasDetector,
-    hasPump,
-  }: Props = $props();
+  let { hasGroundMolecule, hasExcitedMolecule, hasSolvent }: Props = $props();
 
   const items = $derived<ChecklistItem[]>([
     { label: 'Select Solvent', completed: hasSolvent, icon: Beaker },
@@ -44,16 +29,6 @@
       label: 'Select Excited Molecule',
       completed: hasExcitedMolecule,
       icon: Atom,
-    },
-    {
-      label: 'Configure IR Optical Pump and Probe',
-      completed: hasPump,
-      icon: Projector,
-    },
-    {
-      label: 'Configure Detector',
-      completed: hasDetector,
-      icon: Fullscreen,
     },
   ]);
 

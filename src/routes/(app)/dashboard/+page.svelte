@@ -8,6 +8,7 @@
   import ConfigPane from '$lib/dashboard/components/ConfigPane.svelte';
   import MoleculePane from '$lib/dashboard/components/MoleculePane.svelte';
   import ResultsPane from '$lib/dashboard/components/ResultsPane.svelte';
+  import { isValidQRange } from '$lib/simulation/math';
   import {
     createScatteringResource,
     fetchDeltaSSolute,
@@ -53,11 +54,8 @@
         simulation.sample.excited!.id,
       ),
     () =>
-      !!(
-        simulation.sample.ground?.id &&
-        simulation.sample.excited?.id &&
-        simulation.qRange
-      ),
+      !!(simulation.sample.ground?.id && simulation.sample.excited?.id) &&
+      isValidQRange(simulation.qRange),
   );
 
   const solventResource = createScatteringResource(
@@ -69,11 +67,10 @@
         calculations.deltaT!,
       ),
     () =>
-      !!(
-        simulation.sample.solvent?.id &&
-        calculations.ratioSolventSolute != null &&
-        calculations.deltaT != null
-      ),
+      !!simulation.sample.solvent?.id &&
+      calculations.ratioSolventSolute != null &&
+      calculations.deltaT != null &&
+      isValidQRange(simulation.qRange),
   );
 
   const deltaS = $derived(
@@ -124,15 +121,24 @@
   const hasGroundMolecule = $derived(!!simulation.sample.ground?.id);
   const hasExcitedMolecule = $derived(!!simulation.sample.excited?.id);
   const hasSolvent = $derived(!!simulation.sample.solvent?.id);
-  const hasDetector = $derived(!!simulation.detector);
-  const hasPump = $derived(!!simulation.pump);
   const hasAll = $derived(
-    hasGroundMolecule &&
-      hasExcitedMolecule &&
-      hasSolvent &&
-      hasDetector &&
-      hasPump,
+    hasGroundMolecule && hasExcitedMolecule && hasSolvent,
   );
+
+  // Surface any fetch failure so a backend/DB/parse error is visible rather
+  // than silently rendering as an empty chart.
+  const fetchError = $derived(
+    listResource.error ?? soluteResource.error ?? solventResource.error,
+  );
+  const isFetching = $derived(
+    listResource.loading || soluteResource.loading || solventResource.loading,
+  );
+
+  function retryFetches() {
+    void listResource.refetch();
+    void soluteResource.refetch();
+    void solventResource.refetch();
+  }
 
   let w: number | null = $state(null);
   let direction: 'horizontal' | 'vertical' = $derived(
@@ -146,6 +152,24 @@
       {#if hasAll}
         <ScrollArea class="w-full flex-1">
           <div class="mr-2 pb-4">
+            {#if fetchError}
+              <div
+                role="alert"
+                class="mb-2 flex items-center justify-between gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+              >
+                <span>Failed to compute scattering: {fetchError.message}</span>
+                <button
+                  class="rounded border border-destructive/40 px-2 py-1 font-medium hover:bg-destructive/20"
+                  onclick={retryFetches}
+                >
+                  Retry
+                </button>
+              </div>
+            {:else if isFetching}
+              <p class="mb-2 px-1 text-sm text-muted-foreground">
+                Computing scattering signals…
+              </p>
+            {/if}
             <ResultsPane {...results} />
             <MoleculePane {simulation} {hasAll} />
           </div>
@@ -156,8 +180,6 @@
             {hasGroundMolecule}
             {hasExcitedMolecule}
             {hasSolvent}
-            {hasDetector}
-            {hasPump}
           />
         </div>
       {/if}
