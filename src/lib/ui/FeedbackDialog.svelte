@@ -59,8 +59,6 @@
   let selectionError = $state<string | null>(null);
 
   const pageUrl = $derived(page.url.href);
-  const regionJson = $derived(region ? JSON.stringify(region) : '');
-  const regionImageValue = $derived(regionImage ?? '');
 
   const selectionRect = $derived.by(() => {
     if (!drag) return null;
@@ -153,7 +151,6 @@
   async function captureRegion(rect: RegionRect) {
     if (!browser) return null;
     const target = document.documentElement;
-    if (!target) return null;
 
     try {
       const canvas = await toCanvas(target, {
@@ -255,12 +252,12 @@
       <input
         {...submitFeedback.fields.region.as('text')}
         type="hidden"
-        value={regionJson}
+        value={region ? JSON.stringify(region) : ''}
       />
       <input
         {...submitFeedback.fields.regionImage.as('text')}
         type="hidden"
-        value={regionImageValue}
+        value={regionImage ?? ''}
       />
 
       <Field.Set>

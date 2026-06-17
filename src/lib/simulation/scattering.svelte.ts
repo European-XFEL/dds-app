@@ -27,16 +27,14 @@ export function createScatteringCalculations(
     THROTTLE_INTERVAL_MS,
   );
 
-  const sources: ScatteringMathSources = {
+  return new ScatteringMathState({
     concentrationSoluteMolar: () => throttledConcentrationSolute.current,
     excitedStateFraction: () => throttledExcitedStateFraction.current,
     photonEnergyEv: () => throttledPhotonEnergy.current,
     excitedStateEnergyEv: () => throttledExcitedStateEnergy.current,
     solventRhom: () => simulation.sample.solvent?.rhom,
     solventCpm: () => simulation.sample.solvent?.cpm,
-  };
-
-  return new ScatteringMathState(sources);
+  });
 }
 
 export { computeDeltaS, scaleSoluteByExcitedFraction } from './math';

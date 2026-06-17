@@ -35,32 +35,31 @@
 
   const series = $derived.by(() => {
     const q = qValues;
-    const markers = 'line' as const;
 
     return [
       {
         x: q,
         y: deltaSi ?? [],
         label: 'ΔS (Total)',
-        markers,
+        markers: 'line',
       },
       {
         x: q,
         y: deltaSSoluteScaled ?? [],
         label: 'ΔS Solute (α·ΔS)',
-        markers,
+        markers: 'line',
       },
       {
         x: q,
         y: deltaSSolvent ?? [],
         label: 'ΔS Solvent (normalized)',
-        markers,
+        markers: 'line',
       },
       {
         x: q,
         y: deltaSSolventPerMolecule ?? [],
         label: 'ΔS Solvent (per molecule)',
-        markers,
+        markers: 'line',
       },
     ];
   }) as DataSeries[];
