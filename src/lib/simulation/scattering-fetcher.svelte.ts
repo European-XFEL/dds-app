@@ -4,7 +4,14 @@ import type { QRange } from '$lib/types';
 
 import { type ScatteringSeries, createQGrid, interpolateLinear } from './math';
 
+export type ResourceState<T> =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success'; value: T }
+  | { status: 'error'; error: Error };
+
 export type ScatteringResource<T> = {
+  readonly state: ResourceState<T>;
   readonly value: T | null;
   readonly loading: boolean;
   readonly error: Error | null;
@@ -15,58 +22,53 @@ export function createScatteringResource<T>(
   fetcher: () => Promise<T>,
   ready: () => boolean,
 ): ScatteringResource<T> {
-  let value = $state<T | null>(null);
-  let loading = $state(false);
-  let error = $state<Error | null>(null);
+  let state = $state<ResourceState<T>>({ status: 'idle' });
   let requestId = 0;
 
   const runFetch = async () => {
+    // Reading `ready()` synchronously (before any await) is what registers the
+    // resource's reactive dependencies, so callers must read every input they
+    // depend on inside `ready` for the fetch to re-run when they change.
     if (!ready()) {
-      value = null;
-      loading = false;
-      error = null;
+      state = { status: 'idle' };
       return;
     }
 
     const currentRequest = (requestId += 1);
-    loading = true;
-    error = null;
+    state = { status: 'loading' };
 
     try {
-      const result = await fetcher();
+      const value = await fetcher();
       if (currentRequest !== requestId) return;
-      value = result;
+      state = { status: 'success', value };
     } catch (err) {
       if (currentRequest !== requestId) return;
-      error = err instanceof Error ? err : new Error('Unknown fetch error');
-      value = null;
-    } finally {
-      if (currentRequest === requestId) {
-        loading = false;
-      }
+      state = {
+        status: 'error',
+        error:
+          err instanceof Error
+            ? err
+            : new Error('Scattering fetch failed', { cause: err }),
+      };
     }
   };
 
   $effect(() => {
-    if (!ready()) {
-      value = null;
-      loading = false;
-      error = null;
-      return;
-    }
-
     void runFetch();
   });
 
   return {
+    get state() {
+      return state;
+    },
     get value() {
-      return value;
+      return state.status === 'success' ? state.value : null;
     },
     get loading() {
-      return loading;
+      return state.status === 'loading';
     },
     get error() {
-      return error;
+      return state.status === 'error' ? state.error : null;
     },
     refetch: runFetch,
   };
