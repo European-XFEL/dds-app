@@ -68,7 +68,7 @@ export async function getMoleculeFileContentImpl(id: string) {
   });
 
   if (!res) {
-    return error(404, 'Molecule not found');
+    throw error(404, 'Molecule not found');
   }
 
   return res;
@@ -81,33 +81,38 @@ type SolventDifferentials = {
 };
 
 export async function getSolventIQImpl(id: string) {
-  const contents = await db.query.solvents
-    .findFirst({
-      where: { id },
-      columns: {
-        contents: true,
-      },
-    })
-    .then(
-      (s) =>
-        s?.contents ??
-        (() => {
-          return error(404, 'Solvent not found');
-        })(),
-    );
+  const row = await db.query.solvents.findFirst({
+    where: { id },
+    columns: { contents: true },
+  });
 
-  const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents.replaceAll(/#.*\n/g, '');
+  if (!row?.contents) {
+    throw error(404, 'Solvent not found');
+  }
+
+  const contentsCsv =
+    'Q\tdSdT\tdSdRho\n' + row.contents.replaceAll(/#.*\n/g, '');
   const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
     delimiter: '\t',
-    dynamicTyping: false,
+    dynamicTyping: true,
     header: true,
     skipEmptyLines: true,
   });
 
-  const { data } = parsed;
+  if (parsed.errors.length > 0) {
+    console.error(`Failed to parse solvent data for ${id}:`, parsed.errors);
+    throw error(422, `Failed to parse solvent data for ${id}`);
+  }
 
-  const q = data.map((row) => row.Q);
-  const dSdT = data.map((row) => row.dSdT);
+  const q: number[] = [];
+  const dSdT: number[] = [];
+  for (const row of parsed.data) {
+    if (!Number.isFinite(row.Q) || !Number.isFinite(row.dSdT)) {
+      throw error(422, `Solvent data for ${id} contains non-numeric values`);
+    }
+    q.push(row.Q);
+    dSdT.push(row.dSdT);
+  }
 
   return { q, dSdT };
 }
@@ -134,13 +139,13 @@ export async function getDebyeResultImpl(request: z.infer<typeof simRequest>) {
   });
 
   if (!file) {
-    return error(404, 'Molecule not found');
+    throw error(404, 'Molecule not found');
   }
 
   const encoder = new TextEncoder();
   const contents = encoder.encode(file.contents);
 
-  const request_body = {
+  const requestBody = {
     structure: {
       filename: file.filename,
       contents: contents,
@@ -152,27 +157,39 @@ export async function getDebyeResultImpl(request: z.infer<typeof simRequest>) {
     },
   };
 
+  let result;
   try {
-    const result = await simClient.calcDebye(request_body);
-
-    db.insert(schema.intensities)
-      .values({
-        moleculeId: request.fileId,
-        qMin: request.qRange.min,
-        qMax: request.qRange.max,
-        qStep: request.qRange.step,
-        intensity: result.i.map(String),
-        q: result.q.map(String),
-      })
-      .catch((error) =>
-        console.error('Failed to insert intensity result:', error),
-      );
-
-    return result;
-  } catch (error) {
-    console.error('Simulation error:', error);
-    throw error;
+    result = await simClient.calcDebye(requestBody);
+  } catch (err) {
+    console.error('Simulation error:', err);
+    throw err;
   }
+
+  // Best-effort cache write: persist the result for future identical requests.
+  // A failure here must not fail the request, but we await it so the rejection
+  // is handled rather than becoming an unhandled promise rejection, and so a
+  // concurrent duplicate insert (unique violation) is swallowed quietly while
+  // anything unexpected is surfaced.
+  try {
+    await db.insert(schema.intensities).values({
+      moleculeId: request.fileId,
+      qMin: request.qRange.min,
+      qMax: request.qRange.max,
+      qStep: request.qRange.step,
+      intensity: result.i.map(String),
+      q: result.q.map(String),
+    });
+  } catch (err) {
+    const cause =
+      err instanceof DrizzleQueryError
+        ? (err.cause as { code?: string } | undefined)
+        : undefined;
+    if (cause?.code !== '23505') {
+      console.error('Failed to cache intensity result:', err);
+    }
+  }
+
+  return result;
 }
 
 const atomCountLine = /^(\s*\d+)/;
