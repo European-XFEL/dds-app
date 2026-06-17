@@ -11,8 +11,6 @@
   };
 
   let { probe = $bindable(), short = false }: Props = $props();
-
-  let wavelength = $state(probe?.wavelength);
 </script>
 
 <Field.Set>
@@ -27,7 +25,7 @@
     <Field.Field orientation="responsive">
       <NumSlider
         label="X-Ray Wavelength (Å)"
-        bind:value={wavelength}
+        bind:value={probe.wavelength}
         min="0.1"
         max="2.0"
         step="0.01"
