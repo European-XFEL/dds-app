@@ -1,4 +1,4 @@
-import type { QRange } from '$lib/types';
+import type { QRange, Range } from '$lib/types';
 
 export interface Shape {
   readonly width: number;
@@ -24,6 +24,6 @@ export interface Detector {
   beamCenter: CartesianPoint;
   imageShape: Shape;
   readonly modules: DetectorModule[];
-  readonly radiusRange: { min: number; max: number };
+  readonly radiusRange: Range;
   readonly qRange: QRange;
 }

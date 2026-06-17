@@ -25,3 +25,9 @@ export type StructureFile = Omit<FileNoContent, 'type'>;
 export type SolventFile = Omit<FileNoContent, 'type'>;
 
 export type QRange = Omit<protoSim.QRange, '$typeName'>;
+
+/** A numeric interval with the invariant `min <= max`. */
+export interface Range {
+  min: number;
+  max: number;
+}
