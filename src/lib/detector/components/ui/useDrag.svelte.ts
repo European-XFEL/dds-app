@@ -52,7 +52,7 @@ export function useDrag(options: DragOptions): DragState {
 
   function handleMouseMove(event: MouseEvent) {
     const svgElement = getSvgElement();
-    if (!isDragging || !svgElement) return;
+    if (!svgElement) return;
 
     const rect = svgElement.getBoundingClientRect();
     const nextX = event.clientX - rect.left - dragOffset.x;
@@ -68,8 +68,6 @@ export function useDrag(options: DragOptions): DragState {
   }
 
   function removeGlobalListeners() {
-    if (typeof globalThis === 'undefined') return;
-
     globalThis.removeEventListener('mousemove', handleMouseMove);
     globalThis.removeEventListener('mouseup', handleMouseUp);
   }

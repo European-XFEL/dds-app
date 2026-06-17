@@ -89,7 +89,7 @@ export function computeQRangeFromModules(params: {
 
   // Suggested q step: q increment corresponding to ~1 pixel at the largest radius
   // (conservative: smallest dq tends to be at larger radii for this geometry).
-  const rForStep = Math.max(0, rMaxPx);
+  const rForStep = rMaxPx;
   const qAtR = qFromRadiusPx(rForStep);
   const qAtRminus1 = qFromRadiusPx(Math.max(0, rForStep - 1));
   let step = qAtR - qAtRminus1;

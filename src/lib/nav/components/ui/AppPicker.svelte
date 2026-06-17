@@ -27,7 +27,7 @@
   const displayTitle = $derived(displayApp?.title ?? 'Select App');
 
   function handleSelect(app: AppOption) {
-    if (app.disabled || !apps.includes(app)) {
+    if (app.disabled) {
       return;
     }
 
