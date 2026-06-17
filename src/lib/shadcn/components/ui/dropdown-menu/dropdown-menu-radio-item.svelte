@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
-	import CircleIcon from "@lucide/svelte/icons/circle";
+	import { HugeiconsIcon } from "@hugeicons/svelte"
+	import { Tick02Icon } from '@hugeicons/core-free-icons';
 	import { cn, type WithoutChild } from "$lib/shadcn/utils.js";
 
 	let {
@@ -15,17 +16,18 @@
 	bind:ref
 	data-slot="dropdown-menu-radio-item"
 	class={cn(
-		"focus:bg-accent focus:text-accent-foreground outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-sm py-1.5 pe-2 ps-8 text-sm data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+		"focus:bg-accent focus:text-accent-foreground focus:**:text-accent-foreground min-h-7 gap-2 rounded-md py-1.5 pr-8 pl-2 text-xs data-inset:pl-7.5 [&_svg:not([class*='size-'])]:size-3.5 relative flex cursor-default items-center outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		className
 	)}
 	{...restProps}
 >
 	{#snippet children({ checked })}
 		<span
-			class="pointer-events-none absolute start-2 flex size-3.5 items-center justify-center"
+			class="absolute right-2 flex items-center justify-center pointer-events-none"
+			data-slot="dropdown-menu-radio-item-indicator"
 		>
 			{#if checked}
-				<CircleIcon class="size-2 fill-current" />
+				<HugeiconsIcon icon={Tick02Icon} strokeWidth={2}  />
 			{/if}
 		</span>
 		{@render childrenProp?.({ checked })}

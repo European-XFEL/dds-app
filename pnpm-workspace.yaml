@@ -1,2 +1,5 @@
+allowBuilds:
+  '@hugeicons/svelte': true
+  esbuild: true
 patchedDependencies:
   '@sveltejs/kit': utils/@sveltejs__kit.patch

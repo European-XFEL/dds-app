@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
-	import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+	import { HugeiconsIcon } from "@hugeicons/svelte"
+	import { ArrowRight01Icon } from '@hugeicons/core-free-icons';
 	import { cn } from "$lib/shadcn/utils.js";
 
 	let {
@@ -19,11 +20,11 @@
 	data-slot="dropdown-menu-sub-trigger"
 	data-inset={inset}
 	class={cn(
-		"data-highlighted:bg-accent data-highlighted:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground outline-hidden [&_svg:not([class*='text-'])]:text-muted-foreground flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm data-[disabled]:pointer-events-none data-[inset]:ps-8 data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+		"focus:bg-accent focus:text-accent-foreground data-open:bg-accent data-open:text-accent-foreground not-data-[variant=destructive]:focus:**:text-accent-foreground min-h-7 gap-2 rounded-md px-2 py-1 text-xs data-inset:pl-7.5 [&_svg:not([class*='size-'])]:size-3.5 flex cursor-default items-center outline-hidden select-none data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		className
 	)}
 	{...restProps}
 >
 	{@render children?.()}
-	<ChevronRightIcon class="ms-auto size-4" />
+	<HugeiconsIcon icon={ArrowRight01Icon} strokeWidth={2} class="ml-auto" />
 </DropdownMenuPrimitive.SubTrigger>
