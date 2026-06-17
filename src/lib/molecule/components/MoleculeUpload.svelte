@@ -66,14 +66,14 @@
   let atomCountIssues = $derived(uploadForm.fields.atomCount?.issues() ?? []);
   let referenceIssues = $derived(uploadForm.fields.reference?.issues() ?? []);
 
-  let fileInvalid = $derived.by(() => !!fileError || fileIssues.length > 0);
-  let moleculeNameInvalid = $derived.by(
-    () => nameConflict || moleculeNameIssues.length > 0,
+  let fileInvalid = $derived(!!fileError || fileIssues.length > 0);
+  let moleculeNameInvalid = $derived(
+    nameConflict || moleculeNameIssues.length > 0
   );
-  let descriptionInvalid = $derived.by(() => descriptionIssues.length > 0);
-  let stateInvalid = $derived.by(() => stateIssues.length > 0);
-  let atomCountInvalid = $derived.by(() => atomCountIssues.length > 0);
-  let referenceInvalid = $derived.by(() => referenceIssues.length > 0);
+  let descriptionInvalid = $derived(descriptionIssues.length > 0);
+  let stateInvalid = $derived(stateIssues.length > 0);
+  let atomCountInvalid = $derived(atomCountIssues.length > 0);
+  let referenceInvalid = $derived(referenceIssues.length > 0);
 
   function parseAtomCount(contents: string) {
     const firstLine = contents.split(/\r?\n/, 1)[0]?.trim();
@@ -112,8 +112,7 @@
     if (!selected) return;
 
     if (!uploadForm.fields.moleculeName.value()) {
-      const stem = selected.name.replace(/\.[^/.]+$/, '');
-      uploadForm.fields.moleculeName.set(stem);
+      uploadForm.fields.moleculeName.set(filenameStem);
     }
 
     const token = ++fileReadToken;
