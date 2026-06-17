@@ -24,12 +24,10 @@ import {
 
 const STATIC = PUBLIC_TARGET === 'static';
 
-type UploadMoleculeResult = Awaited<ReturnType<typeof uploadMoleculeImpl>>;
-
 type UploadMoleculeResponse =
   | {
       success: true;
-      result: NonNullable<UploadMoleculeResult['result']>;
+      result: NonNullable<Awaited<ReturnType<typeof uploadMoleculeImpl>>['result']>;
       error?: undefined;
     }
   | {
@@ -43,12 +41,7 @@ type CachedValue =
   | Awaited<ReturnType<typeof getSolventIQImpl>>
   | Awaited<ReturnType<typeof getDebyeResultImpl>>;
 
-const immutableCache = new LRUCache<string, CachedValue>({
-  max: 1000,
-  onInsert: (value, key, reason) => {
-    console.log(`Cache insert: key=${key}, reason=${reason}`);
-  },
-});
+const immutableCache = new LRUCache<string, CachedValue>({ max: 1000 });
 
 /**
  * Wraps an impl in a query whose results are memoised in `immutableCache`.
