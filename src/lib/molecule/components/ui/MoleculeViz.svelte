@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   import * as Field from '$shadcn/ui/field/index.js';
@@ -8,6 +7,7 @@
 
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
+  import { useMatterviz } from './useMatterviz.svelte';
 
   interface Props {
     molecule: Sample['ground'] | Sample['excited'];
@@ -53,27 +53,16 @@
     };
   });
 
-  let Structure = $state<
-    null | (typeof import('matterviz/structure'))['Structure']
-  >(null);
+  const { component: Structure } = useMatterviz(() =>
+    import('matterviz/structure').then((m) => m.Structure),
+  );
 
-  onMount(async () => {
-    const mod = await import('matterviz/structure');
-    Structure = mod.Structure;
-  });
-
-  let placeholderTitle = $derived.by(() => {
-    if (!Structure) return 'Loading MatterViz...';
-    if (!molecule?.id) return 'No molecule selected';
-    if (notFound) return 'Molecule file not found';
-    return undefined;
-  });
-
-  let placeholderDescription = $derived.by(() => {
-    if (!Structure) return '';
-    if (!molecule?.id) return 'Select a molecule to view its structure.';
-    if (loading) return 'Loading molecule...';
-    return undefined;
+  const placeholder = $derived.by(() => {
+    if (!Structure) return { title: 'Loading MatterViz...', description: '' };
+    if (!molecule?.id) return { title: 'No molecule selected', description: 'Select a molecule to view its structure.' };
+    if (notFound) return { title: 'Molecule file not found', description: undefined };
+    if (loading) return { title: undefined, description: 'Loading molecule...' };
+    return { title: undefined, description: undefined };
   });
 </script>
 
@@ -90,11 +79,11 @@
           />
         </div>
       {:else}
-        {#key `${placeholderTitle}|${placeholderDescription}`}
+        {#key `${placeholder.title}|${placeholder.description}`}
           <div class="absolute inset-0" transition:fade>
             <Placeholder
-              title={placeholderTitle}
-              description={placeholderDescription}
+              title={placeholder.title}
+              description={placeholder.description}
             />
           </div>
         {/key}

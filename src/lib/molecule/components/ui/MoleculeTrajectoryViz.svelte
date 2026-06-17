@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
 
   import * as Field from '$shadcn/ui/field/index.js';
@@ -8,6 +7,7 @@
 
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
+  import { useMatterviz } from './useMatterviz.svelte';
 
   interface Props {
     ground: Sample['ground'];
@@ -26,9 +26,9 @@
     return `${groundXyz.trimEnd()}\n${excitedXyz.trimEnd()}\n`;
   };
 
-  let Trajectory = $state<
-    null | (typeof import('matterviz/trajectory'))['Trajectory']
-  >(null);
+  const { component: Trajectory } = useMatterviz(() =>
+    import('matterviz/trajectory').then((m) => m.Trajectory),
+  );
 
   let dataUrl = $state<string | null>(null);
   let loading = $state(false);
@@ -76,27 +76,12 @@
     };
   });
 
-  onMount(async () => {
-    const mod = await import('matterviz/trajectory');
-    Trajectory = mod.Trajectory;
-  });
-
-  let placeholderTitle = $derived.by(() => {
-    if (!Trajectory) return 'Loading MatterViz...';
-    if (!ground?.id || !excited?.id)
-      return 'Select ground and excited molecules';
-    if (loading) return 'Loading trajectory...';
-    if (loadError) return 'Molecule files not found';
-    return undefined;
-  });
-
-  let placeholderDescription = $derived.by(() => {
-    if (!Trajectory) return '';
-    if (!ground?.id || !excited?.id)
-      return 'Select a ground and excited molecule to view the trajectory.';
-    if (loading) return 'Concatenating XYZ structures for animation.';
-    if (loadError) return 'Check the selected structures.';
-    return undefined;
+  const placeholder = $derived.by(() => {
+    if (!Trajectory) return { title: 'Loading MatterViz...', description: '' };
+    if (!ground?.id || !excited?.id) return { title: 'Select ground and excited molecules', description: 'Select a ground and excited molecule to view the trajectory.' };
+    if (loading) return { title: 'Loading trajectory...', description: 'Concatenating XYZ structures for animation.' };
+    if (loadError) return { title: 'Molecule files not found', description: 'Check the selected structures.' };
+    return { title: undefined, description: undefined };
   });
 </script>
 
@@ -115,11 +100,11 @@
           />
         </div>
       {:else}
-        {#key `${placeholderTitle}|${placeholderDescription}`}
+        {#key `${placeholder.title}|${placeholder.description}`}
           <div class="absolute inset-0" transition:fade>
             <Placeholder
-              title={placeholderTitle}
-              description={placeholderDescription}
+              title={placeholder.title}
+              description={placeholder.description}
             />
           </div>
         {/key}
