@@ -84,10 +84,6 @@
     return Number.isFinite(parsed) ? parsed : null;
   }
 
-  function _parseComment(contents: string) {
-    return contents.split(/\r?\n/, 2)[1]?.trim();
-  }
-
   if (uploadForm.fields.state.value() === undefined) {
     uploadForm.fields.state.set(0);
   }

@@ -157,13 +157,7 @@ export async function getDebyeResultImpl(request: z.infer<typeof simRequest>) {
     },
   };
 
-  let result;
-  try {
-    result = await simClient.calcDebye(requestBody);
-  } catch (err) {
-    console.error('Simulation error:', err);
-    throw err;
-  }
+  const result = await simClient.calcDebye(requestBody);
 
   // Best-effort cache write: persist the result for future identical requests.
   // A failure here must not fail the request, but we await it so the rejection

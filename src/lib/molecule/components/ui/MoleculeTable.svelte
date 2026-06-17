@@ -72,11 +72,6 @@
         editingCell.field === 'atomCount'
           ? Number.parseInt(value) || 0
           : value || null;
-      console.log(
-        editingCell.id,
-        editingCell.field as keyof Molecule,
-        finalValue,
-      );
     }
     editingCell = null;
     editValue = '';
