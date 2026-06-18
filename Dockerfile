@@ -36,6 +36,6 @@ FROM deps AS prod
 
 COPY --from=build /app/build ./build
 
-EXPOSE 3000
+EXPOSE 8000
 
 CMD ["node", "build/index.js"]
