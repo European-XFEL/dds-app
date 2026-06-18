@@ -1,0 +1,28 @@
+[
+  {
+    "id": "demo-mol-000000000001",
+    "filename": "FeBpy3_LS.xyz",
+    "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "moleculeName": "FeBpy3",
+    "description": "Ground state Geometry 1A1-D3 (LS), https://doi.org/10.1039/C9CP01263J",
+    "state": 0,
+    "reference": "https://doi.org/10.1039/C9CP01263J",
+    "atomCount": 3,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "contents": "3\nGround state Geometry 1A1-D3 (LS)\nFe 0.000000 0.000000 0.000000\nN 1.509294 0.765499 1.045382\nN 1.509294 -0.765499 -1.045382"
+  },
+  {
+    "id": "demo-mol-000000000002",
+    "filename": "FeBpy3_HS.xyz",
+    "sha": "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a",
+    "moleculeName": "FeBpy3",
+    "description": "Excited state Geometry 5T2 (HS), https://doi.org/10.1039/C9CP01263J",
+    "state": 1,
+    "reference": "https://doi.org/10.1039/C9CP01263J",
+    "atomCount": 3,
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "contents": "3\nExcited state Geometry 5T2 (HS)\nFe 0.000000 0.000000 0.000000\nN 1.980000 0.000000 0.000000\nN -1.980000 0.000000 0.000000"
+  }
+]
