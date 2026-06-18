@@ -37,9 +37,6 @@ const config = {
       $shadcn: './src/lib/shadcn/components',
       $remote: './src/lib/remote/common.remote.ts',
     },
-    experimental: {
-      remoteFunctions: true,
-    },
     csrf: {
       trustedOrigins: [
         'https://exfldadev01.desy.de',
@@ -48,11 +45,6 @@ const config = {
     },
     version: { name: VERSION },
     outDir: STATIC ? '.svelte-kit-static' : '.svelte-kit',
-  },
-  compilerOptions: {
-    experimental: {
-      async: true,
-    },
   },
   extensions: ['.svelte', '.svx'],
 };
