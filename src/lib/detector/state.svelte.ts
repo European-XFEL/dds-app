@@ -72,7 +72,7 @@ export class DetectorState implements Detector {
     return { min: this.qRange.rMinPx, max: this.qRange.rMaxPx };
   });
 
-  wavelength = $state<number>();
+  wavelength: number;
 
   constructor(name: keyof typeof DEFAULT_DETECTORS, wavelength: number) {
     const detector = DEFAULT_DETECTORS[name];
@@ -110,13 +110,11 @@ export class DetectorState implements Detector {
       throw new Error(`Detector configuration for ${name} not found.`);
     }
     this.name = detector.name;
-    this.modules = $state(
-      detector.modules.map((mod, index) => ({
-        id: `module-${index + 1}`,
-        shape: { width: mod.shape[0], height: mod.shape[1] },
-        position: { x: mod.position[0], y: mod.position[1] },
-        color: resolveModuleColour(index),
-      })),
-    );
+    this.modules = detector.modules.map((mod, index) => ({
+      id: `module-${index + 1}`,
+      shape: { width: mod.shape[0], height: mod.shape[1] },
+      position: { x: mod.position[0], y: mod.position[1] },
+      color: resolveModuleColour(index),
+    }));
   }
 }
