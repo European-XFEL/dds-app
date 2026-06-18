@@ -4,6 +4,7 @@ import "files.proto";
 
 service SimulationService {
   rpc CalcDebye(SimulationRequest) returns (SimulationResponse);
+  rpc GetSolventInfo(SolventInfoRequest) returns (SolventInfoResponse);
 }
 
 message QRange {
@@ -29,12 +30,10 @@ message SimulationResponse {
 }
 
 message SolventInfoRequest {
-  files.File solvent = 1;
+  string name = 1;
 }
 
 message SolventInfoResponse {
-  double rohm = 1;
+  double rhom = 1;
   double cpm = 2;
-  repeated double q = 3;
-  repeated double ds = 4;
 }

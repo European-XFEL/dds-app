@@ -7,12 +7,25 @@ import { relations } from '../src/lib/server/db/relations.ts';
 import * as schema from '../src/lib/server/db/schema.ts';
 import { getDbUrl } from '../src/lib/server/db/url.ts';
 import { sha256HexFromText } from '../src/lib/server/db/util.ts';
+import {
+  SimulationService,
+  createClient,
+  createConnectTransport,
+} from '../src/lib/server/grpc/index.ts';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import Papa from 'papaparse';
 
 const DATABASE_URL = getDbUrl();
+const BACKEND_URL = process.env.BACKEND_URL ?? 'http://localhost:50051';
 
 const db = drizzle(DATABASE_URL, { schema, relations });
+
+const transport = createConnectTransport({
+  baseUrl: BACKEND_URL,
+  httpVersion: '1.1',
+});
+
+const simClient = createClient(SimulationService, transport);
 
 /**
  * Bootstrap the database with initial molecule and solvent data from files.
@@ -184,12 +197,9 @@ async function seedSolvents(directory: string) {
       rhom = parseFloat(saved_solvent_data.rhom);
       cpm = parseFloat(saved_solvent_data.cpm);
     } else {
-      const queryChemicalPyodide =
-        await import('../src/lib/server/thermo.ts').then(
-          (mod) => mod.queryChemicalPyodide,
-        );
-      const chemPromise = queryChemicalPyodide(name);
-      [rhom, cpm] = await chemPromise;
+      const response = await simClient.getSolventInfo({ name });
+      rhom = response.rhom;
+      cpm = response.cpm;
     }
 
     return {

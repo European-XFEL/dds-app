@@ -12,7 +12,6 @@ class FileTypes(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     FILE_TYPE_UNSPECIFIED: _ClassVar[FileTypes]
     STRUCTURE_FILE: _ClassVar[FileTypes]
     SOLVENT_FILE: _ClassVar[FileTypes]
-
 FILE_TYPE_UNSPECIFIED: FileTypes
 STRUCTURE_FILE: FileTypes
 SOLVENT_FILE: FileTypes
@@ -33,14 +32,7 @@ class File(_message.Message):
     filename: str
     name: str
     contents: bytes
-    def __init__(
-        self,
-        type: _Optional[_Union[FileTypes, str]] = ...,
-        id: _Optional[str] = ...,
-        filename: _Optional[str] = ...,
-        name: _Optional[str] = ...,
-        contents: _Optional[bytes] = ...,
-    ) -> None: ...
+    def __init__(self, type: _Optional[_Union[FileTypes, str]] = ..., id: _Optional[str] = ..., filename: _Optional[str] = ..., name: _Optional[str] = ..., contents: _Optional[bytes] = ...) -> None: ...
 
 class FileMeta(_message.Message):
     __slots__ = ("id", "filename", "name")
@@ -50,12 +42,7 @@ class FileMeta(_message.Message):
     id: str
     filename: str
     name: str
-    def __init__(
-        self,
-        id: _Optional[str] = ...,
-        filename: _Optional[str] = ...,
-        name: _Optional[str] = ...,
-    ) -> None: ...
+    def __init__(self, id: _Optional[str] = ..., filename: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class ListFilesRequest(_message.Message):
     __slots__ = ("type",)
@@ -67,9 +54,7 @@ class ListFilesResponse(_message.Message):
     __slots__ = ("files",)
     FILES_FIELD_NUMBER: _ClassVar[int]
     files: _containers.RepeatedCompositeFieldContainer[FileMeta]
-    def __init__(
-        self, files: _Optional[_Iterable[_Union[FileMeta, _Mapping]]] = ...
-    ) -> None: ...
+    def __init__(self, files: _Optional[_Iterable[_Union[FileMeta, _Mapping]]] = ...) -> None: ...
 
 class GetFileRequest(_message.Message):
     __slots__ = ("type", "id")
@@ -77,9 +62,7 @@ class GetFileRequest(_message.Message):
     ID_FIELD_NUMBER: _ClassVar[int]
     type: FileTypes
     id: str
-    def __init__(
-        self, type: _Optional[_Union[FileTypes, str]] = ..., id: _Optional[str] = ...
-    ) -> None: ...
+    def __init__(self, type: _Optional[_Union[FileTypes, str]] = ..., id: _Optional[str] = ...) -> None: ...
 
 class CreateFileRequest(_message.Message):
     __slots__ = ("type", "filename", "name", "contents")
@@ -91,13 +74,7 @@ class CreateFileRequest(_message.Message):
     filename: str
     name: str
     contents: bytes
-    def __init__(
-        self,
-        type: _Optional[_Union[FileTypes, str]] = ...,
-        filename: _Optional[str] = ...,
-        name: _Optional[str] = ...,
-        contents: _Optional[bytes] = ...,
-    ) -> None: ...
+    def __init__(self, type: _Optional[_Union[FileTypes, str]] = ..., filename: _Optional[str] = ..., name: _Optional[str] = ..., contents: _Optional[bytes] = ...) -> None: ...
 
 class UpdateFileRequest(_message.Message):
     __slots__ = ("File",)
@@ -111,6 +88,4 @@ class DeleteFileRequest(_message.Message):
     ID_FIELD_NUMBER: _ClassVar[int]
     type: FileTypes
     id: str
-    def __init__(
-        self, type: _Optional[_Union[FileTypes, str]] = ..., id: _Optional[str] = ...
-    ) -> None: ...
+    def __init__(self, type: _Optional[_Union[FileTypes, str]] = ..., id: _Optional[str] = ...) -> None: ...

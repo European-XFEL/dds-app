@@ -4,43 +4,46 @@
 # source: simulation.proto
 # Protobuf Python Version: 6.33.5
 """Generated protocol buffer code."""
-
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import runtime_version as _runtime_version
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
-
 _runtime_version.ValidateProtobufRuntimeVersion(
-    _runtime_version.Domain.PUBLIC, 6, 33, 5, "", "simulation.proto"
+    _runtime_version.Domain.PUBLIC,
+    6,
+    33,
+    5,
+    '',
+    'simulation.proto'
 )
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x10simulation.proto\x1a\x0b\x66iles.proto"@\n\x06QRange\x12\x10\n\x03min\x18\x01 \x01(\x01R\x03min\x12\x10\n\x03max\x18\x02 \x01(\x01R\x03max\x12\x12\n\x04step\x18\x03 \x01(\x01R\x04step"\x9d\x01\n\x04Pump\x12(\n\x10photon_energy_ev\x18\x01 \x01(\x01R\x0ephotonEnergyEv\x12\x35\n\x17\x65xcited_state_energy_ev\x18\x02 \x01(\x01R\x14\x65xcitedStateEnergyEv\x12\x34\n\x16\x65xcited_state_fraction\x18\x03 \x01(\x01R\x14\x65xcitedStateFraction"`\n\x11SimulationRequest\x12 \n\x07q_range\x18\x01 \x01(\x0b\x32\x07.QRangeR\x06qRange\x12)\n\tstructure\x18\x02 \x01(\x0b\x32\x0b.files.FileR\tstructure"0\n\x12SimulationResponse\x12\x0c\n\x01q\x18\x01 \x03(\x01R\x01q\x12\x0c\n\x01i\x18\x02 \x03(\x01R\x01i";\n\x12SolventInfoRequest\x12%\n\x07solvent\x18\x01 \x01(\x0b\x32\x0b.files.FileR\x07solvent"Y\n\x13SolventInfoResponse\x12\x12\n\x04rohm\x18\x01 \x01(\x01R\x04rohm\x12\x10\n\x03\x63pm\x18\x02 \x01(\x01R\x03\x63pm\x12\x0c\n\x01q\x18\x03 \x03(\x01R\x01q\x12\x0e\n\x02\x64s\x18\x04 \x03(\x01R\x02\x64s2I\n\x11SimulationService\x12\x34\n\tCalcDebye\x12\x12.SimulationRequest\x1a\x13.SimulationResponseB\x13\x42\x0fSimulationProtoP\x01\x62\x06proto3'
-)
+from . import files_pb2 as files__pb2
+
+
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10simulation.proto\x1a\x0b\x66iles.proto\"0\n\x06QRange\x12\x0b\n\x03min\x18\x01 \x01(\x01\x12\x0b\n\x03max\x18\x02 \x01(\x01\x12\x0c\n\x04step\x18\x03 \x01(\x01\"a\n\x04Pump\x12\x18\n\x10photon_energy_ev\x18\x01 \x01(\x01\x12\x1f\n\x17\x65xcited_state_energy_ev\x18\x02 \x01(\x01\x12\x1e\n\x16\x65xcited_state_fraction\x18\x03 \x01(\x01\"M\n\x11SimulationRequest\x12\x18\n\x07q_range\x18\x01 \x01(\x0b\x32\x07.QRange\x12\x1e\n\tstructure\x18\x02 \x01(\x0b\x32\x0b.files.File\"*\n\x12SimulationResponse\x12\t\n\x01q\x18\x01 \x03(\x01\x12\t\n\x01i\x18\x02 \x03(\x01\"\"\n\x12SolventInfoRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"0\n\x13SolventInfoResponse\x12\x0c\n\x04rhom\x18\x01 \x01(\x01\x12\x0b\n\x03\x63pm\x18\x02 \x01(\x01\x32\x86\x01\n\x11SimulationService\x12\x34\n\tCalcDebye\x12\x12.SimulationRequest\x1a\x13.SimulationResponse\x12;\n\x0eGetSolventInfo\x12\x13.SolventInfoRequest\x1a\x14.SolventInfoResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "simulation_pb2", _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'simulation_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
-    _globals["DESCRIPTOR"]._loaded_options = None
-    _globals["DESCRIPTOR"]._serialized_options = b"B\017SimulationProtoP\001"
-    _globals["_QRANGE"]._serialized_start = 33
-    _globals["_QRANGE"]._serialized_end = 97
-    _globals["_PUMP"]._serialized_start = 100
-    _globals["_PUMP"]._serialized_end = 257
-    _globals["_SIMULATIONREQUEST"]._serialized_start = 259
-    _globals["_SIMULATIONREQUEST"]._serialized_end = 355
-    _globals["_SIMULATIONRESPONSE"]._serialized_start = 357
-    _globals["_SIMULATIONRESPONSE"]._serialized_end = 405
-    _globals["_SOLVENTINFOREQUEST"]._serialized_start = 407
-    _globals["_SOLVENTINFOREQUEST"]._serialized_end = 466
-    _globals["_SOLVENTINFORESPONSE"]._serialized_start = 468
-    _globals["_SOLVENTINFORESPONSE"]._serialized_end = 557
-    _globals["_SIMULATIONSERVICE"]._serialized_start = 559
-    _globals["_SIMULATIONSERVICE"]._serialized_end = 632
+  DESCRIPTOR._loaded_options = None
+  _globals['_QRANGE']._serialized_start=33
+  _globals['_QRANGE']._serialized_end=81
+  _globals['_PUMP']._serialized_start=83
+  _globals['_PUMP']._serialized_end=180
+  _globals['_SIMULATIONREQUEST']._serialized_start=182
+  _globals['_SIMULATIONREQUEST']._serialized_end=259
+  _globals['_SIMULATIONRESPONSE']._serialized_start=261
+  _globals['_SIMULATIONRESPONSE']._serialized_end=303
+  _globals['_SOLVENTINFOREQUEST']._serialized_start=305
+  _globals['_SOLVENTINFOREQUEST']._serialized_end=339
+  _globals['_SOLVENTINFORESPONSE']._serialized_start=341
+  _globals['_SOLVENTINFORESPONSE']._serialized_end=389
+  _globals['_SIMULATIONSERVICE']._serialized_start=392
+  _globals['_SIMULATIONSERVICE']._serialized_end=526
 # @@protoc_insertion_point(module_scope)

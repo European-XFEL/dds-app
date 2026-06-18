@@ -4,11 +4,18 @@ from starlette.applications import Starlette
 from starlette.responses import PlainTextResponse
 from starlette.routing import Route, Mount
 
+from connectrpc.code import Code
+from connectrpc.errors import ConnectError
 from connectrpc.request import RequestContext
 from pydantic import BaseModel, Field
 
 from .gen import simulation_connect
-from .gen.simulation_pb2 import SimulationRequest, SimulationResponse
+from .gen.simulation_pb2 import (
+    SimulationRequest,
+    SimulationResponse,
+    SolventInfoRequest,
+    SolventInfoResponse,
+)
 
 
 class QRange(BaseModel):
@@ -20,6 +27,10 @@ class QRange(BaseModel):
 class File(BaseModel):
     filename: Annotated[str, Field(min_length=4, pattern=r"^.*\.xyz$")]
     contents: Annotated[bytes, Field(min_length=8)]
+
+
+class SolventName(BaseModel):
+    name: Annotated[str, Field(min_length=1)]
 
 
 class SimulationService(simulation_connect.SimulationService):
@@ -40,6 +51,23 @@ class SimulationService(simulation_connect.SimulationService):
         )
 
         return SimulationResponse(q=result[0], i=result[1])
+
+    async def get_solvent_info(
+        self, request: SolventInfoRequest, ctx: RequestContext
+    ) -> SolventInfoResponse:
+        from .calculator import get_solvent_info
+
+        SolventName(name=request.name)
+
+        try:
+            rhom, cpm = get_solvent_info(request.name)
+        except Exception as exc:
+            raise ConnectError(
+                Code.NOT_FOUND,
+                f"Solvent '{request.name}' not recognized: {exc}",
+            ) from exc
+
+        return SolventInfoResponse(rhom=rhom, cpm=cpm)
 
 async def healthz(_request):
     return PlainTextResponse("ok", status_code=200)

@@ -51,3 +51,11 @@ def calc_debye(
         qstep=q_range.step,
         structure_source=structure_source,
     )
+
+
+def get_solvent_info(name: str) -> tuple[float, float]:
+    """Return molar density (mol/m^3) and molar heat capacity (J/mol/K) for a solvent."""
+    from thermo.chemical import Chemical
+
+    chemical = Chemical(name)
+    return float(chemical.rhom), float(chemical.Cpm)

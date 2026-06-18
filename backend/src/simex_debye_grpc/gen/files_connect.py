@@ -11,51 +11,29 @@ from connectrpc.errors import ConnectError
 from connectrpc.interceptor import Interceptor, InterceptorSync
 from connectrpc.method import IdempotencyLevel, MethodInfo
 from connectrpc.request import Headers, RequestContext
-from connectrpc.server import (
-    ConnectASGIApplication,
-    ConnectWSGIApplication,
-    Endpoint,
-    EndpointSync,
-)
-
+from connectrpc.server import ConnectASGIApplication, ConnectWSGIApplication, Endpoint, EndpointSync
 from . import files_pb2 as files__pb2
 
 
 class FileService(Protocol):
-    async def list_files(
-        self, request: files__pb2.ListFilesRequest, ctx: RequestContext
-    ) -> files__pb2.ListFilesResponse:
+    async def list_files(self, request: files__pb2.ListFilesRequest, ctx: RequestContext) -> files__pb2.ListFilesResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def get_file(
-        self, request: files__pb2.GetFileRequest, ctx: RequestContext
-    ) -> files__pb2.File:
+    async def get_file(self, request: files__pb2.GetFileRequest, ctx: RequestContext) -> files__pb2.File:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def create_file(
-        self, request: files__pb2.CreateFileRequest, ctx: RequestContext
-    ) -> files__pb2.File:
+    async def create_file(self, request: files__pb2.CreateFileRequest, ctx: RequestContext) -> files__pb2.File:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def update_file(
-        self, request: files__pb2.UpdateFileRequest, ctx: RequestContext
-    ) -> files__pb2.File:
+    async def update_file(self, request: files__pb2.UpdateFileRequest, ctx: RequestContext) -> files__pb2.File:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
-    async def delete_file(
-        self, request: files__pb2.DeleteFileRequest, ctx: RequestContext
-    ) -> files__pb2.Empty:
+    async def delete_file(self, request: files__pb2.DeleteFileRequest, ctx: RequestContext) -> files__pb2.Empty:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
 class FileServiceASGIApplication(ConnectASGIApplication[FileService]):
-    def __init__(
-        self,
-        service: FileService | AsyncGenerator[FileService],
-        *,
-        interceptors: Iterable[Interceptor] = (),
-        read_max_bytes: int | None = None,
-    ) -> None:
+    def __init__(self, service: FileService | AsyncGenerator[FileService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None) -> None:
         super().__init__(
             service=service,
             endpoints=lambda svc: {
@@ -223,39 +201,20 @@ class FileServiceClient(ConnectClient):
 
 
 class FileServiceSync(Protocol):
-    def list_files(
-        self, request: files__pb2.ListFilesRequest, ctx: RequestContext
-    ) -> files__pb2.ListFilesResponse:
+    def list_files(self, request: files__pb2.ListFilesRequest, ctx: RequestContext) -> files__pb2.ListFilesResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-
-    def get_file(
-        self, request: files__pb2.GetFileRequest, ctx: RequestContext
-    ) -> files__pb2.File:
+    def get_file(self, request: files__pb2.GetFileRequest, ctx: RequestContext) -> files__pb2.File:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-
-    def create_file(
-        self, request: files__pb2.CreateFileRequest, ctx: RequestContext
-    ) -> files__pb2.File:
+    def create_file(self, request: files__pb2.CreateFileRequest, ctx: RequestContext) -> files__pb2.File:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-
-    def update_file(
-        self, request: files__pb2.UpdateFileRequest, ctx: RequestContext
-    ) -> files__pb2.File:
+    def update_file(self, request: files__pb2.UpdateFileRequest, ctx: RequestContext) -> files__pb2.File:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
-
-    def delete_file(
-        self, request: files__pb2.DeleteFileRequest, ctx: RequestContext
-    ) -> files__pb2.Empty:
+    def delete_file(self, request: files__pb2.DeleteFileRequest, ctx: RequestContext) -> files__pb2.Empty:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
 class FileServiceWSGIApplication(ConnectWSGIApplication):
-    def __init__(
-        self,
-        service: FileServiceSync,
-        interceptors: Iterable[InterceptorSync] = (),
-        read_max_bytes: int | None = None,
-    ) -> None:
+    def __init__(self, service: FileServiceSync, interceptors: Iterable[InterceptorSync]=(), read_max_bytes: int | None = None) -> None:
         super().__init__(
             endpoints={
                 "/files.FileService/ListFiles": EndpointSync.unary(

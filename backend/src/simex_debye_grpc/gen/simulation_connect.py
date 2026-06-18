@@ -11,30 +11,20 @@ from connectrpc.errors import ConnectError
 from connectrpc.interceptor import Interceptor, InterceptorSync
 from connectrpc.method import IdempotencyLevel, MethodInfo
 from connectrpc.request import Headers, RequestContext
-from connectrpc.server import (
-    ConnectASGIApplication,
-    ConnectWSGIApplication,
-    Endpoint,
-    EndpointSync,
-)
+from connectrpc.server import ConnectASGIApplication, ConnectWSGIApplication, Endpoint, EndpointSync
 from . import simulation_pb2 as simulation__pb2
 
 
 class SimulationService(Protocol):
-    async def calc_debye(
-        self, request: simulation__pb2.SimulationRequest, ctx: RequestContext
-    ) -> simulation__pb2.SimulationResponse:
+    async def calc_debye(self, request: simulation__pb2.SimulationRequest, ctx: RequestContext) -> simulation__pb2.SimulationResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
+    async def get_solvent_info(self, request: simulation__pb2.SolventInfoRequest, ctx: RequestContext) -> simulation__pb2.SolventInfoResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
 class SimulationServiceASGIApplication(ConnectASGIApplication[SimulationService]):
-    def __init__(
-        self,
-        service: SimulationService | AsyncGenerator[SimulationService],
-        *,
-        interceptors: Iterable[Interceptor] = (),
-        read_max_bytes: int | None = None,
-    ) -> None:
+    def __init__(self, service: SimulationService | AsyncGenerator[SimulationService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None) -> None:
         super().__init__(
             service=service,
             endpoints=lambda svc: {
@@ -47,6 +37,16 @@ class SimulationServiceASGIApplication(ConnectASGIApplication[SimulationService]
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.calc_debye,
+                ),
+                "/SimulationService/GetSolventInfo": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetSolventInfo",
+                        service_name="SimulationService",
+                        input=simulation__pb2.SolventInfoRequest,
+                        output=simulation__pb2.SolventInfoResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.get_solvent_info,
                 ),
             },
             interceptors=interceptors,
@@ -80,21 +80,36 @@ class SimulationServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def get_solvent_info(
+        self,
+        request: simulation__pb2.SolventInfoRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> simulation__pb2.SolventInfoResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetSolventInfo",
+                service_name="SimulationService",
+                input=simulation__pb2.SolventInfoRequest,
+                output=simulation__pb2.SolventInfoResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class SimulationServiceSync(Protocol):
-    def calc_debye(
-        self, request: simulation__pb2.SimulationRequest, ctx: RequestContext
-    ) -> simulation__pb2.SimulationResponse:
+    def calc_debye(self, request: simulation__pb2.SimulationRequest, ctx: RequestContext) -> simulation__pb2.SimulationResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_solvent_info(self, request: simulation__pb2.SolventInfoRequest, ctx: RequestContext) -> simulation__pb2.SolventInfoResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
 class SimulationServiceWSGIApplication(ConnectWSGIApplication):
-    def __init__(
-        self,
-        service: SimulationServiceSync,
-        interceptors: Iterable[InterceptorSync] = (),
-        read_max_bytes: int | None = None,
-    ) -> None:
+    def __init__(self, service: SimulationServiceSync, interceptors: Iterable[InterceptorSync]=(), read_max_bytes: int | None = None) -> None:
         super().__init__(
             endpoints={
                 "/SimulationService/CalcDebye": EndpointSync.unary(
@@ -106,6 +121,16 @@ class SimulationServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.calc_debye,
+                ),
+                "/SimulationService/GetSolventInfo": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetSolventInfo",
+                        service_name="SimulationService",
+                        input=simulation__pb2.SolventInfoRequest,
+                        output=simulation__pb2.SolventInfoResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.get_solvent_info,
                 ),
             },
             interceptors=interceptors,
@@ -133,6 +158,26 @@ class SimulationServiceClientSync(ConnectClientSync):
                 service_name="SimulationService",
                 input=simulation__pb2.SimulationRequest,
                 output=simulation__pb2.SimulationResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def get_solvent_info(
+        self,
+        request: simulation__pb2.SolventInfoRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> simulation__pb2.SolventInfoResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetSolventInfo",
+                service_name="SimulationService",
+                input=simulation__pb2.SolventInfoRequest,
+                output=simulation__pb2.SolventInfoResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,
