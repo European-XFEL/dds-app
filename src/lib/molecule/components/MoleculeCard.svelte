@@ -43,11 +43,9 @@
     const e = moleculeStates.find((s) => s.state === 1);
     if (g) {
       groundId = g.id;
-      ground = g;
     }
     if (e) {
       excitedId = e.id;
-      excited = e;
     }
   });
 
