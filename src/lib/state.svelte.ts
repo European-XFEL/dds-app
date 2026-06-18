@@ -26,8 +26,14 @@ export class SimulationState {
   pump = $state(structuredClone(DEFAULT.pump));
   probe = $state(structuredClone(DEFAULT.probe));
 
-  detector = new DetectorState('LPD');
+  detector = new DetectorState('LPD', DEFAULT.probe.wavelength);
   sample = new SampleState();
+
+  constructor() {
+    $effect(() => {
+      this.detector.wavelength = this.probe.wavelength;
+    });
+  }
 }
 
 export function createSimulationState(): SimulationState {

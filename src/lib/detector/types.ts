@@ -18,7 +18,7 @@ export interface DetectorModule {
 }
 
 export interface Detector {
-  readonly name: string;
+  name: string;
   readonly pixelSize: number;
   distance: number;
   beamCenter: CartesianPoint;

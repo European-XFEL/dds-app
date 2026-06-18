@@ -47,7 +47,7 @@ function calculateImageShape(modules: DetectorModule[]): Shape {
 }
 
 export class DetectorState implements Detector {
-  readonly name: string;
+  name: string;
   readonly pixelSize: number;
   readonly modules: DetectorModule[];
 
@@ -60,7 +60,7 @@ export class DetectorState implements Detector {
       pixelSize: this.pixelSize,
       beamCenter: this.beamCenter,
       modules: this.modules,
-      wavelength: 0.7,
+      wavelength: this.wavelength,
     });
   });
 
@@ -72,21 +72,44 @@ export class DetectorState implements Detector {
     return { min: this.qRange.rMinPx, max: this.qRange.rMaxPx };
   });
 
-  constructor(name: keyof typeof DEFAULT_DETECTORS) {
+  wavelength = $state<number>();
+
+  constructor(name: keyof typeof DEFAULT_DETECTORS, wavelength: number) {
     const detector = DEFAULT_DETECTORS[name];
     if (!detector) {
       throw new Error(`Detector configuration for ${name} not found.`);
     }
     this.name = detector.name;
     this.pixelSize = detector.pixelSize;
+    this.wavelength = $state(wavelength);
 
     this.distance = $state(100);
 
-    const maxX = Math.max(...detector.modules.map((m) => m.position[0] + m.shape[0]));
-    const maxY = Math.max(...detector.modules.map((m) => m.position[1] + m.shape[1]));
+    const maxX = Math.max(
+      ...detector.modules.map((m) => m.position[0] + m.shape[0]),
+    );
+    const maxY = Math.max(
+      ...detector.modules.map((m) => m.position[1] + m.shape[1]),
+    );
 
     this.beamCenter = $state({ x: 16 + maxX / 2, y: 16 + maxY / 2 });
 
+    this.modules = $state(
+      detector.modules.map((mod, index) => ({
+        id: `module-${index + 1}`,
+        shape: { width: mod.shape[0], height: mod.shape[1] },
+        position: { x: mod.position[0], y: mod.position[1] },
+        color: resolveModuleColour(index),
+      })),
+    );
+  }
+
+  setDetector(name: keyof typeof DEFAULT_DETECTORS): void {
+    const detector = DEFAULT_DETECTORS[name];
+    if (!detector) {
+      throw new Error(`Detector configuration for ${name} not found.`);
+    }
+    this.name = detector.name;
     this.modules = $state(
       detector.modules.map((mod, index) => ({
         id: `module-${index + 1}`,

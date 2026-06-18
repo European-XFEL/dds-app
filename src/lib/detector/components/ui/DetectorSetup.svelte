@@ -1,7 +1,6 @@
 <script lang="ts">
   import * as Field from '$shadcn/ui/field/index.js';
   import { Input } from '$shadcn/ui/input/index.js';
-  import * as Select from '$shadcn/ui/select';
 
   import type { CartesianPoint } from '$lib/types';
   import NumSlider from '$lib/ui/NumSlider.svelte';
@@ -12,16 +11,6 @@
   };
 
   let { distance = $bindable(), beamCenter = $bindable() }: Props = $props();
-
-  type DetectorEntry = { name: string; enabled: boolean };
-
-  const detectors: DetectorEntry[] = [
-    { name: 'LPD', enabled: true },
-    { name: 'AGIPD', enabled: false },
-    { name: 'DSSC', enabled: false },
-  ];
-
-  let detectorName: string | undefined = $state('LPD');
 </script>
 
 <Field.Set>
@@ -32,18 +21,7 @@
 
   <Field.Field>
     <Field.Label>Detector</Field.Label>
-    <Select.Root type="single" bind:value={detectorName}>
-      <Select.Trigger>
-        <span>{detectorName || 'Select Detector'}</span>
-      </Select.Trigger>
-      <Select.Content>
-        {#each detectors as { name, enabled } (name)}
-          <Select.Item value={name} label={name} disabled={!enabled}>
-            {name}
-          </Select.Item>
-        {/each}
-      </Select.Content>
-    </Select.Root>
+    <p class="text-sm font-medium">LPD</p>
   </Field.Field>
 
   <Field.Field>
