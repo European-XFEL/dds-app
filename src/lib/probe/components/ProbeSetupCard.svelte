@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
 
-  import * as Card from '$shadcn/ui/card/index.js';
+  import CardWrapper from '$lib/ui/CardWrapper.svelte';
 
   import ProbeSetup from './ProbeSetup.svelte';
 
@@ -9,8 +9,6 @@
     $props();
 </script>
 
-<Card.Root>
-  <Card.Content>
-    <ProbeSetup bind:probe {short} />
-  </Card.Content>
-</Card.Root>
+<CardWrapper>
+  <ProbeSetup bind:probe {short} />
+</CardWrapper>

@@ -1,4 +1,5 @@
 export { default as Date } from './Date.svelte';
+export { default as EditableInput } from './EditableInput.svelte';
 export { default as MoleculeTitle } from './MoleculeTitle.svelte';
 export { default as ReferenceEditable } from './ReferenceEditable.svelte';
 export { default as SHA } from './SHA.svelte';

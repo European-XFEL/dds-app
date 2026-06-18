@@ -1,10 +1,7 @@
 <script lang="ts">
-  import Check from '@lucide/svelte/icons/check';
   import ExternalLink from '@lucide/svelte/icons/external-link';
-  import X from '@lucide/svelte/icons/x';
 
-  import { Button } from '$shadcn/ui/button';
-  import { Input } from '$shadcn/ui/input';
+  import EditableInput from './EditableInput.svelte';
 
   type Props = {
     value: string | null;
@@ -46,27 +43,14 @@
 </script>
 
 {#if isEditing}
-  <div class="flex items-center gap-1">
-    <Input
-      value={editValue}
-      oninput={(e) => onEditValueChange(e.currentTarget.value)}
-      onkeydown={handleKeydown}
-      class="h-7 text-sm"
-      placeholder="https://..."
-      autofocus
-    />
-    <Button
-      variant="ghost"
-      size="icon"
-      class="size-7"
-      onclick={() => onSave(editValue)}
-    >
-      <Check class="size-3" />
-    </Button>
-    <Button variant="ghost" size="icon" class="size-7" onclick={onCancel}>
-      <X class="size-3" />
-    </Button>
-  </div>
+  <EditableInput
+    value={editValue}
+    placeholder="https://..."
+    onSave={() => onSave(editValue)}
+    {onCancel}
+    onChange={onEditValueChange}
+    onKeydown={handleKeydown}
+  />
 {:else if isValidUrl(value)}
   <!-- eslint-disable svelte/no-navigation-without-resolve -->
   <a

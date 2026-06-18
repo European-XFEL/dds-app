@@ -1,9 +1,5 @@
 <script lang="ts">
-  import Check from '@lucide/svelte/icons/check';
-  import X from '@lucide/svelte/icons/x';
-
-  import { Button } from '$shadcn/ui/button';
-  import { Input } from '$shadcn/ui/input';
+  import EditableInput from './EditableInput.svelte';
 
   type Props = {
     value: string | null;
@@ -37,26 +33,13 @@
 </script>
 
 {#if isEditing}
-  <div class="flex items-center gap-1">
-    <Input
-      value={editValue}
-      oninput={(e) => onEditValueChange(e.currentTarget.value)}
-      onkeydown={handleKeydown}
-      class="h-7 text-sm"
-      autofocus
-    />
-    <Button
-      variant="ghost"
-      size="icon"
-      class="size-7"
-      onclick={() => onSave(editValue)}
-    >
-      <Check class="size-3" />
-    </Button>
-    <Button variant="ghost" size="icon" class="size-7" onclick={onCancel}>
-      <X class="size-3" />
-    </Button>
-  </div>
+  <EditableInput
+    value={editValue}
+    onSave={() => onSave(editValue)}
+    {onCancel}
+    onChange={onEditValueChange}
+    onKeydown={handleKeydown}
+  />
 {:else}
   <button
     type="button"

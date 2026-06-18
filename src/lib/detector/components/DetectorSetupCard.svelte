@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ComponentProps } from 'svelte';
 
-  import * as Card from '$shadcn/ui/card/index.js';
+  import CardWrapper from '$lib/ui/CardWrapper.svelte';
 
   import DetectorSetup from './ui/DetectorSetup.svelte';
 
@@ -11,8 +11,6 @@
   }: ComponentProps<typeof DetectorSetup> = $props();
 </script>
 
-<Card.Root>
-  <Card.Content>
-    <DetectorSetup bind:distance bind:beamCenter />
-  </Card.Content>
-</Card.Root>
+<CardWrapper>
+  <DetectorSetup bind:distance bind:beamCenter />
+</CardWrapper>
