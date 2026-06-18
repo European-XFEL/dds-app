@@ -2,7 +2,11 @@ import type { Handle } from '@sveltejs/kit';
 
 import { env } from '$env/dynamic/private';
 
+import { initDb } from '$lib/server/db';
 import { getCapabilities, getHealth } from '$lib/server/health';
+
+// Initialize the database connection at server startup
+initDb();
 
 const DEFAULT_ORIGINS = [
   'http://localhost',

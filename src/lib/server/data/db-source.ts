@@ -4,11 +4,12 @@
  * This module implements the data source interfaces by querying the
  * Postgres database through the existing Drizzle setup.
  */
-
 import { DrizzleQueryError } from 'drizzle-orm';
 import Papa from 'papaparse';
 
 import { error } from '@sveltejs/kit';
+
+import { env } from '$env/dynamic/private';
 
 import { db } from '$lib/server/db';
 import * as schema from '$lib/server/db/schema';
@@ -18,8 +19,6 @@ import {
   createClient,
   createConnectTransport,
 } from '$lib/server/grpc';
-
-import { env } from '$env/dynamic/private';
 
 import type {
   DebyeResult,
@@ -84,7 +83,9 @@ export const dbMoleculeSource: MoleculeDataSource = {
     return res;
   },
 
-  async uploadMolecule(input: UploadMoleculeInput): Promise<UploadMoleculeResult> {
+  async uploadMolecule(
+    input: UploadMoleculeInput,
+  ): Promise<UploadMoleculeResult> {
     const filename = input.file.name;
     const contents = await input.file.text();
     const derivedAtomCount = extractAtomCount(contents);
