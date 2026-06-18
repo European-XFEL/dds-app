@@ -2,7 +2,7 @@ import type { CellContext } from '@tanstack/table-core';
 
 import type { Component } from 'svelte';
 
-import { listMolecules } from '$remote';
+import type { listMolecules } from '$lib/data/api';
 
 export type Molecules = Awaited<ReturnType<typeof listMolecules>>;
 

@@ -291,6 +291,8 @@
           <Card.Title>{title}</Card.Title>
         </Card.Header>
         <Card.Content>
+          <!-- Body is trusted static markdown content authored in this file. -->
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
           {@html body}
         </Card.Content>
       </Card.Root>
@@ -313,6 +315,8 @@
           <Card.Title>{i + 1}. {title}</Card.Title>
         </Card.Header>
         <Card.Content>
+          <!-- Body is trusted static markdown content authored in this file. -->
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
           {@html body}
         </Card.Content>
       </Card.Root>
@@ -330,6 +334,8 @@
           <Card.Title>{i + 1}. {item.title}</Card.Title>
         </Card.Header>
         <Card.Content>
+          <!-- Body is trusted static markdown content authored in this file. -->
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
           {@html item.body}
         </Card.Content>
       </Card.Root>

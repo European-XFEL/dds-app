@@ -4,8 +4,7 @@
   import * as Select from '$shadcn/ui/select/index.js';
   import { Spinner } from '$shadcn/ui/spinner';
 
-  import { listMolecules } from '$remote';
-
+  import type { listMolecules } from '$lib/data/api';
   import type { Sample } from '$lib/types';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;

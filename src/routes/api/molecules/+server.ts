@@ -1,18 +1,22 @@
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { error, json } from '@sveltejs/kit';
 
 import { moleculeSource } from '$lib/server/data';
+
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
   const id = url.searchParams.get('id');
 
   if (id) {
-    // GET /api/molecules?id=xxx -> file content
-    const content = await moleculeSource.getMoleculeFileContent(id);
-    return json(content);
+    try {
+      return json(await moleculeSource.getMoleculeFileContent(id));
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('not found')) {
+        error(404, 'Molecule not found');
+      }
+      throw err;
+    }
   }
 
-  // GET /api/molecules -> list all
-  const molecules = await moleculeSource.listMolecules();
-  return json(molecules);
+  return json(await moleculeSource.listMolecules());
 };

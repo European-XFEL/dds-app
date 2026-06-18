@@ -1,8 +1,10 @@
-import { json, error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { error, json } from '@sveltejs/kit';
+
+import { PUBLIC_TARGET } from '$env/static/public';
 
 import { moleculeSource } from '$lib/server/data';
-import { PUBLIC_TARGET } from '$env/static/public';
+
+import type { RequestHandler } from './$types';
 
 const STATIC = PUBLIC_TARGET === 'static';
 
@@ -30,11 +32,14 @@ export const POST: RequestHandler = async ({ request }) => {
   const file = formData.get('file');
 
   if (
-    typeof moleculeName !== 'string' || !moleculeName.trim() ||
-    typeof description !== 'string' || !description.trim() ||
+    typeof moleculeName !== 'string' ||
+    !moleculeName.trim() ||
+    typeof description !== 'string' ||
+    !description.trim() ||
     typeof state !== 'string' ||
     typeof atomCount !== 'string' ||
-    !(file instanceof File) || !file.name
+    !(file instanceof File) ||
+    !file.name
   ) {
     throw error(400, 'Missing or invalid required fields');
   }
@@ -53,9 +58,10 @@ export const POST: RequestHandler = async ({ request }) => {
     moleculeName: moleculeName.trim(),
     description: description.trim(),
     state: parsedState,
-    reference: typeof reference === 'string' && reference.trim()
-      ? reference.trim()
-      : null,
+    reference:
+      typeof reference === 'string' && reference.trim()
+        ? reference.trim()
+        : null,
     atomCount: parsedAtomCount,
     file,
   });

@@ -35,7 +35,6 @@ const config = {
       $css: './src/app.css',
       $components: './src/components',
       $shadcn: './src/lib/shadcn/components',
-      $remote: './src/lib/remote/common.remote.ts',
     },
     csrf: {
       trustedOrigins: [

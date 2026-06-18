@@ -3,10 +3,10 @@
 
   import * as Field from '$shadcn/ui/field/index.js';
 
-  import { getMoleculeFileContent } from '$remote';
-
+  import { getMoleculeFileContent } from '$lib/data/api';
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
+
   import { useMatterviz } from './useMatterviz.svelte';
 
   interface Props {
@@ -78,9 +78,22 @@
 
   const placeholder = $derived.by(() => {
     if (!Trajectory) return { title: 'Loading MatterViz...', description: '' };
-    if (!ground?.id || !excited?.id) return { title: 'Select ground and excited molecules', description: 'Select a ground and excited molecule to view the trajectory.' };
-    if (loading) return { title: 'Loading trajectory...', description: 'Concatenating XYZ structures for animation.' };
-    if (loadError) return { title: 'Molecule files not found', description: 'Check the selected structures.' };
+    if (!ground?.id || !excited?.id)
+      return {
+        title: 'Select ground and excited molecules',
+        description:
+          'Select a ground and excited molecule to view the trajectory.',
+      };
+    if (loading)
+      return {
+        title: 'Loading trajectory...',
+        description: 'Concatenating XYZ structures for animation.',
+      };
+    if (loadError)
+      return {
+        title: 'Molecule files not found',
+        description: 'Check the selected structures.',
+      };
     return { title: undefined, description: undefined };
   });
 </script>

@@ -3,10 +3,10 @@
 
   import * as Field from '$shadcn/ui/field/index.js';
 
-  import { getMoleculeFileContent } from '$remote';
-
+  import { getMoleculeFileContent } from '$lib/data/api';
   import type { Sample } from '$lib/types';
   import { Placeholder } from '$lib/ui';
+
   import { useMatterviz } from './useMatterviz.svelte';
 
   interface Props {
@@ -59,9 +59,15 @@
 
   const placeholder = $derived.by(() => {
     if (!Structure) return { title: 'Loading MatterViz...', description: '' };
-    if (!molecule?.id) return { title: 'No molecule selected', description: 'Select a molecule to view its structure.' };
-    if (notFound) return { title: 'Molecule file not found', description: undefined };
-    if (loading) return { title: undefined, description: 'Loading molecule...' };
+    if (!molecule?.id)
+      return {
+        title: 'No molecule selected',
+        description: 'Select a molecule to view its structure.',
+      };
+    if (notFound)
+      return { title: 'Molecule file not found', description: undefined };
+    if (loading)
+      return { title: undefined, description: 'Loading molecule...' };
     return { title: undefined, description: undefined };
   });
 </script>

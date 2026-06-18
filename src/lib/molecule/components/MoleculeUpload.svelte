@@ -10,9 +10,7 @@
   import * as Textarea from '$shadcn/ui/textarea/index.js';
   import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
-  import { listMolecules, uploadMolecule } from '$remote';
-
-  import { uploadSchema } from '$lib/remote/schema';
+  import { listMolecules, uploadMolecule } from '$lib/data/api';
   import type { Capability } from '$lib/types';
 
   type Molecules = Awaited<ReturnType<typeof listMolecules>>;
@@ -38,16 +36,27 @@
   let fileReadToken = 0;
   let file = $state<File | null>(null);
 
-  const uploadForm = uploadMolecule.preflight(uploadSchema);
+  // Form field states
+  let moleculeNameValue = $state<string>('');
+  let descriptionValue = $state<string>('');
+  let stateValue = $state<number>(0);
+  let atomCountValue = $state<number | null>(null);
+  let referenceValue = $state<string>('');
+
+  // Validation errors
+  let moleculeNameError = $state<string | null>(null);
+  let descriptionError = $state<string | null>(null);
+  let stateError = $state<string | null>(null);
+  let atomCountError = $state<string | null>(null);
+  let referenceError = $state<string | null>(null);
+  let submitError = $state<string | null>(null);
+
+  let submitting = $state(false);
 
   let filenameStem = $derived.by<string>(() => {
     if (!file) return '';
     return file.name.replace(/\.[^/.]+$/, '');
   });
-
-  let moleculeNameValue = $derived.by<string>(
-    () => uploadForm.fields.moleculeName.value() ?? '',
-  );
 
   let nameConflict = $derived.by(
     () =>
@@ -55,25 +64,12 @@
       !!molecules?.some((m) => m.moleculeName === moleculeNameValue),
   );
 
-  let fileIssues = $derived(uploadForm.fields.file?.issues() ?? []);
-  let moleculeNameIssues = $derived(
-    uploadForm.fields.moleculeName?.issues() ?? [],
-  );
-  let descriptionIssues = $derived(
-    uploadForm.fields.description?.issues() ?? [],
-  );
-  let stateIssues = $derived(uploadForm.fields.state?.issues() ?? []);
-  let atomCountIssues = $derived(uploadForm.fields.atomCount?.issues() ?? []);
-  let referenceIssues = $derived(uploadForm.fields.reference?.issues() ?? []);
-
-  let fileInvalid = $derived(!!fileError || fileIssues.length > 0);
-  let moleculeNameInvalid = $derived(
-    nameConflict || moleculeNameIssues.length > 0
-  );
-  let descriptionInvalid = $derived(descriptionIssues.length > 0);
-  let stateInvalid = $derived(stateIssues.length > 0);
-  let atomCountInvalid = $derived(atomCountIssues.length > 0);
-  let referenceInvalid = $derived(referenceIssues.length > 0);
+  let fileInvalid = $derived(!!fileError);
+  let moleculeNameInvalid = $derived(nameConflict || !!moleculeNameError);
+  let descriptionInvalid = $derived(!!descriptionError);
+  let stateInvalid = $derived(!!stateError);
+  let atomCountInvalid = $derived(!!atomCountError);
+  let referenceInvalid = $derived(!!referenceError);
 
   function parseAtomCount(contents: string) {
     const firstLine = contents.split(/\r?\n/, 1)[0]?.trim();
@@ -84,24 +80,88 @@
     return Number.isFinite(parsed) ? parsed : null;
   }
 
-  if (uploadForm.fields.state.value() === undefined) {
-    uploadForm.fields.state.set(0);
+  function validateForm(): boolean {
+    let valid = true;
+    moleculeNameError = null;
+    descriptionError = null;
+    stateError = null;
+    atomCountError = null;
+    referenceError = null;
+    submitError = null;
+
+    if (!moleculeNameValue.trim()) {
+      moleculeNameError = 'Molecule name is required';
+      valid = false;
+    }
+    if (!descriptionValue.trim()) {
+      descriptionError = 'Description is required';
+      valid = false;
+    }
+    if (!Number.isFinite(stateValue) || stateValue < 0) {
+      stateError = 'State must be a non-negative integer';
+      valid = false;
+    }
+    if (!atomCountValue || atomCountValue <= 0) {
+      atomCountError = 'Atom count must be a positive integer';
+      valid = false;
+    }
+    if (!file) {
+      fileError = 'Please select a file';
+      valid = false;
+    }
+
+    return valid;
   }
 
-  const uploadEnhance = uploadForm.enhance(async ({ form, submit }) => {
-    await submit();
-    const result = uploadForm.result;
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+    if (!validateForm() || !file) return;
 
-    if (result?.success && result.result) {
-      if (result.result.id !== lastUploadedId && molecules) {
-        molecules.push(result.result);
+    submitting = true;
+    submitError = null;
+
+    try {
+      const result = await uploadMolecule({
+        moleculeName: moleculeNameValue.trim(),
+        description: descriptionValue.trim(),
+        state: stateValue,
+        reference: referenceValue.trim() || null,
+        atomCount: atomCountValue!,
+        file,
+      });
+
+      if (result.success && result.result) {
+        if (result.result.id !== lastUploadedId && molecules) {
+          molecules.push(result.result);
+        }
+        lastUploadedId = result.result.id;
+        open = false;
+        resetForm();
+      } else {
+        submitError = result.error ?? 'Unable to upload molecule.';
       }
-      lastUploadedId = result.result.id;
-      open = false;
-      form.reset();
-      file = null;
+    } catch (err) {
+      submitError = err instanceof Error ? err.message : 'Upload failed';
+    } finally {
+      submitting = false;
     }
-  });
+  }
+
+  function resetForm() {
+    moleculeNameValue = '';
+    descriptionValue = '';
+    stateValue = 0;
+    atomCountValue = null;
+    referenceValue = '';
+    file = null;
+    fileError = null;
+    moleculeNameError = null;
+    descriptionError = null;
+    stateError = null;
+    atomCountError = null;
+    referenceError = null;
+    submitError = null;
+  }
 
   function handleFileChange(event: Event) {
     const target = event.currentTarget as HTMLInputElement | null;
@@ -111,8 +171,8 @@
 
     if (!selected) return;
 
-    if (!uploadForm.fields.moleculeName.value()) {
-      uploadForm.fields.moleculeName.set(filenameStem);
+    if (!moleculeNameValue) {
+      moleculeNameValue = filenameStem;
     }
 
     const token = ++fileReadToken;
@@ -125,7 +185,7 @@
           fileError = 'Unable to read the atom count from this file.';
           return;
         }
-        uploadForm.fields.atomCount.set(count);
+        atomCountValue = count;
       })
       .catch(() => {
         if (token !== fileReadToken) return;
@@ -164,24 +224,21 @@
       </Dialog.Description>
     </Dialog.Header>
 
-    <form {...uploadEnhance} enctype="multipart/form-data" class="grid gap-6">
+    <form
+      onsubmit={handleSubmit}
+      enctype="multipart/form-data"
+      class="grid gap-6"
+    >
       <Field.Set>
         <Field.Legend>File</Field.Legend>
         <Field.Field data-invalid={fileInvalid ? true : undefined}>
           <Field.Label>Select File</Field.Label>
           <Field.Content>
-            <Input
-              accept=".xyz"
-              onchange={handleFileChange}
-              {...uploadForm.fields.file.as('file')}
-            />
+            <Input type="file" accept=".xyz" onchange={handleFileChange} />
           </Field.Content>
           {#if fileError}
             <Field.Error>{fileError}</Field.Error>
           {/if}
-          {#each fileIssues as issue (issue.message)}
-            <Field.Error>{issue.message}</Field.Error>
-          {/each}
         </Field.Field>
       </Field.Set>
 
@@ -192,8 +249,9 @@
             <Field.FieldLabel>Molecule Name</Field.FieldLabel>
             <Field.Content>
               <Input
+                type="text"
                 placeholder={filenameStem || 'Molecule name'}
-                {...uploadForm.fields.moleculeName.as('text')}
+                bind:value={moleculeNameValue}
               />
             </Field.Content>
             {#if nameConflict}
@@ -201,9 +259,9 @@
                 >A molecule with this name already exists.</Field.Error
               >
             {/if}
-            {#each moleculeNameIssues as issue (issue.message)}
-              <Field.Error>{issue.message}</Field.Error>
-            {/each}
+            {#if moleculeNameError}
+              <Field.Error>{moleculeNameError}</Field.Error>
+            {/if}
           </Field.Field>
 
           <Field.Field data-invalid={descriptionInvalid ? true : undefined}>
@@ -212,70 +270,69 @@
               <Textarea.Root
                 rows={3}
                 placeholder="Describe the molecule"
-                {...uploadForm.fields.description.as('text')}
+                bind:value={descriptionValue}
               />
             </Field.Content>
-            {#each descriptionIssues as issue (issue.message)}
-              <Field.Error>{issue.message}</Field.Error>
-            {/each}
+            {#if descriptionError}
+              <Field.Error>{descriptionError}</Field.Error>
+            {/if}
           </Field.Field>
 
           <Field.Field data-invalid={stateInvalid ? true : undefined}>
             <Field.FieldLabel>State</Field.FieldLabel>
             <Field.Content>
-              <Input
-                min="0"
-                step="1"
-                {...uploadForm.fields.state.as('number')}
-              />
+              <Input type="number" min="0" step="1" bind:value={stateValue} />
             </Field.Content>
             <Field.Description
               >Use 0 for ground and 1 for excited.</Field.Description
             >
-            {#each stateIssues as issue (issue.message)}
-              <Field.Error>{issue.message}</Field.Error>
-            {/each}
+            {#if stateError}
+              <Field.Error>{stateError}</Field.Error>
+            {/if}
           </Field.Field>
 
           <Field.Field data-invalid={atomCountInvalid ? true : undefined}>
             <Field.FieldLabel>Atom Count</Field.FieldLabel>
             <Field.Content>
               <Input
+                type="number"
                 min="1"
                 step="1"
-                {...uploadForm.fields.atomCount.as('number')}
+                bind:value={atomCountValue}
               />
             </Field.Content>
             <Field.Description>Prefilled from the .xyz file.</Field.Description>
-            {#each atomCountIssues as issue (issue.message)}
-              <Field.Error>{issue.message}</Field.Error>
-            {/each}
+            {#if atomCountError}
+              <Field.Error>{atomCountError}</Field.Error>
+            {/if}
           </Field.Field>
 
           <Field.Field data-invalid={referenceInvalid ? true : undefined}>
             <Field.FieldLabel>Reference</Field.FieldLabel>
             <Field.Content>
               <Input
+                type="text"
                 placeholder="DOI or citation (optional)"
-                {...uploadForm.fields.reference.as('text')}
+                bind:value={referenceValue}
               />
             </Field.Content>
-            {#each referenceIssues as issue (issue.message)}
-              <Field.Error>{issue.message}</Field.Error>
-            {/each}
+            {#if referenceError}
+              <Field.Error>{referenceError}</Field.Error>
+            {/if}
           </Field.Field>
         </Field.Group>
       </Field.Set>
+
+      {#if submitError}
+        <div class="text-sm text-destructive">{submitError}</div>
+      {/if}
 
       <Dialog.Footer>
         <Dialog.Close class={buttonVariants({ variant: 'outline' })}>
           Cancel
         </Dialog.Close>
-        <Button.Root
-          type="submit"
-          disabled={!!uploadForm.pending || nameConflict}
-        >
-          {#if uploadForm.pending}
+        <Button.Root type="submit" disabled={submitting || nameConflict}>
+          {#if submitting}
             <Spinner class="mr-2 h-4 w-4 animate-spin" />
           {/if}
           Upload

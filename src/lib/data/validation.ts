@@ -17,7 +17,7 @@ export const uploadSchema = z.object({
 
 export type UploadInput = z.infer<typeof uploadSchema>;
 
-const feedbackCategories = [
+export const feedbackCategories = [
   'Content',
   'Interface',
   'Bug',

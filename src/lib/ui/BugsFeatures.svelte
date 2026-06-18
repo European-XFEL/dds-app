@@ -47,7 +47,7 @@
 
     <section>
       <ul class="list-disc pl-5">
-        {#each features as feature}
+        {#each features as feature (feature)}
           <li>{feature}</li>
         {/each}
       </ul>
@@ -61,7 +61,7 @@
 
     <section>
       <ul class="list-disc pl-5">
-        {#each bugs as bug}
+        {#each bugs as bug (bug)}
           <li>{bug}</li>
         {/each}
       </ul>

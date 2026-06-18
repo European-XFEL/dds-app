@@ -5,12 +5,11 @@
   import * as Resizable from '$shadcn/ui/resizable/index.js';
   import { ScrollArea } from '$shadcn/ui/scroll-area/index.js';
 
-  import { listMolecules, listSolvents } from '$remote';
-
   import { SetupChecklist } from '$lib/dashboard';
   import ConfigPane from '$lib/dashboard/components/ConfigPane.svelte';
   import MoleculePane from '$lib/dashboard/components/MoleculePane.svelte';
   import ResultsPane from '$lib/dashboard/components/ResultsPane.svelte';
+  import { listMolecules, listSolvents } from '$lib/data/api';
   import { isValidQRange } from '$lib/simulation/math';
   import {
     createScatteringResource,

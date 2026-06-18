@@ -19,5 +19,7 @@
 </script>
 
 <span class={className}>
+  <!-- KaTeX output is generated from trusted math strings, not user input. -->
+  <!-- eslint-disable-next-line svelte/no-at-html-tags -->
   {@html rendered}
 </span>

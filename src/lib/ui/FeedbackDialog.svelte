@@ -3,6 +3,7 @@
   import { toCanvas } from 'html-to-image';
 
   import { tick } from 'svelte';
+  import { SvelteSet } from 'svelte/reactivity';
 
   import { browser } from '$app/environment';
   import { page } from '$app/state';
@@ -15,8 +16,7 @@
   import * as Textarea from '$shadcn/ui/textarea/index.js';
   import * as Tooltip from '$shadcn/ui/tooltip/index.js';
 
-  import { submitFeedback } from '$remote';
-
+  import { submitFeedback } from '$lib/data/api';
   import type { Capability } from '$lib/types';
 
   interface Props {
@@ -57,6 +57,12 @@
   let region = $state<RegionRect | null>(null);
   let regionImage = $state<string | null>(null);
   let selectionError = $state<string | null>(null);
+
+  // Form field states
+  let commentValue = $state<string>('');
+  let selectedCategories = new SvelteSet<string>();
+  let submitError = $state<string | null>(null);
+  let submitting = $state(false);
 
   const pageUrl = $derived(page.url.href);
 
@@ -198,12 +204,49 @@
     }
   }
 
-  function checkboxFieldProps(value: string) {
-    const { type: _type, ...rest } = submitFeedback.fields.categories.as(
-      'checkbox',
-      value,
-    );
-    return rest;
+  function toggleCategory(value: string) {
+    if (selectedCategories.has(value)) {
+      selectedCategories.delete(value);
+    } else {
+      selectedCategories.add(value);
+    }
+  }
+
+  async function handleSubmit(event: SubmitEvent) {
+    event.preventDefault();
+    submitError = null;
+
+    if (!commentValue.trim()) {
+      submitError = 'Comment is required';
+      return;
+    }
+
+    submitting = true;
+
+    try {
+      const result = await submitFeedback({
+        url: pageUrl,
+        comment: commentValue.trim(),
+        categories: Array.from(selectedCategories),
+        region: region ? JSON.stringify(region) : undefined,
+        regionImage: regionImage ?? undefined,
+      });
+
+      if (result.success) {
+        // Reset form
+        commentValue = '';
+        selectedCategories = new SvelteSet();
+        region = null;
+        regionImage = null;
+        open = false;
+      } else {
+        submitError = 'Failed to submit feedback';
+      }
+    } catch (err) {
+      submitError = err instanceof Error ? err.message : 'Submission failed';
+    } finally {
+      submitting = false;
+    }
   }
 </script>
 
@@ -243,30 +286,17 @@
       <Dialog.Title>Share feedback</Dialog.Title>
     </Dialog.Header>
 
-    <form {...submitFeedback} class="mt-4 space-y-6">
-      <input
-        {...submitFeedback.fields.url.as('text')}
-        type="hidden"
-        value={pageUrl}
-      />
-      <input
-        {...submitFeedback.fields.region.as('text')}
-        type="hidden"
-        value={region ? JSON.stringify(region) : ''}
-      />
-      <input
-        {...submitFeedback.fields.regionImage.as('text')}
-        type="hidden"
-        value={regionImage ?? ''}
-      />
-
+    <form onsubmit={handleSubmit} class="mt-4 space-y-6">
       <Field.Set>
         <Field.Legend>Categories</Field.Legend>
         <Field.Description>Select any that apply.</Field.Description>
         <Field.Group data-slot="checkbox-group" class="grid grid-cols-2 gap-3">
           {#each categoryOptions as option (option.value)}
             <Field.Field orientation="horizontal">
-              <Checkbox.Root {...checkboxFieldProps(option.value)} />
+              <Checkbox.Root
+                checked={selectedCategories.has(option.value)}
+                onchange={() => toggleCategory(option.value)}
+              />
               <Field.Label>{option.label}</Field.Label>
             </Field.Field>
           {/each}
@@ -280,7 +310,7 @@
         </Field.Description>
         <Field.Field>
           <Field.Content class="flex flex-col gap-3">
-            <div class="flex grow items-center gap-3">
+            <div class="flex items-center gap-3">
               <Button.Root
                 type="button"
                 variant="outline"
@@ -326,21 +356,22 @@
             <Textarea.Root
               rows={5}
               placeholder="..."
-              {...submitFeedback.fields.comment.as('text')}
+              bind:value={commentValue}
               required
             />
           </Field.Content>
-          {#each submitFeedback.fields.comment.issues() as issue (issue.message)}
-            <Field.Error>{issue.message}</Field.Error>
-          {/each}
         </Field.Field>
       </Field.Set>
+
+      {#if submitError}
+        <div class="text-sm text-destructive">{submitError}</div>
+      {/if}
 
       <Dialog.Footer class="gap-2">
         <Button.Root type="button" variant="ghost" onclick={handleCancel}>
           Cancel
         </Button.Root>
-        <Button.Root type="submit">Submit</Button.Root>
+        <Button.Root type="submit" disabled={submitting}>Submit</Button.Root>
       </Dialog.Footer>
     </form>
   </Dialog.Content>
