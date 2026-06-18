@@ -1,7 +1,3 @@
-import type { CellContext } from '@tanstack/table-core';
-
-import type { Component } from 'svelte';
-
 import type { listMolecules } from '$lib/data/api';
 
 export type Molecules = Awaited<ReturnType<typeof listMolecules>>;
@@ -13,25 +9,8 @@ export type MoleculeSelection = {
   excited: Molecule | null;
 };
 
-export type EditingCell = {
-  id: string;
-  field: string;
-} | null;
-
 export function formatState(state: number): string {
   if (state === 0) return 'Ground (S\u2080)';
   if (state === 1) return 'Excited (S\u2081)';
   return `State ${state}`;
 }
-
-export type CellComponentResult = {
-  component: Component<Record<string, unknown>>;
-  props: Record<string, unknown>;
-};
-
-export type MoleculeColumnMeta = {
-  cell?: (context: CellContext<Molecule, unknown>) => CellComponentResult;
-  sortable?: boolean;
-  headerClass?: string;
-  cellClass?: string;
-};

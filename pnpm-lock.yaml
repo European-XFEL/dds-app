@@ -7,22 +7,38 @@ settings:
 importers:
 
   .:
-    devDependencies:
-      '@bufbuild/buf':
-        specifier: ^1.71.0
-        version: 1.71.0
+    dependencies:
       '@bufbuild/protobuf':
         specifier: ^2.11.0
         version: 2.11.0
-      '@bufbuild/protoc-gen-es':
-        specifier: ^2.11.0
-        version: 2.11.0(@bufbuild/protobuf@2.11.0)
       '@connectrpc/connect':
         specifier: ^2.1.1
         version: 2.1.1(@bufbuild/protobuf@2.11.0)
       '@connectrpc/connect-node':
         specifier: ^2.1.1
         version: 2.1.1(@bufbuild/protobuf@2.11.0)(@connectrpc/connect@2.1.1(@bufbuild/protobuf@2.11.0))
+      '@paralleldrive/cuid2':
+        specifier: ^3.3.0
+        version: 3.3.0
+      drizzle-orm:
+        specifier: 1.0.0-beta.9-e89174b
+        version: 1.0.0-beta.9-e89174b(@types/mssql@9.1.10(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(postgres@3.4.8)
+      papaparse:
+        specifier: ^5.5.3
+        version: 5.5.3
+      postgres:
+        specifier: ^3.4.8
+        version: 3.4.8
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@bufbuild/buf':
+        specifier: ^1.71.0
+        version: 1.71.0
+      '@bufbuild/protoc-gen-es':
+        specifier: ^2.11.0
+        version: 2.11.0(@bufbuild/protobuf@2.11.0)
       '@eslint/compat':
         specifier: ^1.4.1
         version: 1.4.1(eslint@9.39.4(jiti@2.6.1))
@@ -44,9 +60,6 @@ importers:
       '@lucide/svelte':
         specifier: ^1.18.0
         version: 1.18.0(svelte@5.55.0)
-      '@paralleldrive/cuid2':
-        specifier: ^3.3.0
-        version: 3.3.0
       '@sveltejs/adapter-node':
         specifier: ^5.5.4
         version: 5.5.4(@sveltejs/kit@2.55.0(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.55.0)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(svelte@5.55.0)(typescript@5.9.3)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))
@@ -89,9 +102,6 @@ importers:
       drizzle-kit:
         specifier: 1.0.0-beta.9-e89174b
         version: 1.0.0-beta.9-e89174b
-      drizzle-orm:
-        specifier: 1.0.0-beta.9-e89174b
-        version: 1.0.0-beta.9-e89174b(@types/mssql@9.1.10(@azure/core-client@1.10.1))(mssql@11.0.1(@azure/core-client@1.10.1))(postgres@3.4.8)
       echarts:
         specifier: ^6.0.0
         version: 6.0.0
@@ -113,21 +123,12 @@ importers:
       katex:
         specifier: ^0.16.41
         version: 0.16.41
-      lru-cache:
-        specifier: ^11.2.7
-        version: 11.2.7
       matterviz:
         specifier: ^0.3.2
         version: 0.3.2(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.55.0)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)))(@types/three@0.183.1)(acorn@8.16.0)(typescript@5.9.3)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0))
       paneforge:
         specifier: ^1.0.2
         version: 1.0.2(svelte@5.55.0)
-      papaparse:
-        specifier: ^5.5.3
-        version: 5.5.3
-      postgres:
-        specifier: ^3.4.8
-        version: 3.4.8
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
@@ -179,9 +180,6 @@ importers:
       vite-plugin-lucide-preprocess:
         specifier: ^1.4.8
         version: 1.4.8(rollup@4.60.0)(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0))
-      zod:
-        specifier: ^4.3.6
-        version: 4.3.6
 
 packages:
 
@@ -2245,10 +2243,6 @@ packages:
 
   lodash.once@4.1.1:
     resolution: {integrity: sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==}
-
-  lru-cache@11.2.7:
-    resolution: {integrity: sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA==}
-    engines: {node: 20 || >=22}
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -4781,8 +4775,6 @@ snapshots:
   lodash.merge@4.6.2: {}
 
   lodash.once@4.1.1: {}
-
-  lru-cache@11.2.7: {}
 
   lz-string@1.5.0: {}
 

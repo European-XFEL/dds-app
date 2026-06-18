@@ -6,7 +6,7 @@ x-common-env: &common-env
 
 services:
   db:
-    image: postgres:18
+    image: postgres:17
     environment:
       POSTGRES_USER: ${DB_USER:?error}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?error}
@@ -59,7 +59,7 @@ services:
     environment:
       <<: *common-env
       DB_NAME: 'xss-app'
-      BASE_PATH: '/xss-app'
+      PUBLIC_BASE_PATH: '/xss-app'
       PORT: '8000'
     build:
       context: .

@@ -63,12 +63,12 @@ const config_static = {
   ...config,
   kit: {
     ...config.kit,
-    adapter: adapter_static({ pages: 'build-static' }),
+    adapter: adapter_static({ pages: 'build-static', strict: false }),
   },
 };
 
 /**
- * Export the selected config. Defaults to `config_deno` when nothing is set.
+ * Export the selected config. Defaults to `config_node` when nothing is set.
  */
 const selectedConfig = STATIC ? config_static : config_node;
 
