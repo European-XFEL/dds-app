@@ -4,8 +4,18 @@
  * This module implements the data source interfaces by reading from
  * committed JSON files in `data/demo/`. Used for the static/demo build
  * where no database is available.
+ *
+ * File contents are resolved from references (contentsRef) in the JSON,
+ * reading from the original data files at runtime.
  */
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+// Import demo data files - these are bundled at build time for static builds
+// and read from filesystem for node builds
+import moleculesRaw from '../../../../data/demo/molecules.json' with { type: 'json' };
+import solventsRaw from '../../../../data/demo/solvents.json' with { type: 'json' };
 import Papa from 'papaparse';
 
 import { error } from '@sveltejs/kit';
@@ -27,12 +37,7 @@ import type {
   UploadMoleculeResult,
 } from './types';
 
-// Import demo data files - these are bundled at build time for static builds
-// and read from filesystem for node builds
-import moleculesRaw from '../../../../data/demo/molecules.json' with { type: 'json' };
-import solventsRaw from '../../../../data/demo/solvents.json' with { type: 'json' };
-
-// ─── Internal types for JSON data (includes contents) ───────────────────────
+// ─── Internal types for JSON data (with contentsRef) ───────────────────────
 
 interface MoleculeRecord {
   id: string;
@@ -45,7 +50,7 @@ interface MoleculeRecord {
   atomCount: number;
   createdAt: string;
   updatedAt: string | null;
-  contents: string;
+  contentsRef: string;
 }
 
 interface SolventRecord {
@@ -60,7 +65,7 @@ interface SolventRecord {
   qMin: number;
   qMax: number;
   qStep: number;
-  contents: string;
+  contentsRef: string;
 }
 
 type SolventDifferentials = {
@@ -111,6 +116,35 @@ function toSolventInfo(record: SolventRecord): SolventInfo {
   };
 }
 
+// Get the directory of this file using import.meta.url (ES modules)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+/**
+ * Resolve the absolute path for a contentsRef.
+ * The contentsRef is relative to the project root.
+ */
+function resolveContentsPath(contentsRef: string): string {
+  // Resolve relative to project root (where this file is located)
+  // This file is at src/lib/server/data/static-source.ts
+  // Project root is 4 levels up
+  const projectRoot = resolve(__dirname, '../../../../');
+  return resolve(projectRoot, contentsRef);
+}
+
+/**
+ * Read file contents from a contentsRef path.
+ */
+function readFileContents(contentsRef: string): string {
+  const absolutePath = resolveContentsPath(contentsRef);
+  try {
+    return readFileSync(absolutePath, 'utf-8');
+  } catch (err) {
+    console.error(`Failed to read file at ${absolutePath}:`, err);
+    throw error(500, `Failed to read referenced file: ${contentsRef}`);
+  }
+}
+
 // ─── Molecule Data Source ───────────────────────────────────────────────────
 
 export const staticMoleculeSource: MoleculeDataSource = {
@@ -123,7 +157,9 @@ export const staticMoleculeSource: MoleculeDataSource = {
     if (!record) {
       throw error(404, 'Molecule not found');
     }
-    return { contents: record.contents };
+
+    const contents = readFileContents(record.contentsRef);
+    return { contents };
   },
 
   async uploadMolecule(
@@ -150,8 +186,8 @@ export const staticSolventSource: SolventDataSource = {
       throw error(404, 'Solvent not found');
     }
 
-    const contentsCsv =
-      'Q\tdSdT\tdSdRho\n' + record.contents.replaceAll(/#.*\n/g, '');
+    const contents = readFileContents(record.contentsRef);
+    const contentsCsv = 'Q\tdSdT\tdSdRho\n' + contents.replaceAll(/#.*\n/g, '');
     const parsed = Papa.parse<SolventDifferentials>(contentsCsv, {
       delimiter: '\t',
       dynamicTyping: true,
