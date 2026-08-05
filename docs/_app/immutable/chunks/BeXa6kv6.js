@@ -1,0 +1,1 @@
+import"./mOQUUTdI.js";import{s,r as a}from"./B7V8lvbK.js";import{I as p}from"./BXPKef8N.js";var n=new Set(["$$slots","$$events","$$legacy"]);function i(e,r){let o=a(r,n);const t=[["path",{d:"M4.5 3h15"}],["path",{d:"M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"}],["path",{d:"M6 14h12"}]];p(e,s({name:"beaker"},()=>o,{get iconNode(){return t}}))}export{i as B};

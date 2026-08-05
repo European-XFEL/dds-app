@@ -1,1 +1,0 @@
-import"../chunks/DAC7LG0P.js";import{p as i,t as o,a as m,b as l,D as c,c as f,F as n,d,r as u}from"../chunks/DsyOPacL.js";import{s as _}from"../chunks/hsT29ikC.js";var v=f("<pre> </pre>");function x(a,e){i(e,!0);let r=n(()=>e.data.capabilities);var t=v(),s=d(t,!0);u(t),o(p=>_(s,p),[()=>JSON.stringify(c(r),null,2)]),m(a,t),l()}export{x as component};

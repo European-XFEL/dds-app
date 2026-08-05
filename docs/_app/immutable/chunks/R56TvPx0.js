@@ -1,0 +1,1 @@
+import{s as r,p as t}from"./BQjwBPK-.js";const a={get data(){return t.data},get error(){return t.error},get route(){return t.route},get state(){return t.state},get status(){return t.status},get url(){return t.url}};r.updated.check;export{a as p};
